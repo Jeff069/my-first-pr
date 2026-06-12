@@ -5,7 +5,7 @@ Willkommen zu meinem ersten GitHub Repository!
 ## Über dieses Projekt
 
 Dieses Projekt wurde erstellt um den Pull Request Workflow zu üben.
-Ein Pull Request ermöglicht es, Änderugnen vorzuschlagen und von anderen überprüfen zu lassen.
+Ein Pull Request ermöglicht es, Änderungen vorzuschlagen und von anderen überprüfen zu lassen.
 
 ## Workflow
 
@@ -18,4 +18,4 @@ Ein Pull Request ermöglicht es, Änderugnen vorzuschlagen und von anderen über
 
 ## Mitmachen
 
-Jeder kan einen Beitrag leisten — egal ob Anfänger oder Profi!
+Jeder kann einen Beitrag leisten — egal ob Anfänger oder Profi!
