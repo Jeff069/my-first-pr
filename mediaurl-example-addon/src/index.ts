@@ -1,5 +1,6 @@
 import {
   CatalogResponse,
+  ChannelItem,
   createAddon,
   ItemResponse,
   MovieItem,
@@ -59,6 +60,45 @@ const DEMO_MOVIES: DemoMovie[] = [
   },
 ];
 
+interface DemoChannel {
+  id: string;
+  name: string;
+  description: string;
+  stream: string;
+}
+
+// Frei empfangbare Web-Livestreams öffentlicher Sender (HLS).
+const DEMO_CHANNELS: DemoChannel[] = [
+  {
+    id: "dw-deutsch",
+    name: "DW Deutsch",
+    description: "Deutsche Welle — Nachrichten und Magazine auf Deutsch.",
+    stream:
+      "https://dwamdstream106.akamaized.net/hls/live/2015531/dwstream106/index.m3u8",
+  },
+  {
+    id: "dw-english",
+    name: "DW English",
+    description: "Deutsche Welle — internationaler Nachrichtensender.",
+    stream:
+      "https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8",
+  },
+  {
+    id: "tagesschau24",
+    name: "tagesschau24",
+    description: "Der Nachrichtenkanal der ARD.",
+    stream:
+      "https://tagesschau.akamaized.net/hls/live/2020115/tagesschau/tagesschau_1/master.m3u8",
+  },
+  {
+    id: "redbull-tv",
+    name: "Red Bull TV",
+    description: "Sport, Musik und Abenteuer — frei empfangbar.",
+    stream:
+      "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8",
+  },
+];
+
 const toMovieItem = (movie: DemoMovie): MovieItem => ({
   type: "movie",
   ids: { "blender.demo": movie.id },
@@ -68,13 +108,20 @@ const toMovieItem = (movie: DemoMovie): MovieItem => ({
   images: { poster: movie.poster },
 });
 
+const toChannelItem = (channel: DemoChannel): ChannelItem => ({
+  type: "channel",
+  ids: { "blender.demo": channel.id },
+  name: channel.name,
+  description: channel.description,
+});
+
 export const blenderDemoAddon = createAddon({
   id: "blender.demo",
   name: "Blender Open Movies",
   version: "1.0.0",
   description:
     "Beispiel-Addon: frei lizenzierte Kurzfilme der Blender Foundation",
-  itemTypes: ["movie"],
+  itemTypes: ["movie", "channel"],
   actions: ["catalog", "item", "source"],
   catalogs: [
     {
@@ -84,14 +131,32 @@ export const blenderDemoAddon = createAddon({
         search: { enabled: true },
       },
     },
+    {
+      id: "tv-channels",
+      name: "TV-Kanäle (Live)",
+      features: {
+        search: { enabled: true },
+      },
+    },
   ],
 });
 
-// Liefert den Katalog; unterstützt auch die Suche in der App.
+// Liefert die Kataloge; unterstützt auch die Suche in der App.
 blenderDemoAddon.registerActionHandler(
   "catalog",
   async (input): Promise<CatalogResponse> => {
     const search = input.search?.toLowerCase();
+
+    if (input.catalogId === "tv-channels") {
+      const channels = search
+        ? DEMO_CHANNELS.filter((c) => c.name.toLowerCase().includes(search))
+        : DEMO_CHANNELS;
+      return {
+        items: channels.map(toChannelItem),
+        nextCursor: null,
+      };
+    }
+
     const movies = search
       ? DEMO_MOVIES.filter((m) => m.name.toLowerCase().includes(search))
       : DEMO_MOVIES;
@@ -102,21 +167,40 @@ blenderDemoAddon.registerActionHandler(
   }
 );
 
-// Liefert die Detailansicht eines einzelnen Films.
+// Liefert die Detailansicht eines Films oder TV-Kanals.
 blenderDemoAddon.registerActionHandler(
   "item",
   async (input): Promise<ItemResponse> => {
-    const movie = DEMO_MOVIES.find((m) => m.id === input.ids["blender.demo"]);
-    if (!movie) return null;
-    return toMovieItem(movie);
+    const id = input.ids["blender.demo"];
+    if (input.type === "channel") {
+      const channel = DEMO_CHANNELS.find((c) => c.id === id);
+      return channel ? toChannelItem(channel) : null;
+    }
+    const movie = DEMO_MOVIES.find((m) => m.id === id);
+    return movie ? toMovieItem(movie) : null;
   }
 );
 
-// Liefert die Abspielquellen (hier: ein direkter MP4-Stream).
+// Liefert die Abspielquellen: MP4 für Filme, HLS-Livestream für Kanäle.
 blenderDemoAddon.registerActionHandler(
   "source",
   async (input): Promise<SourceResponse> => {
-    const movie = DEMO_MOVIES.find((m) => m.id === input.ids["blender.demo"]);
+    const id = input.ids["blender.demo"];
+
+    if (input.type === "channel") {
+      const channel = DEMO_CHANNELS.find((c) => c.id === id);
+      if (!channel) return [];
+      const source: Source = {
+        type: "url",
+        id: channel.id,
+        name: "Livestream (HLS)",
+        url: channel.stream,
+        format: "hls",
+      };
+      return [source];
+    }
+
+    const movie = DEMO_MOVIES.find((m) => m.id === id);
     if (!movie) return [];
     const source: Source = {
       type: "url",

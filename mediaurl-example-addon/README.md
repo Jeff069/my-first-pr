@@ -1,17 +1,20 @@
 # Blender Demo Addon (MediaURL-Beispiel)
 
 Ein kleines Beispiel-Addon für [MediaURL](https://github.com/mediaurl/mediaurl-js),
-gebaut mit `@mediaurl/sdk`. Es stellt die frei lizenzierten Open Movies der
-Blender Foundation als Katalog bereit — inklusive Suche, Detailansicht und
-abspielbarer MP4-Quelle.
+gebaut mit `@mediaurl/sdk`. Es stellt zwei Kataloge bereit:
+
+1. **Blender Open Movies** — die frei lizenzierten Kurzfilme der Blender
+   Foundation als Video-on-Demand (MP4)
+2. **TV-Kanäle (Live)** — frei empfangbare Web-Livestreams öffentlicher
+   Sender (DW, tagesschau24, Red Bull TV) als HLS-Streams
 
 ## Was das Addon kann
 
-| Aktion    | Handler in `src/index.ts` | Funktion                                          |
-| --------- | ------------------------- | ------------------------------------------------- |
-| `catalog` | Catalog-Handler           | Liste der 4 Filme, Suche wird unterstützt         |
-| `item`    | Item-Handler              | Detailansicht eines Films (Beschreibung, Poster)  |
-| `source`  | Source-Handler            | Abspielquelle (direkter MP4-Link, 1080p)          |
+| Aktion    | Handler in `src/index.ts` | Funktion                                                |
+| --------- | ------------------------- | ------------------------------------------------------- |
+| `catalog` | Catalog-Handler           | Zwei Kataloge (Filme + TV), Suche wird unterstützt      |
+| `item`    | Item-Handler              | Detailansicht eines Films oder Kanals                   |
+| `source`  | Source-Handler            | Abspielquelle: MP4 für Filme, HLS-Livestream für Kanäle |
 
 ## Starten
 
@@ -52,6 +55,23 @@ curl -X POST http://localhost:3000/blender.demo/mediaurl-source.json \
   -H 'Content-Type: application/json' \
   -d '{"type":"movie","ids":{"blender.demo":"sintel"},"name":"Sintel"}'
 ```
+
+TV-Kanäle auflisten und den Livestream eines Kanals holen:
+
+```bash
+curl -X POST http://localhost:3000/blender.demo/mediaurl-catalog.json \
+  -H 'Content-Type: application/json' \
+  -d '{"catalogId":"tv-channels","filter":{},"cursor":null}'
+
+curl -X POST http://localhost:3000/blender.demo/mediaurl-source.json \
+  -H 'Content-Type: application/json' \
+  -d '{"type":"channel","ids":{"blender.demo":"tagesschau24"},"name":"tagesschau24"}'
+```
+
+> **Hinweis zu den Livestreams:** Die Stream-URLs sind öffentliche
+> Web-Livestreams der jeweiligen Sender. Solche URLs können sich ändern —
+> wenn ein Kanal nicht abspielt, die aktuelle URL beim Sender bzw. im
+> [iptv-org-Verzeichnis](https://github.com/iptv-org/iptv) nachschlagen.
 
 ## In der App verwenden
 
