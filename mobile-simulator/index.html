@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Simulator</title>
+<style>
+  :root {
+    --bezel: #1a1a1a;
+    --bg: #f0f0f3;
+    --accent: #4f7cff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  h1 {
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+  }
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .toolbar input {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 260px;
+    font-size: 14px;
+  }
+  .toolbar button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .toolbar button.secondary {
+    background: #ddd;
+    color: #333;
+  }
+  .toolbar button:hover { opacity: 0.9; }
+
+  .phone {
+    position: relative;
+    width: 320px;
+    height: 660px;
+    background: var(--bezel);
+    border-radius: 46px;
+    padding: 14px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  }
+  .phone .notch {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 130px;
+    height: 22px;
+    background: var(--bezel);
+    border-radius: 0 0 16px 16px;
+    z-index: 2;
+  }
+  .screen {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 32px;
+    overflow: hidden;
+  }
+  .screen iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .landscape .phone {
+    width: 660px;
+    height: 320px;
+  }
+  .landscape .notch {
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%) rotate(-90deg);
+  }
+  .hint {
+    max-width: 320px;
+    font-size: 12px;
+    color: #777;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <h1>📱 Mobile Simulator</h1>
+
+  <div class="toolbar">
+    <input id="url" type="text" placeholder="http://localhost:3000" value="http://localhost:3000">
+    <button id="load">Laden</button>
+    <button id="reload" class="secondary">⟳ Neu laden</button>
+    <button id="rotate" class="secondary">⤾ Drehen</button>
+  </div>
+
+  <div class="wrapper" id="wrapper">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <iframe id="frame" src="http://localhost:3000"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <p class="hint">
+    Trag die lokale Adresse deiner App ein (z. B. <code>http://localhost:3000</code>)
+    und öffne diese Seite in einem Fenster neben deinem Terminal.
+    Bei jedem Speichern lädst du einfach mit „Neu laden" neu.
+  </p>
+
+<script>
+  const urlInput = document.getElementById('url');
+  const frame = document.getElementById('frame');
+  const wrapper = document.getElementById('wrapper');
+
+  document.getElementById('load').addEventListener('click', () => {
+    const value = urlInput.value.trim();
+    if (value) frame.src = value;
+  });
+
+  document.getElementById('reload').addEventListener('click', () => {
+    frame.src = frame.src;
+  });
+
+  document.getElementById('rotate').addEventListener('click', () => {
+    wrapper.classList.toggle('landscape');
+  });
+
+  urlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      frame.src = urlInput.value.trim();
+    }
+  });
+</script>
+</body>
+</html>

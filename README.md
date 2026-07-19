@@ -19,3 +19,7 @@ Ein Pull Request ermöglicht es, Änderugnen vorzuschlagen und von anderen über
 ## Mitmachen
 
 Jeder kan einen Beitrag leisten — egal ob Anfänger oder Profi!
+
+## Tools
+
+- [`mobile-simulator/`](./mobile-simulator) — zeigt deine lokale Web-App in einem Handy-Rahmen neben deinem Terminal an.
