@@ -8,6 +8,9 @@ und erlaubte Tools fest, der Text darunter ist der System-Prompt des Agenten.
 
 | Agent | Zweck |
 |---|---|
+| `cine-director` | KI-Filmregisseur: Shots planen, Video-Prompts bauen, Videos generieren (siehe `CINEFORGE.md`) |
+| `kamera-operator` | Spezialist für Kamerabewegung und Bildkomposition (Zuarbeiter des Directors) |
+| `prompt-schmied` | Übersetzt Shot-Designs in modellspezifische Prompts (Veo, Kling, Runway, …) |
 | `code-reviewer` | Prüft Code-Änderungen und Pull Requests auf Fehler und Stil |
 | `doku-autor` | Schreibt und verbessert Dokumentation |
 | `test-autor` | Schreibt automatisierte Tests für bestehenden Code |
