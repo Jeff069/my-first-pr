@@ -1,20 +1,31 @@
 <title>CineForge Studio</title>
 <style>
   :root {
-    --bg: #0c0e12;
-    --panel: #14161c;
-    --panel-2: #191c24;
-    --line: #242936;
-    --line-soft: #1c2029;
-    --text: #e9ebf1;
-    --muted: #8b93a5;
-    --faint: #5c6373;
-    --accent: #e39a3b;
-    --accent-soft: rgba(227, 154, 59, 0.14);
+    --bg: #0b0d12;
+    --panel: #12151c;
+    --panel-2: #171b24;
+    --line: #232936;
+    --line-soft: #1b202b;
+    --text: #edeff4;
+    --muted: #97a0b2;
+    --faint: #5e6678;
+    --accent: #e8a341;
+    --accent-dim: #b57e30;
+    --accent-soft: rgba(232, 163, 65, 0.13);
+    --cool: #6fa7c7;
     --rec: #e5484d;
     --ok: #58b28a;
+    --warn: #d9a13c;
     --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out: cubic-bezier(0.05, 0.7, 0.1, 1);
+    --ease-in: cubic-bezier(0.3, 0, 1, 1);
+    --dur-micro: 150ms;
+    --dur-normal: 400ms;
+    --dur-macro: 700ms;
+    --stagger: 80ms;
+    --radius: 8px;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -23,606 +34,1045 @@
     color: var(--text);
     font-family: var(--sans);
     font-size: 15px;
-    line-height: 1.5;
+    line-height: 1.55;
     min-height: 100vh;
+    overflow-x: hidden;
   }
   ::selection { background: var(--accent-soft); }
 
-  header {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    flex-wrap: wrap;
-    padding: 22px 28px 18px;
-    border-bottom: 1px solid var(--line);
+  /* Ambient-Schicht: Gradient-Drift + Vignette + Grain (dezent, abschaltbar) */
+  .ambient {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: linear-gradient(125deg, #0b0d12 0%, #10131c 45%, #0b0d12 100%);
+    background-size: 280% 280%;
+    animation: drift 18000ms ease-in-out infinite alternate;
   }
-  .wordmark {
-    font-family: var(--sans);
-    font-weight: 800;
-    font-size: 26px;
-    letter-spacing: -0.03em;
-    text-transform: uppercase;
-    margin: 0;
+  @keyframes drift { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+  .orb {
+    position: fixed; z-index: 0; pointer-events: none;
+    width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(232,163,65,0.07), transparent 65%);
+    top: -120px; right: -80px;
+    animation: float 5200ms ease-in-out -1600ms infinite alternate;
   }
-  .wordmark .forge { color: var(--accent); }
-  .rec {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    color: var(--muted);
-    text-transform: uppercase;
+  @keyframes float { from { transform: translateY(-12px); } to { transform: translateY(12px); } }
+  .vignette-page {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 58%, rgba(0,0,0,0.42));
   }
-  .rec::before {
-    content: "";
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--rec);
-    animation: blink 1.6s steps(2, start) infinite;
+  .grain {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .cursor-glow {
+    position: fixed; z-index: 0; pointer-events: none;
+    width: 520px; height: 520px; border-radius: 50%; left: 0; top: 0;
+    background: radial-gradient(circle, rgba(232,163,65,0.05), transparent 62%);
+    transform: translate(-50%, -50%);
   }
   @media (prefers-reduced-motion: reduce) {
-    .rec::before { animation: none; }
-  }
-  @keyframes blink { to { visibility: hidden; } }
-  .tagline {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--faint);
-    margin-left: auto;
+    .ambient, .orb { animation: none; }
+    .cursor-glow { display: none; }
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
   }
 
-  .console {
-    display: grid;
-    grid-template-columns: 300px minmax(320px, 1fr) minmax(360px, 1.1fr);
-    gap: 0;
-    min-height: calc(100vh - 70px);
-  }
-  @media (max-width: 1080px) {
-    .console { grid-template-columns: 1fr; }
-    .col { border-right: none !important; border-bottom: 1px solid var(--line); }
-  }
-  .col { padding: 20px 22px 40px; }
-  .col + .col { border-left: 1px solid var(--line); }
+  .shell { position: relative; z-index: 2; max-width: 1460px; margin: 0 auto; padding: 26px 26px 80px; }
 
-  .eyebrow {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 0 0 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  /* Choreografierter Entrance-Reveal (Hero führt, Panels folgen gestaffelt) */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px) scale(0.98);
+    transition: opacity var(--dur-macro) var(--ease-out), transform var(--dur-macro) var(--ease-out);
+    transition-delay: calc(var(--i, 0) * var(--stagger));
   }
-  .eyebrow .n {
-    color: var(--accent);
-  }
+  .reveal.sichtbar { opacity: 1; transform: none; }
 
-  /* ---------- Bibliothek ---------- */
-  .search {
-    width: 100%;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 13px;
-    padding: 9px 12px;
-    margin-bottom: 12px;
+  header { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; padding: 4px 2px 22px; }
+  .wordmark { font-weight: 800; font-size: 30px; letter-spacing: -0.035em; text-transform: uppercase; margin: 0; }
+  .wordmark .f { color: var(--accent); }
+  .rec {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
+    color: var(--muted); text-transform: uppercase;
   }
-  .search::placeholder { color: var(--faint); }
-  .search:focus, select:focus, textarea:focus, button:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
+  .rec::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--rec);
+    animation: puls 2600ms ease-in-out infinite alternate;
   }
-  .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
-  .tab {
-    flex: 1;
-    background: none;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    color: var(--muted);
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 7px 0;
-    cursor: pointer;
-  }
-  .tab.active {
-    color: var(--accent);
-    border-color: var(--accent);
-    background: var(--accent-soft);
-  }
-  .preset-list { display: flex; flex-direction: column; gap: 6px; max-height: 62vh; overflow-y: auto; padding-right: 4px; }
-  .preset {
-    text-align: left;
+  @keyframes puls { from { opacity: 1; transform: scale(1); } to { opacity: 0.55; transform: scale(0.85); } }
+  .subline { font-family: var(--mono); font-size: 12px; color: var(--faint); margin-left: auto; }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 460px; gap: 22px; align-items: start; }
+  .layout > * { min-width: 0; }
+  @media (max-width: 1120px) { .layout { grid-template-columns: minmax(0, 1fr); } .monitor-wrap { position: static !important; } }
+
+  .schritt {
     background: var(--panel);
     border: 1px solid var(--line-soft);
-    border-radius: 6px;
-    color: var(--text);
-    padding: 8px 11px;
-    cursor: pointer;
-    font-family: var(--sans);
+    border-radius: var(--radius);
+    padding: 20px 22px 22px;
+    margin-bottom: 18px;
   }
-  .preset:hover { border-color: var(--accent); }
-  .preset.selected { border-color: var(--accent); background: var(--accent-soft); }
-  .preset .p-name { font-weight: 600; font-size: 13.5px; display: block; }
-  .preset .p-desc { font-size: 12px; color: var(--muted); display: block; }
-  .preset .p-id { font-family: var(--mono); font-size: 10.5px; color: var(--faint); }
+  .schritt-kopf { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .schritt-nr { font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: 0.1em; }
+  .schritt-titel { font-size: 17px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+  .schritt-sub { font-size: 13px; color: var(--muted); margin: 0 0 14px; }
 
-  /* ---------- Builder ---------- */
-  label { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 16px 0 6px; }
-  textarea, select {
-    width: 100%;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 14px;
-    padding: 10px 12px;
+  textarea {
+    width: 100%; min-height: 88px; resize: vertical;
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius);
+    color: var(--text); font-family: var(--sans); font-size: 14.5px; padding: 11px 13px;
   }
-  textarea { min-height: 92px; resize: vertical; }
-  .param-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 30px; margin-top: 6px; }
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--accent-soft);
-    border: 1px solid var(--accent);
-    border-radius: 999px;
-    color: var(--accent);
-    font-family: var(--mono);
-    font-size: 11.5px;
-    padding: 3px 10px;
-    cursor: pointer;
+  textarea:focus, input:focus, button:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 1px;
   }
-  .chip .x { font-weight: 700; }
-  .chips .empty { color: var(--faint); font-size: 12.5px; font-family: var(--mono); align-self: center; }
-  .hint { font-size: 12px; color: var(--faint); margin-top: 8px; }
+  .beispiele { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+  .bsp {
+    background: none; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--muted); font-size: 12.5px; padding: 5px 13px; cursor: pointer;
+    transition: color var(--dur-micro) var(--ease), border-color var(--dur-micro) var(--ease), transform var(--dur-micro) var(--ease);
+  }
+  .bsp:hover { color: var(--accent); border-color: var(--accent); }
+  .bsp:active { transform: scale(0.98); }
+  .bsp.wuerfel { color: var(--accent); border-color: var(--accent-dim); }
 
-  /* ---------- Output ---------- */
-  .out-block { margin-bottom: 18px; }
-  .out-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-  .out-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .filterzeile { display: flex; gap: 10px; margin-bottom: 14px; }
+  .suche {
+    flex: 1; background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius);
+    color: var(--text); font-family: var(--mono); font-size: 13px; padding: 8px 12px;
+  }
+  .suche::placeholder { color: var(--faint); }
+
+  /* Preset-Karten mit Live-Vorschau */
+  .karten { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .karte {
+    background: var(--panel-2); border: 1px solid var(--line-soft); border-radius: var(--radius);
+    padding: 0; cursor: pointer; text-align: left; overflow: hidden;
+    color: var(--text); font-family: var(--sans);
+    transition: border-color var(--dur-micro) var(--ease), transform var(--dur-micro) var(--ease), box-shadow 180ms var(--ease);
+  }
+  .karte:hover { border-color: var(--accent-dim); transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,0.35); }
+  .karte:active { transform: scale(0.985); }
+  .karte.aktiv { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 8px 22px rgba(0,0,0,0.3); }
+  .karte-info { padding: 8px 10px 9px; }
+  .karte-name { font-weight: 650; font-size: 13px; display: block; letter-spacing: -0.005em; }
+  .karte-desc { font-size: 11.5px; color: var(--muted); display: block; line-height: 1.35; margin-top: 1px; }
+
+  /* Die Mini-Bühne: eine stilisierte Filmszene */
+  .stage {
+    position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+    background: #06070a; perspective: 620px;
+  }
+  .cam { position: absolute; inset: 0; transform-style: preserve-3d; }
+  .scene { position: absolute; inset: 0; }
+  .sky { position: absolute; inset: 0; background: linear-gradient(180deg, #0d1322 0%, #1a2032 52%, #2b2233 78%, #3a2a2c 100%); }
+  .sun {
+    position: absolute; left: 62%; top: 26%; width: 17%; aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle, #f4c877 0%, #e8a341 55%, transparent 72%);
+    filter: blur(1px); opacity: 0.9;
+  }
+  .far {
+    position: absolute; left: -4%; right: -4%; bottom: 18%; height: 34%;
+    background: #10141f;
+    clip-path: polygon(0% 100%, 0% 55%, 7% 55%, 7% 30%, 14% 30%, 14% 62%, 22% 62%, 22% 20%, 28% 20%, 28% 48%, 37% 48%, 37% 34%, 45% 34%, 45% 58%, 54% 58%, 54% 12%, 61% 12%, 61% 42%, 70% 42%, 70% 28%, 78% 28%, 78% 52%, 86% 52%, 86% 38%, 93% 38%, 93% 60%, 100% 60%, 100% 100%);
+  }
+  .near {
+    position: absolute; left: -4%; right: -4%; bottom: 12%; height: 26%;
+    background: #0a0d15;
+    clip-path: polygon(0% 100%, 0% 40%, 9% 40%, 9% 65%, 18% 65%, 18% 25%, 27% 25%, 27% 55%, 38% 55%, 38% 70%, 48% 70%, 48% 30%, 58% 30%, 58% 60%, 68% 60%, 68% 45%, 79% 45%, 79% 68%, 88% 68%, 88% 35%, 100% 35%, 100% 100%);
+  }
+  .ground { position: absolute; left: 0; right: 0; bottom: 0; height: 14%; background: linear-gradient(180deg, #0c0e14, #06070a); }
+  .subj { position: absolute; left: 50%; bottom: 11%; width: 9%; transform: translateX(-50%); }
+  .kopf {
+    width: 42%; aspect-ratio: 1; border-radius: 50%; margin: 0 auto;
+    background: #05060a; box-shadow: inset -2px 1px 3px rgba(232,163,65,0.5);
+  }
+  .torso {
+    width: 100%; aspect-ratio: 0.62; margin-top: -8%;
+    background: #05060a; border-radius: 44% 44% 26% 26%;
+    box-shadow: inset -3px 2px 4px rgba(232,163,65,0.42);
+  }
+  .schatten {
+    width: 130%; height: 9%; margin: 2% auto 0; border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.7), transparent 70%);
+  }
+  .fx { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+  .vig {
+    position: absolute; inset: 0; pointer-events: none; z-index: 4;
+    background: radial-gradient(ellipse at center, transparent 52%, rgba(0,0,0,0.5));
+  }
+
+  /* Kamera-Animationen — laufen bei Hover und Auswahl (nur transform/opacity) */
+  .karte:hover .stage .cam, .karte.aktiv .stage .cam, .stage.spielt .cam { animation-play-state: running; }
+  .cam, .subj, .fx, .scene > * { animation-play-state: paused; }
+  .stage.spielt .subj, .stage.spielt .fx,
+  .karte:hover .subj, .karte:hover .fx, .karte.aktiv .subj, .karte.aktiv .fx { animation-play-state: running; }
+
+  .a-zoomin .cam    { animation: kzoomin var(--adur, 3200ms) var(--ease) infinite alternate; }
+  @keyframes kzoomin { from { transform: scale(1); } to { transform: scale(var(--asc, 1.55)); } }
+  .a-zoomout .cam   { animation: kzoomout var(--adur, 3200ms) var(--ease) infinite alternate; }
+  @keyframes kzoomout { from { transform: scale(var(--asc, 1.55)); } to { transform: scale(1); } }
+  .a-vertigo .scene > .sky, .a-vertigo .scene > .far, .a-vertigo .scene > .near, .a-vertigo .scene > .sun
+                    { animation: kvertbg var(--adur, 3800ms) var(--ease) infinite alternate; }
+  .a-vertigo .subj  { animation: kvertsub var(--adur, 3800ms) var(--ease) infinite alternate; }
+  @keyframes kvertbg { from { transform: scale(1.45); } to { transform: scale(1); } }
+  @keyframes kvertsub { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.12); } }
+  .a-pan .cam       { animation: kpan var(--adur, 3000ms) var(--ease) infinite alternate; }
+  @keyframes kpan { from { transform: translateX(calc(var(--adir, 1) * 9%)) scale(1.18); } to { transform: translateX(calc(var(--adir, 1) * -9%)) scale(1.18); } }
+  .a-tilt .cam      { animation: ktilt var(--adur, 3000ms) var(--ease) infinite alternate; }
+  @keyframes ktilt { from { transform: translateY(calc(var(--adir, 1) * 8%)) scale(1.2); } to { transform: translateY(calc(var(--adir, 1) * -8%)) scale(1.2); } }
+  .a-crane .cam     { animation: kcrane var(--adur, 3500ms) var(--ease) infinite alternate; }
+  @keyframes kcrane { from { transform: translateY(calc(var(--adir, 1) * 9%)) scale(1.22); } to { transform: translateY(calc(var(--adir, 1) * -9%)) scale(0.98); } }
+  .a-overhead .cam  { animation: kover var(--adur, 4000ms) var(--ease) infinite alternate; }
+  @keyframes kover { from { transform: rotateX(0deg) scale(1.05); } to { transform: rotateX(44deg) translateY(9%) scale(1.15); } }
+  .a-rotor .cam     { animation: krotor var(--adur, 5200ms) linear infinite; }
+  @keyframes krotor { from { transform: rotateY(0deg) scale(1.12); } to { transform: rotateY(360deg) scale(1.12); } }
+  .a-arc .cam       { animation: karc var(--adur, 3500ms) var(--ease) infinite alternate; }
+  @keyframes karc { from { transform: rotateY(calc(var(--adir, 1) * -26deg)) scale(1.15); } to { transform: rotateY(calc(var(--adir, 1) * 26deg)) scale(1.15); } }
+  .a-whip .cam      { animation: kwhip var(--adur, 1200ms) var(--ease) infinite alternate; }
+  @keyframes kwhip {
+    0% { transform: translateX(14%) scale(1.2); filter: blur(0); }
+    45% { filter: blur(5px); }
+    100% { transform: translateX(-14%) scale(1.2); filter: blur(0); }
+  }
+  .a-fpv .cam       { animation: kfpv var(--adur, 2300ms) var(--ease) infinite alternate; }
+  @keyframes kfpv {
+    0% { transform: translate(9%, 5%) rotate(3deg) scale(1.12); }
+    35% { transform: translate(-4%, -3%) rotate(-4deg) scale(1.3); }
+    70% { transform: translate(6%, -6%) rotate(2deg) scale(1.5); }
+    100% { transform: translate(-8%, 4%) rotate(-3deg) scale(1.72); }
+  }
+  .a-flyover .cam   { animation: kfly var(--adur, 4500ms) var(--ease) infinite alternate; }
+  @keyframes kfly { from { transform: scale(1.4) translateY(-7%); } to { transform: scale(1.02) translateY(5%); } }
+  .a-bullet .cam    { animation: kbullet var(--adur, 4200ms) var(--ease) infinite alternate; }
+  @keyframes kbullet {
+    0% { transform: rotateY(-32deg) scale(1.2); }
+    42% { transform: rotateY(-5deg) scale(1.24); }
+    58% { transform: rotateY(5deg) scale(1.24); }
+    100% { transform: rotateY(32deg) scale(1.2); }
+  }
+  .a-robo .cam      { animation: krobo var(--adur, 2100ms) var(--ease) infinite; }
+  @keyframes krobo {
+    0%, 26% { transform: translate(0, 0) scale(1.05); }
+    34%, 60% { transform: translate(-9%, -5%) scale(1.35); }
+    68%, 100% { transform: translate(7%, 3%) scale(1.16); }
+  }
+  .a-snorri .scene > .sky, .a-snorri .scene > .far, .a-snorri .scene > .near, .a-snorri .scene > .sun, .a-snorri .scene > .ground
+                    { animation: ksnorri var(--adur, 2800ms) ease-in-out infinite alternate; }
+  @keyframes ksnorri { from { transform: rotate(-5deg) translateX(-4%) scale(1.12); } to { transform: rotate(5deg) translateX(4%) scale(1.12); } }
+  .a-shake .cam     { animation: kshake var(--adur, 1900ms) ease-in-out infinite; }
+  @keyframes kshake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1.08); }
+    22% { transform: translate(-1.3%, 0.9%) rotate(-0.5deg) scale(1.08); }
+    45% { transform: translate(1.1%, -0.7%) rotate(0.4deg) scale(1.08); }
+    70% { transform: translate(-0.8%, -1%) rotate(-0.3deg) scale(1.08); }
+  }
+  .a-still .sun     { animation: kstill var(--adur, 4200ms) ease-in-out infinite alternate; }
+  @keyframes kstill { from { opacity: 0.8; } to { opacity: 1; } }
+  .a-spinsubj .subj { animation: kspin var(--adur, 5200ms) linear infinite; transform-style: preserve-3d; }
+  @keyframes kspin { from { transform: translateX(-50%) rotateY(0deg); } to { transform: translateX(-50%) rotateY(360deg); } }
+  .a-rush .scene > .far  { animation: krushf var(--adur, 1600ms) ease-in-out infinite alternate; }
+  .a-rush .scene > .near { animation: krushn var(--adur, 1600ms) ease-in-out infinite alternate; }
+  @keyframes krushf { from { transform: translateX(4%); } to { transform: translateX(-4%); } }
+  @keyframes krushn { from { transform: translateX(11%); } to { transform: translateX(-11%); } }
+  .a-through .cam   { animation: kthrough var(--adur, 2700ms) var(--ease) infinite alternate; }
+  @keyframes kthrough {
+    0% { transform: scale(1); opacity: 1; }
+    48% { opacity: 1; }
+    54% { opacity: 0.25; }
+    60% { opacity: 1; }
+    100% { transform: scale(2.25); opacity: 1; }
+  }
+  .a-eyes .cam      { animation: keyes var(--adur, 3000ms) var(--ease) infinite alternate; }
+  .a-eyes .vig      { animation: kiris var(--adur, 3000ms) var(--ease) infinite alternate; }
+  @keyframes keyes { from { transform: scale(1); } to { transform: scale(2.5); } }
+  @keyframes kiris {
+    from { background: radial-gradient(ellipse at center, transparent 52%, rgba(0,0,0,0.5)); }
+    to { background: radial-gradient(ellipse at center, transparent 18%, rgba(0,0,0,0.94)); }
+  }
+  .a-fisheye .cam   { animation: kfish var(--adur, 3500ms) ease-in-out infinite alternate; border-radius: 22% / 34%; overflow: hidden; }
+  @keyframes kfish { from { transform: scale(1.14) rotate(-1deg); } to { transform: scale(1.22) rotate(1deg); } }
+  .a-dutch .cam     { animation: kdutch var(--adur, 3500ms) ease-in-out infinite alternate; }
+  @keyframes kdutch { from { transform: rotate(-8deg) scale(1.2); } to { transform: rotate(-10deg) scale(1.24); } }
+  .a-bob .cam       { animation: kbob var(--adur, 1400ms) ease-in-out infinite alternate; }
+  @keyframes kbob { from { transform: translateY(1.5%) scale(1.24); } to { transform: translateY(-1.5%) scale(1.28); } }
+
+  /* VFX-Ebenen */
+  .fx-flash .fx     { animation: vflash var(--vdur, 2600ms) var(--ease) infinite; }
+  @keyframes vflash {
+    0%, 55% { background: transparent; }
+    62% { background: radial-gradient(circle at 50% 68%, rgba(255,166,64,0.85), rgba(229,72,77,0.35) 45%, transparent 70%); }
+    76% { background: radial-gradient(circle at 50% 66%, rgba(255,196,120,0.4), transparent 62%); }
+    100% { background: transparent; }
+  }
+  .fx-flash .cam    { animation-name: kshake !important; animation-duration: 900ms !important; }
+  .fx-fire .fx      { animation: vfire var(--vdur, 2000ms) ease-in-out infinite alternate; }
+  @keyframes vfire {
+    from { background: linear-gradient(0deg, rgba(255,120,40,0.45), transparent 42%); }
+    to { background: linear-gradient(0deg, rgba(255,170,60,0.6), transparent 55%); }
+  }
+  .fx-bolt .fx      { animation: vbolt var(--vdur, 2400ms) steps(1) infinite; }
+  @keyframes vbolt {
+    0%, 44%, 52%, 100% { background: transparent; }
+    46%, 49% { background: rgba(214,230,255,0.75); }
+    50% { background: rgba(160,190,255,0.35); }
+  }
+  .fx-dissolve .subj { animation: vdissolve var(--vdur, 3000ms) var(--ease) infinite alternate; }
+  @keyframes vdissolve { from { opacity: 1; filter: blur(0); } to { opacity: 0.1; filter: blur(4px); transform: translateX(-50%) translateY(-6%); } }
+  .fx-rise .subj    { animation: vrise var(--vdur, 3400ms) ease-in-out infinite alternate; }
+  @keyframes vrise { from { transform: translateX(-50%) translateY(0); } to { transform: translateX(-50%) translateY(-34%); } }
+  .fx-melt .subj    { animation: vmelt var(--vdur, 3200ms) var(--ease) infinite alternate; transform-origin: bottom center; }
+  @keyframes vmelt { from { transform: translateX(-50%) scaleY(1); } to { transform: translateX(-50%) scaleY(0.55) scaleX(1.3); } }
+  .fx-freeze .fx    { animation: vfreeze var(--vdur, 3200ms) var(--ease) infinite alternate; }
+  @keyframes vfreeze {
+    from { background: transparent; backdrop-filter: none; }
+    to { background: linear-gradient(200deg, rgba(120,190,230,0.28), rgba(60,110,180,0.16)); }
+  }
+  .fx-ghost .subj   { animation: vghost var(--vdur, 3000ms) var(--ease) infinite alternate; }
+  @keyframes vghost { from { opacity: 1; } to { opacity: 0.06; } }
+  .fx-chrome .subj  { animation: vchrome var(--vdur, 3000ms) var(--ease) infinite alternate; }
+  @keyframes vchrome { from { filter: none; } to { filter: grayscale(1) brightness(2.6) contrast(1.5); } }
+  .fx-portal .fx::before {
+    content: ""; position: absolute; left: 50%; bottom: 12%; width: 26%; aspect-ratio: 0.62;
+    transform: translateX(-50%); border-radius: 50%;
+    border: 3px solid rgba(168,120,255,0.8);
+    box-shadow: 0 0 26px rgba(150,90,255,0.65), inset 0 0 22px rgba(150,90,255,0.5);
+    animation: vportal var(--vdur, 2800ms) var(--ease) infinite alternate;
+  }
+  @keyframes vportal { from { transform: translateX(-50%) scale(0.4); opacity: 0.25; } to { transform: translateX(-50%) scale(1.15); opacity: 1; } }
+  .fx-timefreeze .fx { background: linear-gradient(180deg, rgba(110,180,220,0.14), rgba(110,180,220,0.05)); }
+  .fx-timefreeze .cam { animation-duration: calc(var(--adur, 3200ms) * 4) !important; }
+  .fx-glitch .cam   { animation-name: vglitch !important; animation-duration: 1300ms !important; animation-timing-function: steps(1) !important; }
+  @keyframes vglitch {
+    0%, 100% { transform: translate(0, 0) scale(1.1); filter: none; }
+    18% { transform: translate(-2.5%, 1%) scale(1.1); filter: hue-rotate(90deg) saturate(2.5); }
+    22% { transform: translate(2%, -1.5%) scale(1.12); filter: none; }
+    54% { transform: translate(1.5%, 0.5%) scale(1.1); filter: hue-rotate(-70deg) saturate(3); }
+    58% { transform: translate(0, 0) scale(1.1); filter: none; }
+  }
+  .fx-smoke .fx     { animation: vsmoke var(--vdur, 3400ms) var(--ease) infinite alternate; }
+  @keyframes vsmoke {
+    from { background: radial-gradient(circle at 50% 75%, rgba(150,150,160,0.85), rgba(90,90,100,0.55) 55%, transparent 80%); }
+    to { background: radial-gradient(circle at 50% 60%, rgba(150,150,160,0.06), transparent 62%); }
+  }
+  .fx-petal .fx     { animation: vpetal var(--vdur, 2600ms) var(--ease) infinite; }
+  @keyframes vpetal {
+    0%, 45% { background: transparent; }
+    55% { background: radial-gradient(circle at 48% 58%, rgba(255,150,190,0.5), transparent 55%); }
+    75% { background: radial-gradient(circle at 52% 40%, rgba(255,170,205,0.28), transparent 65%); }
+    100% { background: transparent; }
+  }
+
+  /* Film-Looks als Grade auf der Szene */
+  .l-kodak-35mm .scene   { filter: sepia(0.22) contrast(1.06) brightness(1.02) saturate(1.1); }
+  .l-grain-16mm .scene   { filter: sepia(0.3) contrast(1.25) brightness(0.96); }
+  .l-vhs-88 .scene       { filter: saturate(0.65) contrast(0.94) brightness(1.05); }
+  .l-vhs-88 .fx {
+    background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,0.16) 3px 4px);
+  }
+  .l-noir .scene         { filter: grayscale(1) contrast(1.45) brightness(0.94); }
+  .l-neo-noir .scene     { filter: saturate(1.5) contrast(1.15) hue-rotate(-12deg); }
+  .l-neo-noir .sky       { background: linear-gradient(180deg, #0a1024 0%, #1c1440 55%, #4a1a4d 82%, #7a2350 100%); }
+  .l-golden-hour .scene  { filter: sepia(0.35) saturate(1.25) brightness(1.06) contrast(1.02); }
+  .l-blue-hour .scene    { filter: saturate(0.85) brightness(0.92) hue-rotate(18deg) contrast(1.05); }
+  .l-blue-hour .sky      { background: linear-gradient(180deg, #0a1226 0%, #14233f 60%, #1d3050 100%); }
+  .l-teal-orange .scene  { filter: contrast(1.18) saturate(1.35); }
+  .l-teal-orange .sky    { background: linear-gradient(180deg, #06222b 0%, #0d3340 50%, #b06428 92%); }
+  .l-bleach-bypass .scene{ filter: saturate(0.38) contrast(1.28) brightness(1.04); }
+  .l-dreamcore .scene    { filter: brightness(1.12) saturate(1.15) blur(0.4px); }
+  .l-dreamcore .fx       { background: radial-gradient(ellipse at 50% 30%, rgba(255,240,250,0.16), transparent 60%); }
+  .l-infrared .scene     { filter: hue-rotate(140deg) saturate(1.7) brightness(1.05); }
+  .l-high-bw .scene      { filter: grayscale(1) contrast(1.7) brightness(0.98); }
+
+  /* Segmentierte Regler */
+  .seg-gruppe { margin-top: 14px; }
+  .seg-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 7px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg button {
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px;
+    color: var(--muted); font-family: var(--mono); font-size: 12px; padding: 7px 14px; cursor: pointer;
+    transition: color var(--dur-micro) var(--ease), border-color var(--dur-micro) var(--ease), background var(--dur-micro) var(--ease), transform var(--dur-micro) var(--ease);
+  }
+  .seg button:hover { color: var(--text); border-color: var(--accent-dim); }
+  .seg button:active { transform: scale(0.97); }
+  .seg button.aktiv { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+  /* Regie-Monitor */
+  .monitor-wrap { position: sticky; top: 20px; }
+  .monitor {
+    background: var(--panel); border: 1px solid var(--line-soft); border-radius: var(--radius);
+    padding: 16px 18px 18px;
+  }
+  .monitor-kopf { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .monitor-titel { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .monitor-titel::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--rec); animation: puls 2600ms ease-in-out infinite alternate; }
+  .mon-stage-halter { display: flex; justify-content: center; background: #05060a; border-radius: 7px; overflow: hidden; border: 1px solid var(--line-soft); }
+  .mon-stage-halter .stage { max-height: 400px; border-radius: 0; }
+  .mon-stage-halter.hochkant .stage { width: 52%; }
+  .mon-stage-halter.quadrat .stage { width: 68%; }
+  .mon-leer {
+    position: absolute; inset: 0; z-index: 6; display: flex; align-items: center; justify-content: center;
+    color: var(--faint); font-family: var(--mono); font-size: 12px; text-align: center; padding: 20px;
+    background: rgba(5,6,10,0.55);
+  }
+
+  .check { margin: 14px 0 4px; display: flex; flex-direction: column; gap: 6px; }
+  .check-zeile { display: flex; gap: 9px; font-size: 12.5px; line-height: 1.45; align-items: baseline; }
+  .check-zeile .punkt { font-family: var(--mono); font-size: 11px; white-space: nowrap; }
+  .check-zeile.ok .punkt { color: var(--ok); }
+  .check-zeile.warnung .punkt { color: var(--warn); }
+  .check-zeile.konflikt .punkt { color: var(--rec); }
+  .check-zeile span:last-child { color: var(--muted); }
+
+  .aus-block { margin-top: 14px; }
+  .aus-kopf { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .aus-titel { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
   pre {
-    background: var(--panel-2);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 13px 14px;
-    margin: 0;
-    font-family: var(--mono);
-    font-size: 12.5px;
-    line-height: 1.65;
-    white-space: pre-wrap;
-    word-break: break-word;
-    color: var(--text);
-    min-height: 44px;
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px;
+    padding: 12px 13px; margin: 0; font-family: var(--mono); font-size: 12px; line-height: 1.65;
+    white-space: pre-wrap; word-break: break-word; min-height: 40px; max-height: 220px; overflow-y: auto;
   }
-  pre .placeholder { color: var(--faint); }
+  pre .platzhalter { color: var(--faint); }
+  .prompt-notiz { font-size: 11.5px; color: var(--faint); margin: 6px 2px 0; }
+
   .btn {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 11.5px;
-    letter-spacing: 0.06em;
-    padding: 6px 12px;
-    cursor: pointer;
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px;
+    color: var(--text); font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.05em;
+    padding: 7px 13px; cursor: pointer;
+    transition: color var(--dur-micro) var(--ease), border-color var(--dur-micro) var(--ease), transform var(--dur-micro) var(--ease);
   }
   .btn:hover { border-color: var(--accent); color: var(--accent); }
-  .btn.primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #17130a;
-    font-weight: 700;
-  }
-  .btn.primary:hover { filter: brightness(1.08); color: #17130a; }
-  .btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .btn:active { transform: scale(0.98); }
+  .btn.primaer { background: var(--accent); border-color: var(--accent); color: #171208; font-weight: 700; }
+  .btn.primaer:hover { color: #171208; filter: brightness(1.07); }
+  .btn-zeile { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 
-  .shots { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-  .shot-item {
-    background: var(--panel);
-    border: 1px solid var(--line-soft);
-    border-left: 3px solid var(--accent);
-    border-radius: 6px;
-    padding: 9px 12px;
-    display: flex;
-    gap: 10px;
-    align-items: baseline;
+  .shots { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; min-width: 0; }
+  .shot-el {
+    background: var(--panel-2); border: 1px solid var(--line-soft); border-left: 3px solid var(--accent);
+    border-radius: 7px; padding: 9px 11px; display: flex; gap: 9px; align-items: center;
+    min-width: 0; max-width: 100%; overflow: hidden;
   }
-  .shot-item .no { font-family: var(--mono); font-size: 11px; color: var(--accent); white-space: nowrap; }
-  .shot-item .txt { font-size: 12.5px; color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .shot-item .del { background: none; border: none; color: var(--faint); cursor: pointer; font-size: 14px; padding: 0 2px; }
-  .shot-item .del:hover { color: var(--rec); }
-  .shots .empty { color: var(--faint); font-family: var(--mono); font-size: 12px; }
+  .shot-el .nr { font-family: var(--mono); font-size: 10.5px; color: var(--accent); white-space: nowrap; }
+  .shot-el .beschreibung { font-size: 12.5px; color: var(--muted); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .shot-el .mini { background: none; border: none; color: var(--faint); cursor: pointer; font-size: 13px; padding: 2px 3px; font-family: var(--mono); }
+  .shot-el .mini:hover { color: var(--accent); }
+  .shot-el .mini.loeschen:hover { color: var(--rec); }
+  .shots .leer { color: var(--faint); font-family: var(--mono); font-size: 12px; }
 
-  footer {
-    border-top: 1px solid var(--line);
-    padding: 14px 28px 20px;
-    font-size: 12px;
-    color: var(--faint);
-    font-family: var(--mono);
-  }
-  footer a { color: var(--muted); }
+  footer { position: relative; z-index: 2; max-width: 1460px; margin: 0 auto; padding: 10px 28px 26px; font-size: 11.5px; color: var(--faint); font-family: var(--mono); line-height: 1.7; }
 </style>
 
-<header>
-  <h1 class="wordmark">Cine<span class="forge">forge</span></h1>
-  <span class="rec">Studio-Konsole</span>
-  <span class="tagline">Idee &rarr; Shot &rarr; Prompt &rarr; Video</span>
-</header>
+<div class="ambient"></div>
+<div class="orb"></div>
+<div class="vignette-page"></div>
+<div class="grain"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
 
-<div class="console">
+<div class="shell">
+  <header class="reveal" style="--i:0">
+    <h1 class="wordmark">Cine<span class="f">forge</span></h1>
+    <span class="rec">Studio</span>
+    <span class="subline">Idee &rarr; Shot &rarr; Prompt &rarr; Video</span>
+  </header>
 
-  <section class="col" aria-label="Preset-Bibliothek">
-    <p class="eyebrow"><span class="n">01</span> Preset-Bibliothek</p>
-    <input class="search" id="search" type="search" placeholder="Preset suchen &hellip;" aria-label="Preset suchen">
-    <div class="tabs" role="tablist">
-      <button class="tab active" data-cat="kamera" role="tab">Kamera</button>
-      <button class="tab" data-cat="vfx" role="tab">VFX</button>
-      <button class="tab" data-cat="look" role="tab">Look</button>
-    </div>
-    <div class="preset-list" id="presetList"></div>
-  </section>
+  <div class="layout">
+    <main>
 
-  <section class="col" aria-label="Shot-Builder">
-    <p class="eyebrow"><span class="n">02</span> Shot-Builder</p>
+      <section class="schritt reveal" style="--i:1" aria-labelledby="s1t">
+        <div class="schritt-kopf"><span class="schritt-nr">01</span><h2 class="schritt-titel" id="s1t">Deine Idee</h2></div>
+        <p class="schritt-sub">Beschreib in einem Satz, was im Bild passiert &mdash; ein Motiv, eine Aktion.</p>
+        <textarea id="subjekt" placeholder="z.B. Ein Boxer steht allein im Ring einer leeren Halle, Schwei&szlig; gl&auml;nzt, er hebt langsam die F&auml;uste" aria-label="Motiv und Aktion"></textarea>
+        <div class="beispiele" id="beispiele"></div>
+      </section>
 
-    <label for="subject">Subjekt &amp; Aktion</label>
-    <textarea id="subject" placeholder="z.B. Ein Boxer steht allein im Ring einer leeren Halle, Schwei&szlig; gl&auml;nzt, er hebt langsam die F&auml;uste"></textarea>
+      <section class="schritt reveal" style="--i:2" aria-labelledby="s2t">
+        <div class="schritt-kopf"><span class="schritt-nr">02</span><h2 class="schritt-titel" id="s2t">Kamera</h2></div>
+        <p class="schritt-sub">Fahr mit der Maus &uuml;ber eine Karte &mdash; die Vorschau zeigt dir die Bewegung. Max. 2 kombinierbar.</p>
+        <div class="filterzeile">
+          <input class="suche" id="suche" type="search" placeholder="Kamerafahrt suchen &hellip;" aria-label="Kamerafahrt suchen">
+        </div>
+        <div class="karten" id="kartenKamera"></div>
+      </section>
 
-    <label>Gew&auml;hlte Presets</label>
-    <div class="chips" id="chips"><span class="empty">links Presets anklicken &hellip;</span></div>
-    <p class="hint">Max. 2 Kamera-Motions, 1 VFX, 1 Look &mdash; mehr wird matschig.</p>
+      <section class="schritt reveal" style="--i:3" aria-labelledby="s3t">
+        <div class="schritt-kopf"><span class="schritt-nr">03</span><h2 class="schritt-titel" id="s3t">Effekt &amp; Look</h2></div>
+        <p class="schritt-sub">Je maximal einer. Effekte erz&auml;hlen, Looks f&auml;rben &mdash; beides optional.</p>
+        <span class="seg-label">Effekt (VFX)</span>
+        <div class="karten" id="kartenVfx" style="margin-bottom:16px"></div>
+        <span class="seg-label">Film-Look</span>
+        <div class="karten" id="kartenLook"></div>
+      </section>
 
-    <div class="param-row">
-      <div>
-        <label for="target">Zielmodell</label>
-        <select id="target">
-          <option value="universal">Universal</option>
-          <option value="veo">Google Veo 3.x</option>
-          <option value="kling">Kling 2.x</option>
-          <option value="runway">Runway Gen-4</option>
-          <option value="luma">Luma Ray2</option>
-          <option value="sora">Sora 2</option>
-          <option value="hailuo">Hailuo / MiniMax</option>
-        </select>
+      <section class="schritt reveal" style="--i:4" aria-labelledby="s4t">
+        <div class="schritt-kopf"><span class="schritt-nr">04</span><h2 class="schritt-titel" id="s4t">Technik</h2></div>
+        <p class="schritt-sub">Format, L&auml;nge und das Videomodell, f&uuml;r das der Prompt optimiert wird.</p>
+        <div class="seg-gruppe"><span class="seg-label">Format</span><div class="seg" id="segFormat"></div></div>
+        <div class="seg-gruppe"><span class="seg-label">Dauer</span><div class="seg" id="segDauer"></div></div>
+        <div class="seg-gruppe"><span class="seg-label">Zielmodell</span><div class="seg" id="segModell"></div></div>
+      </section>
+
+    </main>
+
+    <aside class="monitor-wrap reveal" style="--i:2">
+      <div class="monitor">
+        <div class="monitor-kopf">
+          <span class="monitor-titel">Regie-Monitor</span>
+          <button class="btn" id="replay" title="Vorschau neu abspielen">&#8635; Abspielen</button>
+        </div>
+        <div class="mon-stage-halter" id="monHalter">
+          <div class="stage spielt" id="monStage">
+            <div class="cam"><div class="scene">
+              <div class="sky"></div><div class="sun"></div>
+              <div class="far"></div><div class="near"></div>
+              <div class="ground"></div>
+              <div class="subj"><div class="kopf"></div><div class="torso"></div><div class="schatten"></div></div>
+            </div></div>
+            <div class="fx"></div><div class="vig"></div>
+            <div class="mon-leer" id="monLeer">W&auml;hle eine Kamerafahrt &mdash;<br>der Monitor spielt sie dir vor.</div>
+          </div>
+        </div>
+
+        <div class="check" id="check" role="status" aria-live="polite"></div>
+
+        <div class="aus-block">
+          <div class="aus-kopf">
+            <span class="aus-titel" id="promptTitel">Prompt &mdash; Universal</span>
+            <button class="btn" id="kopierePrompt">Kopieren</button>
+          </div>
+          <pre id="promptAus"><span class="platzhalter">Idee eingeben und Presets w&auml;hlen &hellip;</span></pre>
+          <p class="prompt-notiz">Prompts sind auf Englisch &mdash; das verstehen alle Videomodelle am zuverl&auml;ssigsten.</p>
+        </div>
+
+        <div class="aus-block">
+          <div class="aus-kopf">
+            <span class="aus-titel">Agent-Befehl (cine-director)</span>
+            <button class="btn" id="kopiereBefehl">Kopieren</button>
+          </div>
+          <pre id="befehlAus"><span class="platzhalter">/shot &hellip;</span></pre>
+        </div>
+
+        <div class="btn-zeile">
+          <button class="btn primaer" id="shotSpeichern">+ Shot speichern</button>
+          <button class="btn" id="exportMd">Storyboard (MD)</button>
+          <button class="btn" id="exportJson">JSON</button>
+        </div>
+
+        <div class="aus-block">
+          <div class="aus-kopf"><span class="aus-titel">Shot-Liste</span>
+            <button class="btn" id="listeLeeren">Leeren</button>
+          </div>
+          <div class="shots" id="shotListe"></div>
+        </div>
       </div>
-      <div>
-        <label for="ar">Format</label>
-        <select id="ar">
-          <option>16:9</option>
-          <option>9:16</option>
-          <option>1:1</option>
-          <option>21:9</option>
-        </select>
-      </div>
-    </div>
-    <div class="param-row">
-      <div>
-        <label for="dur">Dauer</label>
-        <select id="dur">
-          <option>5s</option>
-          <option selected>8s</option>
-          <option>10s</option>
-        </select>
-      </div>
-      <div></div>
-    </div>
-  </section>
-
-  <section class="col" aria-label="Ausgabe">
-    <p class="eyebrow"><span class="n">03</span> Ausgabe</p>
-
-    <div class="out-block">
-      <div class="out-head">
-        <span class="out-title" id="promptTitle">Prompt &mdash; Universal</span>
-        <button class="btn" id="copyPrompt">Kopieren</button>
-      </div>
-      <pre id="promptOut"><span class="placeholder">Subjekt eingeben und Presets w&auml;hlen &hellip;</span></pre>
-    </div>
-
-    <div class="out-block">
-      <div class="out-head">
-        <span class="out-title">Agent-Befehl f&uuml;r cine-director</span>
-        <button class="btn" id="copyCmd">Kopieren</button>
-      </div>
-      <pre id="cmdOut"><span class="placeholder">/shot &hellip;</span></pre>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn primary" id="addShot">+ Zur Shot-Liste</button>
-      <button class="btn" id="exportBoard">Storyboard exportieren</button>
-      <button class="btn" id="clearBoard">Liste leeren</button>
-    </div>
-
-    <p class="eyebrow" style="margin-top:24px;"><span class="n">04</span> Shot-Liste</p>
-    <div class="shots" id="shotList"><span class="empty">Noch keine Shots.</span></div>
-  </section>
+    </aside>
+  </div>
 </div>
 
-<footer>
-  CineForge Studio &mdash; eigenst&auml;ndiges Tool, inspiriert vom Workflow moderner
-  KI-Video-Studios. Nicht mit Higgsfield oder anderen Anbietern verbunden.
-  Die Prompts funktionieren in jedem Videomodell &mdash; auch in Gratis-Tiers.
+<footer class="reveal" style="--i:5">
+  CineForge Studio &mdash; eigenst&auml;ndiges Werkzeug, inspiriert vom Workflow moderner KI-Video-Studios.
+  Nicht mit Higgsfield oder anderen Anbietern verbunden. Motion-Design nach Prinzipien aus
+  LottieFiles motion-design, design-dna, threejs-skills und GSAP-Referenzen &mdash; umgesetzt in reinem HTML/CSS/JS.
 </footer>
 
 <script>
+  // ---------- Datenbasis: [id, name, kategorie, beschreibung, prompt-en, anim, dauer_ms, richtung, zoomfaktor, schnell]
   var PRESETS = [
-    ["crash-zoom-in","Crash Zoom In","kamera","Schock, Punch, Comedy","aggressive crash zoom in toward the subject, rapid focal punch"],
-    ["crash-zoom-out","Crash Zoom Out","kamera","Enthüllung mit Wucht","violent crash zoom out revealing the surroundings"],
-    ["dolly-in","Dolly In","kamera","Intimität, Sog","smooth dolly in, camera physically gliding toward the subject"],
-    ["dolly-out","Dolly Out","kamera","Loslassen, Kontext","slow dolly out, gradually revealing the environment"],
-    ["super-dolly-in","Super Dolly In","kamera","Ein Move von weit nach nah","dramatic long-throw dolly in from wide to close-up in one continuous move"],
-    ["dolly-zoom","Dolly Zoom (Vertigo)","kamera","Hitchcock-Schwindel","vertigo dolly zoom, background warping while subject stays fixed"],
-    ["push-in","Push In","kamera","Leise Nähe","gentle push in on the subject's face, building intimacy"],
-    ["pull-back","Pull Back","kamera","Ruhiger Rückzug","steady pull back through the scene"],
-    ["orbit-360","360° Orbit","kamera","Erhabenheit, Produkt-Show","full 360 degree orbit around the subject, constant radius"],
-    ["arc-left","Arc Left","kamera","Halbkreis links","camera arcs left around the subject in a semicircle"],
-    ["arc-right","Arc Right","kamera","Halbkreis rechts","camera arcs right around the subject in a semicircle"],
-    ["pan-left","Pan Left","kamera","Blick schwenkt links","smooth pan left across the scene"],
-    ["pan-right","Pan Right","kamera","Blick schwenkt rechts","smooth pan right across the scene"],
-    ["whip-pan","Whip Pan","kamera","Schneller Übergang","fast whip pan with motion blur transition"],
-    ["tilt-up","Tilt Up","kamera","Größe enthüllen","slow tilt up from ground level to reveal the subject"],
-    ["tilt-down","Tilt Down","kamera","Von oben herab","tilt down from above onto the subject"],
-    ["crane-up","Crane Up","kamera","Szene wird klein","crane rises vertically, scene shrinking below"],
-    ["crane-down","Crane Down","kamera","Herabschweben","crane descends from high above toward the subject"],
-    ["overhead","Crane Overhead","kamera","Direkt von oben","top-down overhead shot, camera looking straight down"],
-    ["fpv-drone","FPV Drone","kamera","Speed, Adrenalin","high-speed FPV drone shot weaving through the scene"],
-    ["drone-flyover","Drone Flyover","kamera","Episch, weit","cinematic aerial flyover, smooth and wide"],
-    ["bullet-time","Bullet Time","kamera","Eingefrorener Moment","frozen-moment bullet time, camera sweeping around suspended action"],
-    ["robo-arm","Robo Arm","kamera","Mechanisch präzise","precise robotic arm camera move, fast mechanical repositioning"],
-    ["snorricam","Snorricam","kamera","Welt dreht sich ums Subjekt","snorricam rig, camera fixed to the subject's body, world moving around them"],
-    ["handheld","Handheld","kamera","Doku-Realismus","raw handheld camera, subtle shake, documentary energy"],
-    ["static","Static Tripod","kamera","Kontrolle, Beobachtung","locked-off static tripod shot, all motion within the frame"],
-    ["lazy-susan","Lazy Susan","kamera","Drehteller-Präsentation","subject on a slowly rotating turntable, camera static"],
-    ["head-tracking","Head Tracking","kamera","Am Kopf verankert","camera locked to the subject's head movement"],
-    ["object-pov","Object POV","kamera","Sicht des Objekts","point-of-view shot from the object itself"],
-    ["through-object","Through Object","kamera","Unmöglicher Durchflug","camera passes impossibly through an object into the next space"],
-    ["eyes-in","Eyes In","kamera","Durch die Iris","extreme push into the subject's eye, transitioning through the iris"],
-    ["fisheye","Fisheye","kamera","Verzerrte Weite","ultra-wide fisheye lens, curved edges, exaggerated depth"],
-    ["dutch-angle","Dutch Angle","kamera","Kippende Unruhe","tilted dutch angle, unsettling diagonal horizon"],
-    ["car-grip","Car Grip Mount","kamera","Am Auto montiert","vehicle-mounted grip shot alongside a moving car, road rushing past"],
-    ["buckle-up","Buckle Up","kamera","Hinter der Windschutzscheibe","inside-vehicle POV, mounted behind the windshield"],
-    ["explosion","Explosion","vfx","Druckwelle & Trümmer","massive practical explosion behind the subject, debris and shockwave"],
-    ["disintegration","Disintegration","vfx","Zerfall in Partikel","subject disintegrating into drifting particles"],
-    ["levitation","Levitation","vfx","Schweben","subject levitating slowly off the ground, hair and clothes floating"],
-    ["set-on-fire","Set on Fire","vfx","Flammen & Funken","flames igniting across the scene, embers rising"],
-    ["melting","Melting","vfx","Schmelzen wie Wachs","surfaces melting and dripping like wax"],
-    ["freeze-shatter","Freeze & Shatter","vfx","Einfrieren, zerspringen","scene freezing over, then shattering like glass"],
-    ["thunder-god","Thunder God","vfx","Blitzeinschläge","lightning striking around the subject, electric arcs on skin"],
-    ["invisible","Invisibility","vfx","Unsichtbar werden","subject fading to invisibility, clothes collapsing"],
-    ["turn-metal","Turning Metal","vfx","Flüssiges Chrom","subject's skin turning to liquid chrome"],
-    ["portal","Portal Jump","vfx","Sprung in andere Welt","glowing portal opening, subject stepping through into another world"],
-    ["time-freeze","Time Freeze","vfx","Zeit steht still","time frozen around the subject who keeps moving"],
-    ["glitch","Reality Glitch","vfx","Datamosh-Artefakte","reality glitching, RGB-split datamosh artifacts"],
-    ["smoke-reveal","Smoke Reveal","vfx","Aus dem Rauch","subject revealed as thick smoke clears"],
-    ["petal-burst","Petal Burst","vfx","Blütenwirbel","explosion of flower petals swirling around the subject"],
-    ["kodak-35mm","35mm Kodak","look","Warmes Filmkorn","shot on 35mm Kodak film, fine grain, warm halation"],
-    ["grain-16mm","16mm Grain","look","Rau & körnig","gritty 16mm film, heavy grain, slightly unstable gate"],
-    ["vhs-88","VHS 1988","look","Camcorder-Nostalgie","1988 VHS camcorder look, tracking lines, washed color"],
-    ["noir","Film Noir","look","Harte Schatten, s/w","black-and-white film noir, hard shadows, venetian-blind light"],
-    ["neo-noir","Neo-Noir Neon","look","Neon auf nassem Asphalt","neo-noir, wet asphalt reflecting neon signage, deep blacks"],
-    ["golden-hour","Golden Hour","look","Warmes Gegenlicht","golden hour backlight, long soft shadows, warm haze"],
-    ["blue-hour","Blue Hour","look","Kühle Dämmerung","blue hour twilight, cool ambient glow, practical lights on"],
-    ["teal-orange","Teal & Orange","look","Blockbuster-Grade","blockbuster teal-and-orange grade, high contrast"],
-    ["bleach-bypass","Bleach Bypass","look","Silbrig entfärbt","bleach bypass process, desaturated, silvery highlights"],
-    ["dreamcore","Dreamcore","look","Milchig-weiches Leuchten","soft-bloom dreamcore, milky highlights, pastel fog"],
-    ["infrared","Infrared","look","Weiß-rosa Laub","infrared photography look, foliage glowing white-pink"],
-    ["high-bw","High-Contrast B&W","look","Skulpturales Licht","high-contrast black and white, deep blacks, sculpted light"]
+    ["crash-zoom-in","Crash Zoom In","kamera","Schock, Punch, Comedy","aggressive crash zoom in toward the subject, rapid focal punch","zoomin",900,1,1.8,true],
+    ["crash-zoom-out","Crash Zoom Out","kamera","Enthüllung mit Wucht","violent crash zoom out revealing the surroundings","zoomout",900,1,1.8,true],
+    ["dolly-in","Dolly In","kamera","Intimität, Sog","smooth dolly in, camera physically gliding toward the subject","zoomin",3200,1,1.55,false],
+    ["dolly-out","Dolly Out","kamera","Loslassen, Kontext","slow dolly out, gradually revealing the environment","zoomout",3200,1,1.55,false],
+    ["super-dolly-in","Super Dolly In","kamera","Ein Move von weit nach nah","dramatic long-throw dolly in from wide to close-up in one continuous move","zoomin",4200,1,1.95,false],
+    ["dolly-zoom","Dolly Zoom (Vertigo)","kamera","Hitchcock-Schwindel","vertigo dolly zoom, background warping while subject stays fixed","vertigo",3800,1,1,false],
+    ["push-in","Push In","kamera","Leise Nähe","gentle push in on the subject's face, building intimacy","zoomin",3600,1,1.3,false],
+    ["pull-back","Pull Back","kamera","Ruhiger Rückzug","steady pull back through the scene","zoomout",3600,1,1.3,false],
+    ["orbit-360","360° Orbit","kamera","Erhabenheit, Produkt-Show","full 360 degree orbit around the subject, constant radius","rotor",5200,1,1,false],
+    ["arc-left","Arc Left","kamera","Halbkreis links","camera arcs left around the subject in a semicircle","arc",3500,-1,1,false],
+    ["arc-right","Arc Right","kamera","Halbkreis rechts","camera arcs right around the subject in a semicircle","arc",3500,1,1,false],
+    ["pan-left","Pan Left","kamera","Blick schwenkt links","smooth pan left across the scene","pan",3000,-1,1,false],
+    ["pan-right","Pan Right","kamera","Blick schwenkt rechts","smooth pan right across the scene","pan",3000,1,1,false],
+    ["whip-pan","Whip Pan","kamera","Schneller Übergang","fast whip pan with motion blur transition","whip",1200,1,1,true],
+    ["tilt-up","Tilt Up","kamera","Größe enthüllen","slow tilt up from ground level to reveal the subject","tilt",3000,1,1,false],
+    ["tilt-down","Tilt Down","kamera","Von oben herab","tilt down from above onto the subject","tilt",3000,-1,1,false],
+    ["crane-up","Crane Up","kamera","Szene wird klein","crane rises vertically, scene shrinking below","crane",3500,1,1,false],
+    ["crane-down","Crane Down","kamera","Herabschweben","crane descends from high above toward the subject","crane",3500,-1,1,false],
+    ["overhead","Crane Overhead","kamera","Direkt von oben","top-down overhead shot, camera looking straight down","overhead",4000,1,1,false],
+    ["fpv-drone","FPV Drone","kamera","Speed, Adrenalin","high-speed FPV drone shot weaving through the scene","fpv",2300,1,1,true],
+    ["drone-flyover","Drone Flyover","kamera","Episch, weit","cinematic aerial flyover, smooth and wide","flyover",4500,1,1,false],
+    ["bullet-time","Bullet Time","kamera","Eingefrorener Moment","frozen-moment bullet time, camera sweeping around suspended action","bullet",4200,1,1,false],
+    ["robo-arm","Robo Arm","kamera","Mechanisch präzise","precise robotic arm camera move, fast mechanical repositioning","robo",2100,1,1,true],
+    ["snorricam","Snorricam","kamera","Welt dreht sich ums Subjekt","snorricam rig, camera fixed to the subject's body, world moving around them","snorri",2800,1,1,false],
+    ["handheld","Handheld","kamera","Doku-Realismus","raw handheld camera, subtle shake, documentary energy","shake",1900,1,1,false],
+    ["static","Static Tripod","kamera","Kontrolle, Beobachtung","locked-off static tripod shot, all motion within the frame","still",4200,1,1,false],
+    ["lazy-susan","Lazy Susan","kamera","Drehteller-Präsentation","subject on a slowly rotating turntable, camera static","spinsubj",5200,1,1,false],
+    ["head-tracking","Head Tracking","kamera","Am Kopf verankert","camera locked to the subject's head movement","pan",2600,1,1,false],
+    ["object-pov","Object POV","kamera","Sicht des Objekts","point-of-view shot from the object itself","rush",1600,1,1,false],
+    ["through-object","Through Object","kamera","Unmöglicher Durchflug","camera passes impossibly through an object into the next space","through",2700,1,1,false],
+    ["eyes-in","Eyes In","kamera","Durch die Iris","extreme push into the subject's eye, transitioning through the iris","eyes",3000,1,1,false],
+    ["fisheye","Fisheye","kamera","Verzerrte Weite","ultra-wide fisheye lens, curved edges, exaggerated depth","fisheye",3500,1,1,false],
+    ["dutch-angle","Dutch Angle","kamera","Kippende Unruhe","tilted dutch angle, unsettling diagonal horizon","dutch",3500,1,1,false],
+    ["car-grip","Car Grip Mount","kamera","Am Auto montiert","vehicle-mounted grip shot alongside a moving car, road rushing past","rush",1300,1,1,true],
+    ["buckle-up","Buckle Up","kamera","Hinter der Windschutzscheibe","inside-vehicle POV, mounted behind the windshield","bob",1400,1,1,false],
+    ["explosion","Explosion","vfx","Druckwelle & Trümmer","massive practical explosion behind the subject, debris and shockwave","flash",2600,1,1,false],
+    ["disintegration","Disintegration","vfx","Zerfall in Partikel","subject disintegrating into drifting particles","dissolve",3000,1,1,false],
+    ["levitation","Levitation","vfx","Schweben","subject levitating slowly off the ground, hair and clothes floating","rise",3400,1,1,false],
+    ["set-on-fire","Set on Fire","vfx","Flammen & Funken","flames igniting across the scene, embers rising","fire",2000,1,1,false],
+    ["melting","Melting","vfx","Schmelzen wie Wachs","surfaces melting and dripping like wax","melt",3200,1,1,false],
+    ["freeze-shatter","Freeze & Shatter","vfx","Einfrieren, zerspringen","scene freezing over, then shattering like glass","freeze",3200,1,1,false],
+    ["thunder-god","Thunder God","vfx","Blitzeinschläge","lightning striking around the subject, electric arcs on skin","bolt",2400,1,1,false],
+    ["invisible","Invisibility","vfx","Unsichtbar werden","subject fading to invisibility, clothes collapsing","ghost",3000,1,1,false],
+    ["turn-metal","Turning Metal","vfx","Flüssiges Chrom","subject's skin turning to liquid chrome","chrome",3000,1,1,false],
+    ["portal","Portal Jump","vfx","Sprung in andere Welt","glowing portal opening, subject stepping through into another world","portal",2800,1,1,false],
+    ["time-freeze","Time Freeze","vfx","Zeit steht still","time frozen around the subject who keeps moving","timefreeze",3000,1,1,false],
+    ["glitch","Reality Glitch","vfx","Datamosh-Artefakte","reality glitching, RGB-split datamosh artifacts","glitch",1300,1,1,false],
+    ["smoke-reveal","Smoke Reveal","vfx","Aus dem Rauch","subject revealed as thick smoke clears","smoke",3400,1,1,false],
+    ["petal-burst","Petal Burst","vfx","Blütenwirbel","explosion of flower petals swirling around the subject","petal",2600,1,1,false],
+    ["kodak-35mm","35mm Kodak","look","Warmes Filmkorn","shot on 35mm Kodak film, fine grain, warm halation","",0,1,1,false],
+    ["grain-16mm","16mm Grain","look","Rau & körnig","gritty 16mm film, heavy grain, slightly unstable gate","",0,1,1,false],
+    ["vhs-88","VHS 1988","look","Camcorder-Nostalgie","1988 VHS camcorder look, tracking lines, washed color","",0,1,1,false],
+    ["noir","Film Noir","look","Harte Schatten, s/w","black-and-white film noir, hard shadows, venetian-blind light","",0,1,1,false],
+    ["neo-noir","Neo-Noir Neon","look","Neon auf nassem Asphalt","neo-noir, wet asphalt reflecting neon signage, deep blacks","",0,1,1,false],
+    ["golden-hour","Golden Hour","look","Warmes Gegenlicht","golden hour backlight, long soft shadows, warm haze","",0,1,1,false],
+    ["blue-hour","Blue Hour","look","Kühle Dämmerung","blue hour twilight, cool ambient glow, practical lights on","",0,1,1,false],
+    ["teal-orange","Teal & Orange","look","Blockbuster-Grade","blockbuster teal-and-orange grade, high contrast","",0,1,1,false],
+    ["bleach-bypass","Bleach Bypass","look","Silbrig entfärbt","bleach bypass process, desaturated, silvery highlights","",0,1,1,false],
+    ["dreamcore","Dreamcore","look","Milchig-weiches Leuchten","soft-bloom dreamcore, milky highlights, pastel fog","",0,1,1,false],
+    ["infrared","Infrared","look","Weiß-rosa Laub","infrared photography look, foliage glowing white-pink","",0,1,1,false],
+    ["high-bw","High-Contrast B&W","look","Skulpturales Licht","high-contrast black and white, deep blacks, sculpted light","",0,1,1,false]
+  ];
+  var P = { id:0, name:1, kat:2, de:3, en:4, anim:5, dauer:6, dir:7, zoom:8, schnell:9 };
+
+  var BEISPIELE = [
+    { text: "🥊 Boxer im leeren Ring", subjekt: "Ein Boxer steht allein im Ring einer leeren Halle, Schweiß glänzt, er hebt langsam die Fäuste", presets: ["super-dolly-in", "kodak-35mm"], ar: "16:9", dur: "8s" },
+    { text: "🌸 Parfüm-Spot", subjekt: "Ein Parfümflakon aus geschliffenem Glas steht auf schwarzem Marmor, Lichtreflexe wandern über die Kanten", presets: ["orbit-360", "petal-burst", "dreamcore"], ar: "9:16", dur: "5s" },
+    { text: "🏙️ Cyberpunk-Verfolgung", subjekt: "Eine Frau im Regenmantel rennt durch eine neonbeleuchtete Gasse, Pfützen spritzen bei jedem Schritt", presets: ["fpv-drone", "neo-noir"], ar: "16:9", dur: "8s" },
+    { text: "👟 Sneaker-Präsentation", subjekt: "Ein weißer Sneaker schwebt über einem Podest aus Beton, Staubpartikel tanzen im Lichtkegel", presets: ["lazy-susan", "levitation", "teal-orange"], ar: "1:1", dur: "5s" },
+    { text: "🦅 Naturdoku", subjekt: "Ein Adler gleitet über ein Nebelmeer zwischen Berggipfeln im ersten Morgenlicht", presets: ["drone-flyover", "golden-hour"], ar: "21:9", dur: "10s" }
   ];
 
+  var MODELLE = [
+    ["universal", "Universal"], ["veo", "Veo 3.x"], ["kling", "Kling 2.x"],
+    ["runway", "Runway Gen-4"], ["luma", "Luma Ray2"], ["sora", "Sora 2"], ["hailuo", "Hailuo"]
+  ];
+  var FORMATE = ["16:9", "9:16", "1:1", "21:9"];
+  var DAUERN = ["5s", "8s", "10s"];
   var LIMITS = { kamera: 2, vfx: 1, look: 1 };
-  var state = {
-    cat: "kamera",
-    search: "",
-    selected: [],
-    shots: JSON.parse(localStorage.getItem("cineforge.shots") || "[]")
-  };
 
-  function byId(id) { return document.getElementById(id); }
-  function find(pid) {
-    for (var i = 0; i < PRESETS.length; i++) if (PRESETS[i][0] === pid) return PRESETS[i];
+  var zustand = {
+    gewaehlt: [],
+    ar: "16:9", dur: "8s", modell: "universal", suche: "",
+    shots: []
+  };
+  try { zustand.shots = JSON.parse(localStorage.getItem("cineforge.v2.shots") || "[]"); } catch (e) { zustand.shots = []; }
+
+  function el(id) { return document.getElementById(id); }
+  function preset(pid) {
+    for (var i = 0; i < PRESETS.length; i++) if (PRESETS[i][P.id] === pid) return PRESETS[i];
     return null;
   }
-  function selectedOfCat(cat) {
-    return state.selected.filter(function (pid) { return find(pid)[2] === cat; });
+  function gewaehltIn(kat) {
+    return zustand.gewaehlt.filter(function (pid) { var p = preset(pid); return p && p[P.kat] === kat; });
+  }
+  function reduzierteBewegung() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
-  function renderLibrary() {
-    var list = byId("presetList");
-    list.innerHTML = "";
-    var q = state.search.toLowerCase();
+  // ---------- Bühnen-Markup
+  function stageHtml() {
+    return '<div class="cam"><div class="scene">' +
+      '<div class="sky"></div><div class="sun"></div><div class="far"></div><div class="near"></div><div class="ground"></div>' +
+      '<div class="subj"><div class="kopf"></div><div class="torso"></div><div class="schatten"></div></div>' +
+      '</div></div><div class="fx"></div><div class="vig"></div>';
+  }
+  function stageKlassen(stageEl, kameraIds, vfxId, lookId) {
+    stageEl.className = stageEl.className.split(" ").filter(function (c) {
+      return c.indexOf("a-") !== 0 && c.indexOf("fx-") !== 0 && c.indexOf("l-") !== 0;
+    }).join(" ");
+    var ersteKamera = kameraIds.length ? preset(kameraIds[0]) : null;
+    if (ersteKamera && ersteKamera[P.anim]) {
+      stageEl.classList.add("a-" + ersteKamera[P.anim]);
+      stageEl.style.setProperty("--adur", ersteKamera[P.dauer] + "ms");
+      stageEl.style.setProperty("--adir", ersteKamera[P.dir]);
+      stageEl.style.setProperty("--asc", ersteKamera[P.zoom]);
+    }
+    if (vfxId) {
+      var v = preset(vfxId);
+      if (v) { stageEl.classList.add("fx-" + v[P.anim]); stageEl.style.setProperty("--vdur", v[P.dauer] + "ms"); }
+    }
+    if (lookId) stageEl.classList.add("l-" + lookId);
+  }
+
+  // ---------- Karten rendern
+  function karteBauen(p) {
+    var b = document.createElement("button");
+    b.className = "karte";
+    b.setAttribute("data-id", p[P.id]);
+    b.setAttribute("aria-pressed", "false");
+    var stage = document.createElement("div");
+    stage.className = "stage";
+    stage.setAttribute("aria-hidden", "true");
+    stage.innerHTML = stageHtml();
+    if (p[P.kat] === "kamera") stageKlassen(stage, [p[P.id]], null, null);
+    else if (p[P.kat] === "vfx") stageKlassen(stage, [], p[P.id], null);
+    else stageKlassen(stage, [], null, p[P.id]);
+    b.appendChild(stage);
+    var info = document.createElement("div");
+    info.className = "karte-info";
+    info.innerHTML = '<span class="karte-name"></span><span class="karte-desc"></span>';
+    info.querySelector(".karte-name").textContent = p[P.name];
+    info.querySelector(".karte-desc").textContent = p[P.de];
+    b.appendChild(info);
+    b.addEventListener("click", function () { umschalten(p[P.id]); });
+    return b;
+  }
+
+  function kartenRendern() {
+    var ziele = { kamera: el("kartenKamera"), vfx: el("kartenVfx"), look: el("kartenLook") };
+    Object.keys(ziele).forEach(function (kat) { ziele[kat].innerHTML = ""; });
+    var q = zustand.suche.toLowerCase();
     PRESETS.forEach(function (p) {
-      if (p[2] !== state.cat) return;
-      if (q && p[0].indexOf(q) < 0 && p[1].toLowerCase().indexOf(q) < 0 && p[3].toLowerCase().indexOf(q) < 0) return;
-      var b = document.createElement("button");
-      b.className = "preset" + (state.selected.indexOf(p[0]) >= 0 ? " selected" : "");
-      b.innerHTML = '<span class="p-name">' + p[1] + '</span>' +
-                    '<span class="p-desc">' + p[3] + '</span>' +
-                    '<span class="p-id">' + p[0] + '</span>';
-      b.addEventListener("click", function () { toggle(p[0]); });
-      list.appendChild(b);
+      if (p[P.kat] === "kamera" && q &&
+          p[P.id].indexOf(q) < 0 && p[P.name].toLowerCase().indexOf(q) < 0 && p[P.de].toLowerCase().indexOf(q) < 0) return;
+      ziele[p[P.kat]].appendChild(karteBauen(p));
     });
-    if (!list.children.length) {
-      list.innerHTML = '<span style="color:var(--faint);font-family:var(--mono);font-size:12px;">Kein Treffer.</span>';
-    }
+    kartenMarkieren();
+  }
+  function kartenMarkieren() {
+    document.querySelectorAll(".karte").forEach(function (k) {
+      var aktiv = zustand.gewaehlt.indexOf(k.getAttribute("data-id")) >= 0;
+      k.classList.toggle("aktiv", aktiv);
+      k.setAttribute("aria-pressed", aktiv ? "true" : "false");
+    });
   }
 
-  function toggle(pid) {
-    var idx = state.selected.indexOf(pid);
+  function umschalten(pid) {
+    var idx = zustand.gewaehlt.indexOf(pid);
     if (idx >= 0) {
-      state.selected.splice(idx, 1);
+      zustand.gewaehlt.splice(idx, 1);
     } else {
-      var cat = find(pid)[2];
-      var same = selectedOfCat(cat);
-      if (same.length >= LIMITS[cat]) {
-        state.selected.splice(state.selected.indexOf(same[0]), 1);
+      var kat = preset(pid)[P.kat];
+      var selbe = gewaehltIn(kat);
+      if (selbe.length >= LIMITS[kat]) {
+        zustand.gewaehlt.splice(zustand.gewaehlt.indexOf(selbe[0]), 1);
       }
-      state.selected.push(pid);
+      zustand.gewaehlt.push(pid);
     }
-    renderLibrary(); renderChips(); renderOutput();
+    kartenMarkieren();
+    allesAktualisieren();
   }
 
-  function renderChips() {
-    var box = byId("chips");
-    box.innerHTML = "";
-    if (!state.selected.length) {
-      box.innerHTML = '<span class="empty">links Presets anklicken &hellip;</span>';
-      return;
+  // ---------- Segmentierte Regler
+  function segmenteBauen(halterId, werte, feld) {
+    var halter = el(halterId);
+    werte.forEach(function (w) {
+      var wert = Array.isArray(w) ? w[0] : w;
+      var text = Array.isArray(w) ? w[1] : w;
+      var b = document.createElement("button");
+      b.textContent = text;
+      b.setAttribute("data-wert", wert);
+      b.addEventListener("click", function () {
+        zustand[feld] = wert;
+        halter.querySelectorAll("button").forEach(function (x) { x.classList.toggle("aktiv", x === b); });
+        allesAktualisieren();
+      });
+      halter.appendChild(b);
+    });
+    halter.querySelector('[data-wert="' + zustand[feld] + '"]').classList.add("aktiv");
+  }
+
+  // ---------- Beispiele + Zufalls-Regie
+  function beispieleBauen() {
+    var halter = el("beispiele");
+    BEISPIELE.forEach(function (bsp) {
+      var b = document.createElement("button");
+      b.className = "bsp";
+      b.textContent = bsp.text;
+      b.addEventListener("click", function () { beispielLaden(bsp); });
+      halter.appendChild(b);
+    });
+    var w = document.createElement("button");
+    w.className = "bsp wuerfel";
+    w.textContent = "🎲 Überrasch mich";
+    w.addEventListener("click", zufallsRegie);
+    halter.appendChild(w);
+  }
+  function beispielLaden(bsp) {
+    el("subjekt").value = bsp.subjekt;
+    zustand.gewaehlt = bsp.presets.slice();
+    zustand.ar = bsp.ar; zustand.dur = bsp.dur;
+    seglerSynchronisieren();
+    kartenMarkieren();
+    allesAktualisieren();
+  }
+  function zufallsRegie() {
+    if (!el("subjekt").value.trim()) {
+      var bsp = BEISPIELE[Math.floor(Math.random() * BEISPIELE.length)];
+      el("subjekt").value = bsp.subjekt;
     }
-    state.selected.forEach(function (pid) {
-      var p = find(pid);
-      var c = document.createElement("button");
-      c.className = "chip";
-      c.innerHTML = p[1] + ' <span class="x">&times;</span>';
-      c.title = "Entfernen";
-      c.addEventListener("click", function () { toggle(pid); });
-      box.appendChild(c);
+    var kameras = PRESETS.filter(function (p) { return p[P.kat] === "kamera" && p[P.id] !== "static"; });
+    var looks = PRESETS.filter(function (p) { return p[P.kat] === "look"; });
+    var vfxe = PRESETS.filter(function (p) { return p[P.kat] === "vfx"; });
+    var wahl = [kameras[Math.floor(Math.random() * kameras.length)][P.id]];
+    if (Math.random() < 0.35) {
+      var zweite = kameras[Math.floor(Math.random() * kameras.length)][P.id];
+      var k1 = preset(wahl[0]), k2 = preset(zweite);
+      if (zweite !== wahl[0] && !(k1[P.schnell] && k2[P.schnell])) wahl.push(zweite);
+    }
+    if (Math.random() < 0.4) wahl.push(vfxe[Math.floor(Math.random() * vfxe.length)][P.id]);
+    wahl.push(looks[Math.floor(Math.random() * looks.length)][P.id]);
+    zustand.gewaehlt = wahl;
+    kartenMarkieren();
+    allesAktualisieren();
+  }
+  function seglerSynchronisieren() {
+    [["segFormat", "ar"], ["segDauer", "dur"], ["segModell", "modell"]].forEach(function (paar) {
+      el(paar[0]).querySelectorAll("button").forEach(function (b) {
+        b.classList.toggle("aktiv", b.getAttribute("data-wert") === zustand[paar[1]]);
+      });
     });
   }
 
-  function frag(cat) {
-    return selectedOfCat(cat).map(function (pid) { return find(pid)[4]; });
+  // ---------- Regie-Check
+  function checkErmitteln() {
+    var meldungen = [];
+    var kameras = gewaehltIn("kamera");
+    var subjekt = el("subjekt").value.trim();
+    if (!subjekt) meldungen.push(["warnung", "Beschreib deine Idee in Schritt 01 — ohne Motiv kein Shot."]);
+    if (!kameras.length) meldungen.push(["warnung", "Wähle mindestens eine Kamerafahrt in Schritt 02."]);
+    if (kameras.indexOf("static") >= 0 && kameras.length > 1)
+      meldungen.push(["konflikt", "Static Tripod widerspricht jeder zweiten Kamerafahrt — eins von beiden entfernen."]);
+    if (kameras.indexOf("whip-pan") >= 0 && (kameras.indexOf("orbit-360") >= 0 || kameras.indexOf("arc-left") >= 0 || kameras.indexOf("arc-right") >= 0))
+      meldungen.push(["konflikt", "Whip Pan + Orbit/Arc verwirren Videomodelle fast immer — lieber trennen."]);
+    var schnelle = kameras.filter(function (id) { return preset(id)[P.schnell]; });
+    if (schnelle.length >= 2)
+      meldungen.push(["warnung", "Zwei schnelle Moves gleichzeitig werden matschig — einen davon als eigenen Shot planen."]);
+    if (zustand.dur === "5s" && (kameras.indexOf("super-dolly-in") >= 0 || kameras.indexOf("through-object") >= 0 || kameras.indexOf("orbit-360") >= 0))
+      meldungen.push(["warnung", "Lange Fahrten (Super Dolly, Through Object, 360°) brauchen 8–10s, sonst wirken sie gehetzt."]);
+    if (zustand.ar === "9:16" && (kameras.indexOf("drone-flyover") >= 0 || kameras.indexOf("car-grip") >= 0))
+      meldungen.push(["warnung", "Weite Quer-Moves wirken im Hochformat oft beschnitten — 16:9 oder 21:9 erwägen."]);
+    if (!meldungen.length) meldungen.push(["ok", "Bereit zum Dreh — Prompt rechts kopieren oder Shot speichern."]);
+    return meldungen;
   }
-  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function checkRendern() {
+    var halter = el("check");
+    halter.innerHTML = "";
+    checkErmitteln().forEach(function (m) {
+      var z = document.createElement("div");
+      z.className = "check-zeile " + m[0];
+      var symbol = m[0] === "ok" ? "OK" : (m[0] === "warnung" ? "!" : "✕");
+      z.innerHTML = '<span class="punkt"></span><span></span>';
+      z.querySelector(".punkt").textContent = symbol;
+      z.querySelector("span:last-child").textContent = m[1];
+      halter.appendChild(z);
+    });
+  }
 
-  function buildPrompt() {
-    var subject = byId("subject").value.trim();
-    var target = byId("target").value;
-    var ar = byId("ar").value;
-    var dur = byId("dur").value;
-    var cams = frag("kamera"), vfx = frag("vfx"), looks = frag("look");
-    if (!subject && !state.selected.length) return null;
+  // ---------- Prompt-Compiler
+  function fragmente(kat) {
+    return gewaehltIn(kat).map(function (pid) { return preset(pid)[P.en]; });
+  }
+  function gross(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-    var camTxt = cams.length ? cap(cams.join(", combined with ")) : "Cinematic camera";
-    var subjTxt = subject || "the subject in the scene";
-    var lines = [];
-
-    if (target === "runway") {
-      var parts = [];
-      if (cams.length) parts.push(cams.join(", "));
-      parts.push(subjTxt);
-      if (looks.length) parts.push(looks.join(", "));
-      if (vfx.length) parts.push(vfx.join(", "));
-      lines.push(parts.join(". ") + ".");
+  function promptBauen() {
+    var subjekt = el("subjekt").value.trim();
+    var kams = fragmente("kamera"), vfx = fragmente("vfx"), looks = fragmente("look");
+    if (!subjekt && !zustand.gewaehlt.length) return null;
+    var kamText = kams.length ? gross(kams.join(", combined with ")) : "Cinematic camera";
+    var subjText = subjekt || "the subject in the scene";
+    var zeilen = [];
+    if (zustand.modell === "runway") {
+      var teile = [];
+      if (kams.length) teile.push(kams.join(", "));
+      teile.push(subjText);
+      if (looks.length) teile.push(looks.join(", "));
+      if (vfx.length) teile.push(vfx.join(", "));
+      zeilen.push(teile.join(". ") + ".");
     } else {
-      var s = camTxt + ". " + subjTxt + ".";
-      if (vfx.length) s += " " + cap(vfx.join(". ")) + ".";
-      if (looks.length) s += " " + cap(looks.join(". ")) + ".";
-      s += " Cinematic lighting, physically accurate motion, high detail.";
-      lines.push(s);
+      var s = kamText + ". " + subjText + ".";
+      if (vfx.length) s += " " + gross(vfx.join(". ")) + ".";
+      if (looks.length) s += " " + gross(looks.join(". ")) + ".";
+      s += " Cinematic lighting, physically accurate motion and fabric, high detail.";
+      zeilen.push(s);
     }
-    lines.push("Duration " + dur + ", aspect ratio " + ar + ".");
-
-    if (target === "veo") {
-      lines.push("Audio: ambient sound of the scene, subtle cinematic score" + (vfx.length ? ", impact sound design matching the effect" : "") + ".");
+    zeilen.push("Duration " + zustand.dur + ", aspect ratio " + zustand.ar + ".");
+    if (zustand.modell === "veo") {
+      zeilen.push("Audio: ambient sound of the scene, subtle cinematic score" + (vfx.length ? ", impact sound design matching the effect" : "") + ".");
     }
-    if (target === "kling") {
-      lines.push("Negative: blurry, text, watermark, distorted hands, extra limbs.");
+    if (zustand.modell === "kling") {
+      zeilen.push("Negative: blurry, text, watermark, distorted hands, extra limbs.");
     }
-    return lines.join("\n");
+    return zeilen.join("\n");
   }
 
-  function buildCmd() {
-    var subject = byId("subject").value.trim();
-    var cams = selectedOfCat("kamera"), vfx = selectedOfCat("vfx"), looks = selectedOfCat("look");
-    if (!subject && !state.selected.length) return null;
-    var cmd = '/shot --subject "' + (subject || "...") + '"';
-    if (cams.length) cmd += " --motion " + cams.join(",");
+  function befehlBauen() {
+    var subjekt = el("subjekt").value.trim();
+    var kams = gewaehltIn("kamera"), vfx = gewaehltIn("vfx"), looks = gewaehltIn("look");
+    if (!subjekt && !zustand.gewaehlt.length) return null;
+    var cmd = '/shot --subject "' + (subjekt || "...") + '"';
+    if (kams.length) cmd += " --motion " + kams.join(",");
     if (vfx.length) cmd += " --vfx " + vfx.join(",");
     if (looks.length) cmd += " --look " + looks.join(",");
-    cmd += " --target " + byId("target").value + " --ar " + byId("ar").value + " --dur " + byId("dur").value;
+    cmd += " --target " + zustand.modell + " --ar " + zustand.ar + " --dur " + zustand.dur;
     return cmd;
   }
 
-  var MODEL_NAMES = { universal: "Universal", veo: "Google Veo 3.x", kling: "Kling 2.x", runway: "Runway Gen-4", luma: "Luma Ray2", sora: "Sora 2", hailuo: "Hailuo / MiniMax" };
+  var MODELL_NAMEN = {};
+  MODELLE.forEach(function (m) { MODELL_NAMEN[m[0]] = m[1]; });
 
-  function renderOutput() {
-    byId("promptTitle").textContent = "Prompt — " + MODEL_NAMES[byId("target").value];
-    var p = buildPrompt(), c = buildCmd();
-    byId("promptOut").textContent = "";
-    byId("cmdOut").textContent = "";
-    if (p) { byId("promptOut").textContent = p; }
-    else { byId("promptOut").innerHTML = '<span class="placeholder">Subjekt eingeben und Presets wählen …</span>'; }
-    if (c) { byId("cmdOut").textContent = c; }
-    else { byId("cmdOut").innerHTML = '<span class="placeholder">/shot …</span>'; }
+  function ausgabeRendern() {
+    el("promptTitel").textContent = "Prompt — " + MODELL_NAMEN[zustand.modell];
+    var p = promptBauen(), c = befehlBauen();
+    if (p) { el("promptAus").textContent = p; }
+    else { el("promptAus").innerHTML = '<span class="platzhalter">Idee eingeben und Presets wählen …</span>'; }
+    if (c) { el("befehlAus").textContent = c; }
+    else { el("befehlAus").innerHTML = '<span class="platzhalter">/shot …</span>'; }
   }
 
-  function copyText(text, btn) {
-    if (!text) return;
-    navigator.clipboard.writeText(text).then(function () {
-      var old = btn.textContent;
-      btn.textContent = "Kopiert ✓";
-      btn.style.color = "var(--ok)";
-      setTimeout(function () { btn.textContent = old; btn.style.color = ""; }, 1400);
-    });
+  // ---------- Regie-Monitor
+  function monitorRendern() {
+    var stage = el("monStage");
+    var kams = gewaehltIn("kamera");
+    var vfx = gewaehltIn("vfx")[0] || null;
+    var look = gewaehltIn("look")[0] || null;
+    stageKlassen(stage, kams, vfx, look);
+    el("monLeer").style.display = (kams.length || vfx || look) ? "none" : "flex";
+    var halter = el("monHalter");
+    halter.classList.toggle("hochkant", zustand.ar === "9:16");
+    halter.classList.toggle("quadrat", zustand.ar === "1:1");
+    stage.style.aspectRatio = zustand.ar.replace(":", " / ");
   }
+  el("replay").addEventListener("click", function () {
+    var stage = el("monStage");
+    stage.classList.remove("spielt");
+    void stage.offsetWidth;
+    stage.classList.add("spielt");
+  });
 
-  function renderShots() {
-    var box = byId("shotList");
-    box.innerHTML = "";
-    if (!state.shots.length) {
-      box.innerHTML = '<span class="empty">Noch keine Shots.</span>';
+  // ---------- Shot-Liste
+  function speichern() { localStorage.setItem("cineforge.v2.shots", JSON.stringify(zustand.shots)); }
+  function shotsRendern() {
+    var halter = el("shotListe");
+    halter.innerHTML = "";
+    if (!zustand.shots.length) {
+      halter.innerHTML = '<span class="leer">Noch keine Shots gespeichert.</span>';
       return;
     }
-    state.shots.forEach(function (s, i) {
+    zustand.shots.forEach(function (s, i) {
       var d = document.createElement("div");
-      d.className = "shot-item";
-      d.innerHTML = '<span class="no">SHOT ' + String(i + 1).padStart(2, "0") + '</span>' +
-                    '<span class="txt" title="' + s.subject.replace(/"/g, "&quot;") + '">' + (s.subject || "(ohne Subjekt)") + '</span>';
-      var del = document.createElement("button");
-      del.className = "del"; del.textContent = "×"; del.title = "Shot entfernen";
-      del.addEventListener("click", function () {
-        state.shots.splice(i, 1); persist(); renderShots();
+      d.className = "shot-el";
+      d.innerHTML = '<span class="nr"></span><span class="beschreibung"></span>';
+      d.querySelector(".nr").textContent = "SHOT " + String(i + 1).padStart(2, "0");
+      var besch = d.querySelector(".beschreibung");
+      besch.textContent = s.subjekt || "(ohne Motiv)";
+      besch.title = s.subjekt || "";
+      [["↑", "Nach oben", function () { if (i > 0) { var t = zustand.shots[i - 1]; zustand.shots[i - 1] = s; zustand.shots[i] = t; speichern(); shotsRendern(); } }],
+       ["↓", "Nach unten", function () { if (i < zustand.shots.length - 1) { var t = zustand.shots[i + 1]; zustand.shots[i + 1] = s; zustand.shots[i] = t; speichern(); shotsRendern(); } }],
+       ["✎", "In den Editor laden", function () { shotLaden(s); }],
+       ["✕", "Löschen", function () { zustand.shots.splice(i, 1); speichern(); shotsRendern(); }]
+      ].forEach(function (def) {
+        var b = document.createElement("button");
+        b.className = "mini" + (def[0] === "✕" ? " loeschen" : "");
+        b.textContent = def[0]; b.title = def[1];
+        b.addEventListener("click", def[2]);
+        d.appendChild(b);
       });
-      d.appendChild(del);
-      box.appendChild(d);
+      halter.appendChild(d);
     });
   }
-  function persist() { localStorage.setItem("cineforge.shots", JSON.stringify(state.shots)); }
+  function shotLaden(s) {
+    el("subjekt").value = s.subjekt;
+    zustand.gewaehlt = s.presets.slice();
+    zustand.ar = s.ar; zustand.dur = s.dur; zustand.modell = s.modell;
+    seglerSynchronisieren();
+    kartenMarkieren();
+    allesAktualisieren();
+  }
 
-  byId("search").addEventListener("input", function (e) { state.search = e.target.value; renderLibrary(); });
-  Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (t) {
-    t.addEventListener("click", function () {
-      Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (x) { x.classList.remove("active"); });
-      t.classList.add("active");
-      state.cat = t.getAttribute("data-cat");
-      renderLibrary();
-    });
-  });
-  ["subject", "target", "ar", "dur"].forEach(function (id) {
-    byId(id).addEventListener("input", renderOutput);
-    byId(id).addEventListener("change", renderOutput);
-  });
-  byId("copyPrompt").addEventListener("click", function () { copyText(buildPrompt(), this); });
-  byId("copyCmd").addEventListener("click", function () { copyText(buildCmd(), this); });
-  byId("addShot").addEventListener("click", function () {
-    var p = buildPrompt(), c = buildCmd();
+  el("shotSpeichern").addEventListener("click", function () {
+    var p = promptBauen();
     if (!p) return;
-    state.shots.push({ subject: byId("subject").value.trim(), prompt: p, cmd: c });
-    persist(); renderShots();
-  });
-  byId("clearBoard").addEventListener("click", function () {
-    state.shots = []; persist(); renderShots();
-  });
-  byId("exportBoard").addEventListener("click", function () {
-    if (!state.shots.length) return;
-    var md = "# Storyboard — CineForge\n\n";
-    state.shots.forEach(function (s, i) {
-      md += "## Shot " + (i + 1) + " — " + (s.subject || "ohne Titel") + "\n\n";
-      md += "```\n" + s.prompt + "\n```\n\n";
-      md += "Agent-Befehl: `" + s.cmd + "`\n\n";
+    zustand.shots.push({
+      subjekt: el("subjekt").value.trim(),
+      presets: zustand.gewaehlt.slice(),
+      ar: zustand.ar, dur: zustand.dur, modell: zustand.modell,
+      prompt: p, befehl: befehlBauen()
     });
-    copyText(md, this);
+    speichern();
+    shotsRendern();
+  });
+  el("listeLeeren").addEventListener("click", function () {
+    zustand.shots = []; speichern(); shotsRendern();
   });
 
-  renderLibrary(); renderChips(); renderOutput(); renderShots();
+  function kopieren(text, knopf) {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(function () {
+      var alt = knopf.textContent;
+      knopf.textContent = "Kopiert ✓";
+      knopf.style.color = "var(--ok)"; knopf.style.borderColor = "var(--ok)";
+      setTimeout(function () { knopf.textContent = alt; knopf.style.color = ""; knopf.style.borderColor = ""; }, 1400);
+    });
+  }
+  el("kopierePrompt").addEventListener("click", function () { kopieren(promptBauen(), this); });
+  el("kopiereBefehl").addEventListener("click", function () { kopieren(befehlBauen(), this); });
+  el("exportMd").addEventListener("click", function () {
+    if (!zustand.shots.length) return;
+    var md = "# Storyboard — CineForge\n\n";
+    zustand.shots.forEach(function (s, i) {
+      md += "## Shot " + (i + 1) + " — " + (s.subjekt || "ohne Titel") + "\n\n";
+      md += "```\n" + s.prompt + "\n```\n\n";
+      md += "Agent-Befehl: `" + s.befehl + "`\n\n";
+    });
+    kopieren(md, this);
+  });
+  el("exportJson").addEventListener("click", function () {
+    if (!zustand.shots.length) return;
+    var blob = new Blob([JSON.stringify({ app: "CineForge", version: 2, shots: zustand.shots }, null, 2)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "cineforge-storyboard.json";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 400);
+  });
+
+  function allesAktualisieren() {
+    checkRendern();
+    ausgabeRendern();
+    monitorRendern();
+  }
+
+  // ---------- Verkabelung
+  el("suche").addEventListener("input", function (e) { zustand.suche = e.target.value; kartenRendern(); });
+  el("subjekt").addEventListener("input", function () { checkRendern(); ausgabeRendern(); });
+
+  segmenteBauen("segFormat", FORMATE, "ar");
+  segmenteBauen("segDauer", DAUERN, "dur");
+  segmenteBauen("segModell", MODELLE, "modell");
+  beispieleBauen();
+  kartenRendern();
+  shotsRendern();
+  allesAktualisieren();
+
+  // Entrance-Choreografie: Hero führt, Panels folgen gestaffelt (Budget < 500ms)
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      document.querySelectorAll(".reveal").forEach(function (r) { r.classList.add("sichtbar"); });
+    });
+  });
+
+  // Gedämpfter Cursor-Glow (Damping 0.06, geclampt; nicht bei reduzierter Bewegung/Touch)
+  (function () {
+    if (reduzierteBewegung() || !window.matchMedia("(pointer: fine)").matches) return;
+    var glow = el("cursorGlow");
+    var zx = innerWidth / 2, zy = innerHeight / 2, x = zx, y = zy;
+    addEventListener("pointermove", function (e) { zx = e.clientX; zy = e.clientY; });
+    (function schleife() {
+      x += (zx - x) * 0.06;
+      y += (zy - y) * 0.06;
+      glow.style.transform = "translate(" + (x - 260) + "px," + (y - 260) + "px)";
+      requestAnimationFrame(schleife);
+    })();
+  })();
 </script>

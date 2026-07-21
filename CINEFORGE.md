@@ -43,15 +43,40 @@ Oder direkt mit Befehlen (die komplette Sprache steht in
 ## Die Studio-App
 
 `studio/index.html` ist eine eigenständige Web-App (einfach im Browser öffnen —
-keine Installation, kein Server):
+keine Installation, kein Server). Komplett deutschsprachig, geführter Ablauf in
+vier Schritten:
 
-- **Preset-Bibliothek**: 35 Kamera-Motions, 14 VFX, 12 Film-Looks — durchsuchbar
-- **Shot-Builder**: Subjekt + Presets + Zielmodell + Format + Dauer
+- **01 Deine Idee**: Motiv beschreiben, Beispiel-Ideen auf Klick,
+  „🎲 Überrasch mich"-Zufalls-Regie
+- **02 Kamera**: 35 Kamerafahrten als Karten mit **animierter Live-Vorschau** —
+  jede Karte spielt ihre Bewegung beim Daraufzeigen vor
+- **03 Effekt & Look**: 14 VFX und 12 Film-Looks, ebenfalls mit Live-Vorschau
+- **04 Technik**: Format, Dauer, Zielmodell als klare Schalter
+- **Regie-Monitor**: spielt die gewählte Kombination aus Kamerafahrt + Effekt +
+  Look als animierte Szene vor — im gewählten Seitenverhältnis
+- **Regie-Check**: warnt vor Kombinationen, die Videomodelle verhauen
+  (z.B. Static + Fahrt, Whip Pan + Orbit, zwei schnelle Moves)
 - **Prompt-Compiler**: baut den fertigen Prompt im Format des Zielmodells
   (Veo mit Audio-Zeile, Kling mit Negative-Prompt, Runway kompakt)
-- **Agent-Befehl**: erzeugt parallel den passenden `/shot`-Befehl für den Director
-- **Shot-Liste**: Shots sammeln und als Markdown-Storyboard exportieren
-  (bleibt im Browser gespeichert)
+- **Shot-Liste**: Shots speichern, umsortieren, zurückladen, als
+  Markdown-Storyboard kopieren oder als JSON herunterladen (bleibt im Browser)
+
+### Design-Fundament
+
+Das Motion-Design der App folgt einem destillierten Leitfaden aus vier
+öffentlichen Skill-Vorlagen (siehe
+`.claude/skills/cine-presets/references/motion-leitfaden.md`):
+
+| Vorlage | Was daraus übernommen wurde |
+|---|---|
+| `LottieFiles/motion-design-skill` | Timing-/Easing-Tabellen, Motion-Personality „Premium" (0% Overshoot), Stagger-Budgets |
+| `zanwei/design-dna` | Token-System (alle Werte als CSS-Variablen), Performance-Tiers, Reduced-Motion-Pflicht |
+| `CloudAI-X/threejs-skills` | Gedämpfte Verfolgung (Damping 0.06), Vignette/Grain-Parameter, Licht-Verhältnis 1:0.5:0.3 |
+| `martinholovsky/…/gsap` | Nur transform/opacity animieren, Choreografie Hero→Panels→Details, Cleanup-Regeln |
+
+Die Skills selbst kannst du lokal installieren (z.B.
+`npx skills add LottieFiles/motion-design-skill`) — die App braucht sie nicht,
+sie ist self-contained.
 
 ## Wo die Videos herkommen
 
