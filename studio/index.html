@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>CineForge Studio</title>
 <style>
   :root {
@@ -8,7 +9,7 @@
     --line-soft: #1b202b;
     --text: #edeff4;
     --muted: #97a0b2;
-    --faint: #5e6678;
+    --faint: #848da1;
     --accent: #e8a341;
     --accent-dim: #b57e30;
     --accent-soft: rgba(232, 163, 65, 0.13);
@@ -73,8 +74,17 @@
   @media (prefers-reduced-motion: reduce) {
     .ambient, .orb { animation: none; }
     .cursor-glow { display: none; }
-    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    .stage *, .stage *::before, .stage *::after { animation: none !important; }
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      transition-delay: 0ms !important;
+    }
   }
+  /* Sparmodus für schwache Geräte (hardwareConcurrency <= 2, per JS gesetzt) */
+  .sparmodus .ambient, .sparmodus .orb { animation: none; }
+  .sparmodus .grain, .sparmodus .cursor-glow { display: none; }
 
   .shell { position: relative; z-index: 2; max-width: 1460px; margin: 0 auto; padding: 26px 26px 80px; }
 
@@ -203,11 +213,18 @@
     background: radial-gradient(ellipse at center, transparent 52%, rgba(0,0,0,0.5));
   }
 
-  /* Kamera-Animationen — laufen bei Hover und Auswahl (nur transform/opacity) */
-  .karte:hover .stage .cam, .karte.aktiv .stage .cam, .stage.spielt .cam { animation-play-state: running; }
-  .cam, .subj, .fx, .scene > * { animation-play-state: paused; }
-  .stage.spielt .subj, .stage.spielt .fx,
-  .karte:hover .subj, .karte:hover .fx, .karte.aktiv .subj, .karte.aktiv .fx { animation-play-state: running; }
+  /* Kamera-Animationen laufen nur bei Hover, Auswahl oder im Monitor. Das Pausieren muss
+     die animation-Kurzschrift der Preset-Regeln (a-… und fx-…) schlagen, daher !important. */
+  .karte:not(:hover):not(.aktiv) .stage *,
+  .karte:not(:hover):not(.aktiv) .stage *::before,
+  .karte:not(:hover):not(.aktiv) .stage *::after {
+    animation-play-state: paused !important;
+  }
+  #monStage:not(.spielt) *,
+  #monStage:not(.spielt) *::before,
+  #monStage:not(.spielt) *::after {
+    animation-play-state: paused !important;
+  }
 
   .a-zoomin .cam    { animation: kzoomin var(--adur, 3200ms) var(--ease) infinite alternate; }
   @keyframes kzoomin { from { transform: scale(1); } to { transform: scale(var(--asc, 1.55)); } }
@@ -232,9 +249,8 @@
   @keyframes karc { from { transform: rotateY(calc(var(--adir, 1) * -26deg)) scale(1.15); } to { transform: rotateY(calc(var(--adir, 1) * 26deg)) scale(1.15); } }
   .a-whip .cam      { animation: kwhip var(--adur, 1200ms) var(--ease) infinite alternate; }
   @keyframes kwhip {
-    0% { transform: translateX(14%) scale(1.2); filter: blur(0); }
-    45% { filter: blur(5px); }
-    100% { transform: translateX(-14%) scale(1.2); filter: blur(0); }
+    0%, 12% { transform: translateX(14%) scale(1.2); }
+    88%, 100% { transform: translateX(-14%) scale(1.2); }
   }
   .a-fpv .cam       { animation: kfpv var(--adur, 2300ms) var(--ease) infinite alternate; }
   @keyframes kfpv {
@@ -285,12 +301,14 @@
     100% { transform: scale(2.25); opacity: 1; }
   }
   .a-eyes .cam      { animation: keyes var(--adur, 3000ms) var(--ease) infinite alternate; }
-  .a-eyes .vig      { animation: kiris var(--adur, 3000ms) var(--ease) infinite alternate; }
-  @keyframes keyes { from { transform: scale(1); } to { transform: scale(2.5); } }
-  @keyframes kiris {
-    from { background: radial-gradient(ellipse at center, transparent 52%, rgba(0,0,0,0.5)); }
-    to { background: radial-gradient(ellipse at center, transparent 18%, rgba(0,0,0,0.94)); }
+  .a-eyes .vig::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 16%, rgba(0,0,0,0.95) 55%);
+    opacity: 0;
+    animation: kiris var(--adur, 3000ms) var(--ease) infinite alternate;
   }
+  @keyframes keyes { from { transform: scale(1); } to { transform: scale(2.5); } }
+  @keyframes kiris { from { opacity: 0; } to { opacity: 1; } }
   .a-fisheye .cam   { animation: kfish var(--adur, 3500ms) ease-in-out infinite alternate; border-radius: 22% / 34%; overflow: hidden; }
   @keyframes kfish { from { transform: scale(1.14) rotate(-1deg); } to { transform: scale(1.22) rotate(1deg); } }
   .a-dutch .cam     { animation: kdutch var(--adur, 3500ms) ease-in-out infinite alternate; }
@@ -299,40 +317,52 @@
   @keyframes kbob { from { transform: translateY(1.5%) scale(1.24); } to { transform: translateY(-1.5%) scale(1.28); } }
 
   /* VFX-Ebenen */
-  .fx-flash .fx     { animation: vflash var(--vdur, 2600ms) var(--ease) infinite; }
+  .fx-flash .fx     {
+    background: radial-gradient(circle at 50% 66%, rgba(255,166,64,0.85), rgba(229,72,77,0.35) 45%, transparent 70%);
+    opacity: 0;
+    animation: vflash var(--vdur, 2600ms) var(--ease) infinite;
+  }
   @keyframes vflash {
-    0%, 55% { background: transparent; }
-    62% { background: radial-gradient(circle at 50% 68%, rgba(255,166,64,0.85), rgba(229,72,77,0.35) 45%, transparent 70%); }
-    76% { background: radial-gradient(circle at 50% 66%, rgba(255,196,120,0.4), transparent 62%); }
-    100% { background: transparent; }
+    0%, 55% { opacity: 0; }
+    62% { opacity: 1; }
+    76% { opacity: 0.4; }
+    100% { opacity: 0; }
   }
-  .fx-flash .cam    { animation-name: kshake !important; animation-duration: 900ms !important; }
-  .fx-fire .fx      { animation: vfire var(--vdur, 2000ms) ease-in-out infinite alternate; }
-  @keyframes vfire {
-    from { background: linear-gradient(0deg, rgba(255,120,40,0.45), transparent 42%); }
-    to { background: linear-gradient(0deg, rgba(255,170,60,0.6), transparent 55%); }
+  .fx-flash .cam    { animation-name: kshake !important; animation-duration: 900ms !important; animation-iteration-count: infinite !important; }
+  .fx-fire .fx      {
+    background: linear-gradient(0deg, rgba(255,145,50,0.55), transparent 52%);
+    animation: vfire var(--vdur, 2000ms) ease-in-out infinite alternate;
   }
-  .fx-bolt .fx      { animation: vbolt var(--vdur, 2400ms) steps(1) infinite; }
+  @keyframes vfire { from { opacity: 0.55; } to { opacity: 1; } }
+  .fx-bolt .fx      {
+    background: rgba(205,225,255,0.75);
+    opacity: 0;
+    animation: vbolt var(--vdur, 2400ms) steps(1) infinite;
+  }
   @keyframes vbolt {
-    0%, 44%, 52%, 100% { background: transparent; }
-    46%, 49% { background: rgba(214,230,255,0.75); }
-    50% { background: rgba(160,190,255,0.35); }
+    0%, 44%, 52%, 100% { opacity: 0; }
+    46%, 49% { opacity: 1; }
+    50% { opacity: 0.45; }
   }
   .fx-dissolve .subj { animation: vdissolve var(--vdur, 3000ms) var(--ease) infinite alternate; }
-  @keyframes vdissolve { from { opacity: 1; filter: blur(0); } to { opacity: 0.1; filter: blur(4px); transform: translateX(-50%) translateY(-6%); } }
+  @keyframes vdissolve { from { opacity: 1; transform: translateX(-50%); } to { opacity: 0.08; transform: translateX(-50%) translateY(-6%); } }
   .fx-rise .subj    { animation: vrise var(--vdur, 3400ms) ease-in-out infinite alternate; }
   @keyframes vrise { from { transform: translateX(-50%) translateY(0); } to { transform: translateX(-50%) translateY(-34%); } }
   .fx-melt .subj    { animation: vmelt var(--vdur, 3200ms) var(--ease) infinite alternate; transform-origin: bottom center; }
   @keyframes vmelt { from { transform: translateX(-50%) scaleY(1); } to { transform: translateX(-50%) scaleY(0.55) scaleX(1.3); } }
-  .fx-freeze .fx    { animation: vfreeze var(--vdur, 3200ms) var(--ease) infinite alternate; }
-  @keyframes vfreeze {
-    from { background: transparent; backdrop-filter: none; }
-    to { background: linear-gradient(200deg, rgba(120,190,230,0.28), rgba(60,110,180,0.16)); }
+  .fx-freeze .fx    {
+    background: linear-gradient(200deg, rgba(120,190,230,0.3), rgba(60,110,180,0.18));
+    opacity: 0;
+    animation: vfreeze var(--vdur, 3200ms) var(--ease) infinite alternate;
   }
+  @keyframes vfreeze { from { opacity: 0; } to { opacity: 1; } }
   .fx-ghost .subj   { animation: vghost var(--vdur, 3000ms) var(--ease) infinite alternate; }
   @keyframes vghost { from { opacity: 1; } to { opacity: 0.06; } }
-  .fx-chrome .subj  { animation: vchrome var(--vdur, 3000ms) var(--ease) infinite alternate; }
-  @keyframes vchrome { from { filter: none; } to { filter: grayscale(1) brightness(2.6) contrast(1.5); } }
+  .fx-chrome .subj  {
+    filter: grayscale(1) brightness(2.2) contrast(1.45);
+    animation: vchrome var(--vdur, 3000ms) var(--ease) infinite alternate;
+  }
+  @keyframes vchrome { from { opacity: 0.72; } to { opacity: 1; } }
   .fx-portal .fx::before {
     content: ""; position: absolute; left: 50%; bottom: 12%; width: 26%; aspect-ratio: 0.62;
     transform: translateX(-50%); border-radius: 50%;
@@ -343,25 +373,41 @@
   @keyframes vportal { from { transform: translateX(-50%) scale(0.4); opacity: 0.25; } to { transform: translateX(-50%) scale(1.15); opacity: 1; } }
   .fx-timefreeze .fx { background: linear-gradient(180deg, rgba(110,180,220,0.14), rgba(110,180,220,0.05)); }
   .fx-timefreeze .cam { animation-duration: calc(var(--adur, 3200ms) * 4) !important; }
-  .fx-glitch .cam   { animation-name: vglitch !important; animation-duration: 1300ms !important; animation-timing-function: steps(1) !important; }
+  .fx-glitch .cam   { animation-name: vglitch !important; animation-duration: 1300ms !important; animation-timing-function: steps(1) !important; animation-iteration-count: infinite !important; }
   @keyframes vglitch {
-    0%, 100% { transform: translate(0, 0) scale(1.1); filter: none; }
-    18% { transform: translate(-2.5%, 1%) scale(1.1); filter: hue-rotate(90deg) saturate(2.5); }
-    22% { transform: translate(2%, -1.5%) scale(1.12); filter: none; }
-    54% { transform: translate(1.5%, 0.5%) scale(1.1); filter: hue-rotate(-70deg) saturate(3); }
-    58% { transform: translate(0, 0) scale(1.1); filter: none; }
+    0%, 100% { transform: translate(0, 0) scale(1.1); }
+    18% { transform: translate(-2.5%, 1%) scale(1.1); }
+    22% { transform: translate(2%, -1.5%) scale(1.12); }
+    54% { transform: translate(1.5%, 0.5%) scale(1.1); }
+    58% { transform: translate(0, 0) scale(1.1); }
   }
-  .fx-smoke .fx     { animation: vsmoke var(--vdur, 3400ms) var(--ease) infinite alternate; }
-  @keyframes vsmoke {
-    from { background: radial-gradient(circle at 50% 75%, rgba(150,150,160,0.85), rgba(90,90,100,0.55) 55%, transparent 80%); }
-    to { background: radial-gradient(circle at 50% 60%, rgba(150,150,160,0.06), transparent 62%); }
+  .fx-glitch .fx    {
+    background: linear-gradient(90deg, rgba(255,0,90,0.26), rgba(0,255,215,0.26));
+    opacity: 0;
+    animation: vglitchfx 1300ms steps(1) infinite;
   }
-  .fx-petal .fx     { animation: vpetal var(--vdur, 2600ms) var(--ease) infinite; }
+  @keyframes vglitchfx {
+    0%, 100% { opacity: 0; }
+    18%, 21% { opacity: 1; }
+    22% { opacity: 0; }
+    54%, 57% { opacity: 0.8; }
+    58% { opacity: 0; }
+  }
+  .fx-smoke .fx     {
+    background: radial-gradient(circle at 50% 70%, rgba(150,150,160,0.9), rgba(90,90,100,0.55) 55%, transparent 80%);
+    animation: vsmoke var(--vdur, 3400ms) var(--ease) infinite alternate;
+  }
+  @keyframes vsmoke { from { opacity: 1; transform: scale(1); } to { opacity: 0.05; transform: scale(1.28); } }
+  .fx-petal .fx     {
+    background: radial-gradient(circle at 50% 55%, rgba(255,155,195,0.5), transparent 58%);
+    opacity: 0;
+    animation: vpetal var(--vdur, 2600ms) var(--ease) infinite;
+  }
   @keyframes vpetal {
-    0%, 45% { background: transparent; }
-    55% { background: radial-gradient(circle at 48% 58%, rgba(255,150,190,0.5), transparent 55%); }
-    75% { background: radial-gradient(circle at 52% 40%, rgba(255,170,205,0.28), transparent 65%); }
-    100% { background: transparent; }
+    0%, 45% { opacity: 0; }
+    55% { opacity: 1; }
+    78% { opacity: 0.45; }
+    100% { opacity: 0; }
   }
 
   /* Film-Looks als Grade auf der Szene */
@@ -417,6 +463,7 @@
     background: rgba(5,6,10,0.55);
   }
 
+  .mon-hinweis { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin: 8px 2px 0; }
   .check { margin: 14px 0 4px; display: flex; flex-direction: column; gap: 6px; }
   .check-zeile { display: flex; gap: 9px; font-size: 12.5px; line-height: 1.45; align-items: baseline; }
   .check-zeile .punkt { font-family: var(--mono); font-size: 11px; white-space: nowrap; }
@@ -489,7 +536,7 @@
 
       <section class="schritt reveal" style="--i:2" aria-labelledby="s2t">
         <div class="schritt-kopf"><span class="schritt-nr">02</span><h2 class="schritt-titel" id="s2t">Kamera</h2></div>
-        <p class="schritt-sub">Fahr mit der Maus &uuml;ber eine Karte &mdash; die Vorschau zeigt dir die Bewegung. Max. 2 kombinierbar.</p>
+        <p class="schritt-sub">Fahr mit der Maus &uuml;ber eine Karte oder tipp sie an &mdash; die Vorschau zeigt dir die Bewegung. Max. 2 kombinierbar.</p>
         <div class="filterzeile">
           <input class="suche" id="suche" type="search" placeholder="Kamerafahrt suchen &hellip;" aria-label="Kamerafahrt suchen">
         </div>
@@ -507,7 +554,7 @@
 
       <section class="schritt reveal" style="--i:4" aria-labelledby="s4t">
         <div class="schritt-kopf"><span class="schritt-nr">04</span><h2 class="schritt-titel" id="s4t">Technik</h2></div>
-        <p class="schritt-sub">Format, L&auml;nge und das Videomodell, f&uuml;r das der Prompt optimiert wird.</p>
+        <p class="schritt-sub">Format, Dauer und das Videomodell, f&uuml;r das der Prompt optimiert wird.</p>
         <div class="seg-gruppe"><span class="seg-label">Format</span><div class="seg" id="segFormat"></div></div>
         <div class="seg-gruppe"><span class="seg-label">Dauer</span><div class="seg" id="segDauer"></div></div>
         <div class="seg-gruppe"><span class="seg-label">Zielmodell</span><div class="seg" id="segModell"></div></div>
@@ -519,7 +566,7 @@
       <div class="monitor">
         <div class="monitor-kopf">
           <span class="monitor-titel">Regie-Monitor</span>
-          <button class="btn" id="replay" title="Vorschau neu abspielen">&#8635; Abspielen</button>
+          <button class="btn" id="replay" title="Vorschau von vorn abspielen">&#8635; Neu abspielen</button>
         </div>
         <div class="mon-stage-halter" id="monHalter">
           <div class="stage spielt" id="monStage">
@@ -534,6 +581,8 @@
           </div>
         </div>
 
+        <p class="mon-hinweis" id="monHinweis" hidden>Die Vorschau zeigt den ersten Move &mdash; im fertigen Video werden beide kombiniert.</p>
+
         <div class="check" id="check" role="status" aria-live="polite"></div>
 
         <div class="aus-block">
@@ -541,7 +590,7 @@
             <span class="aus-titel" id="promptTitel">Prompt &mdash; Universal</span>
             <button class="btn" id="kopierePrompt">Kopieren</button>
           </div>
-          <pre id="promptAus"><span class="platzhalter">Idee eingeben und Presets w&auml;hlen &hellip;</span></pre>
+          <pre id="promptAus"><span class="platzhalter">Gib deine Idee ein und w&auml;hle Kamera, Effekt oder Look &hellip;</span></pre>
           <p class="prompt-notiz">Prompts sind auf Englisch &mdash; das verstehen alle Videomodelle am zuverl&auml;ssigsten.</p>
         </div>
 
@@ -555,13 +604,13 @@
 
         <div class="btn-zeile">
           <button class="btn primaer" id="shotSpeichern">+ Shot speichern</button>
-          <button class="btn" id="exportMd">Storyboard (MD)</button>
-          <button class="btn" id="exportJson">JSON</button>
+          <button class="btn" id="exportMd">Storyboard kopieren</button>
+          <button class="btn" id="exportJson">JSON herunterladen</button>
         </div>
 
         <div class="aus-block">
           <div class="aus-kopf"><span class="aus-titel">Shot-Liste</span>
-            <button class="btn" id="listeLeeren">Leeren</button>
+            <button class="btn" id="listeLeeren">Liste leeren</button>
           </div>
           <div class="shots" id="shotListe"></div>
         </div>
@@ -602,7 +651,7 @@
     ["drone-flyover","Drone Flyover","kamera","Episch, weit","cinematic aerial flyover, smooth and wide","flyover",4500,1,1,false],
     ["bullet-time","Bullet Time","kamera","Eingefrorener Moment","frozen-moment bullet time, camera sweeping around suspended action","bullet",4200,1,1,false],
     ["robo-arm","Robo Arm","kamera","Mechanisch präzise","precise robotic arm camera move, fast mechanical repositioning","robo",2100,1,1,true],
-    ["snorricam","Snorricam","kamera","Welt dreht sich ums Subjekt","snorricam rig, camera fixed to the subject's body, world moving around them","snorri",2800,1,1,false],
+    ["snorricam","Snorricam","kamera","Welt dreht sich ums Motiv","snorricam rig, camera fixed to the subject's body, world moving around them","snorri",2800,1,1,false],
     ["handheld","Handheld","kamera","Doku-Realismus","raw handheld camera, subtle shake, documentary energy","shake",1900,1,1,false],
     ["static","Static Tripod","kamera","Kontrolle, Beobachtung","locked-off static tripod shot, all motion within the frame","still",4200,1,1,false],
     ["lazy-susan","Lazy Susan","kamera","Drehteller-Präsentation","subject on a slowly rotating turntable, camera static","spinsubj",5200,1,1,false],
@@ -841,17 +890,17 @@
     if (!subjekt) meldungen.push(["warnung", "Beschreib deine Idee in Schritt 01 — ohne Motiv kein Shot."]);
     if (!kameras.length) meldungen.push(["warnung", "Wähle mindestens eine Kamerafahrt in Schritt 02."]);
     if (kameras.indexOf("static") >= 0 && kameras.length > 1)
-      meldungen.push(["konflikt", "Static Tripod widerspricht jeder zweiten Kamerafahrt — eins von beiden entfernen."]);
+      meldungen.push(["konflikt", "Static Tripod widerspricht jeder weiteren Kamerafahrt — entferne eine von beiden."]);
     if (kameras.indexOf("whip-pan") >= 0 && (kameras.indexOf("orbit-360") >= 0 || kameras.indexOf("arc-left") >= 0 || kameras.indexOf("arc-right") >= 0))
-      meldungen.push(["konflikt", "Whip Pan + Orbit/Arc verwirren Videomodelle fast immer — lieber trennen."]);
+      meldungen.push(["konflikt", "Whip Pan + Orbit/Arc verwirren Videomodelle fast immer — trenn sie lieber in zwei Shots."]);
     var schnelle = kameras.filter(function (id) { return preset(id)[P.schnell]; });
     if (schnelle.length >= 2)
-      meldungen.push(["warnung", "Zwei schnelle Moves gleichzeitig werden matschig — einen davon als eigenen Shot planen."]);
+      meldungen.push(["warnung", "Zwei schnelle Moves gleichzeitig werden matschig — plane einen davon als eigenen Shot."]);
     if (zustand.dur === "5s" && (kameras.indexOf("super-dolly-in") >= 0 || kameras.indexOf("through-object") >= 0 || kameras.indexOf("orbit-360") >= 0))
       meldungen.push(["warnung", "Lange Fahrten (Super Dolly, Through Object, 360°) brauchen 8–10s, sonst wirken sie gehetzt."]);
     if (zustand.ar === "9:16" && (kameras.indexOf("drone-flyover") >= 0 || kameras.indexOf("car-grip") >= 0))
-      meldungen.push(["warnung", "Weite Quer-Moves wirken im Hochformat oft beschnitten — 16:9 oder 21:9 erwägen."]);
-    if (!meldungen.length) meldungen.push(["ok", "Bereit zum Dreh — Prompt rechts kopieren oder Shot speichern."]);
+      meldungen.push(["warnung", "Weite Quer-Moves wirken im Hochformat oft beschnitten — erwäge 16:9 oder 21:9."]);
+    if (!meldungen.length) meldungen.push(["ok", "Bereit zum Dreh — kopiere den Prompt im Regie-Monitor oder speichere den Shot."]);
     return meldungen;
   }
   function checkRendern() {
@@ -924,7 +973,7 @@
     el("promptTitel").textContent = "Prompt — " + MODELL_NAMEN[zustand.modell];
     var p = promptBauen(), c = befehlBauen();
     if (p) { el("promptAus").textContent = p; }
-    else { el("promptAus").innerHTML = '<span class="platzhalter">Idee eingeben und Presets wählen …</span>'; }
+    else { el("promptAus").innerHTML = '<span class="platzhalter">Gib deine Idee ein und wähle Kamera, Effekt oder Look …</span>'; }
     if (c) { el("befehlAus").textContent = c; }
     else { el("befehlAus").innerHTML = '<span class="platzhalter">/shot …</span>'; }
   }
@@ -937,6 +986,7 @@
     var look = gewaehltIn("look")[0] || null;
     stageKlassen(stage, kams, vfx, look);
     el("monLeer").style.display = (kams.length || vfx || look) ? "none" : "flex";
+    el("monHinweis").hidden = kams.length < 2;
     var halter = el("monHalter");
     halter.classList.toggle("hochkant", zustand.ar === "9:16");
     halter.classList.toggle("quadrat", zustand.ar === "1:1");
@@ -944,13 +994,16 @@
   }
   el("replay").addEventListener("click", function () {
     var stage = el("monStage");
-    stage.classList.remove("spielt");
+    stage.className = "stage spielt";
     void stage.offsetWidth;
-    stage.classList.add("spielt");
+    monitorRendern();
   });
 
   // ---------- Shot-Liste
-  function speichern() { localStorage.setItem("cineforge.v2.shots", JSON.stringify(zustand.shots)); }
+  function speichern() {
+    try { localStorage.setItem("cineforge.v2.shots", JSON.stringify(zustand.shots)); }
+    catch (e) { /* Speicher voll oder blockiert — die Liste lebt dann nur im Arbeitsspeicher weiter */ }
+  }
   function shotsRendern() {
     var halter = el("shotListe");
     halter.innerHTML = "";
@@ -968,7 +1021,7 @@
       besch.title = s.subjekt || "";
       [["↑", "Nach oben", function () { if (i > 0) { var t = zustand.shots[i - 1]; zustand.shots[i - 1] = s; zustand.shots[i] = t; speichern(); shotsRendern(); } }],
        ["↓", "Nach unten", function () { if (i < zustand.shots.length - 1) { var t = zustand.shots[i + 1]; zustand.shots[i + 1] = s; zustand.shots[i] = t; speichern(); shotsRendern(); } }],
-       ["✎", "In den Editor laden", function () { shotLaden(s); }],
+       ["✎", "Bearbeiten (lädt den Shot links in die Schritte)", function () { shotLaden(s); }],
        ["✕", "Löschen", function () { zustand.shots.splice(i, 1); speichern(); shotsRendern(); }]
       ].forEach(function (def) {
         var b = document.createElement("button");
@@ -1007,12 +1060,20 @@
 
   function kopieren(text, knopf) {
     if (!text) return;
-    navigator.clipboard.writeText(text).then(function () {
-      var alt = knopf.textContent;
-      knopf.textContent = "Kopiert ✓";
-      knopf.style.color = "var(--ok)"; knopf.style.borderColor = "var(--ok)";
-      setTimeout(function () { knopf.textContent = alt; knopf.style.color = ""; knopf.style.borderColor = ""; }, 1400);
-    });
+    if (!knopf.dataset.label) knopf.dataset.label = knopf.textContent;
+    function rueckmeldung(label, farbe) {
+      knopf.textContent = label;
+      knopf.style.color = farbe; knopf.style.borderColor = farbe;
+      clearTimeout(knopf._timer);
+      knopf._timer = setTimeout(function () {
+        knopf.textContent = knopf.dataset.label;
+        knopf.style.color = ""; knopf.style.borderColor = "";
+      }, 1400);
+    }
+    navigator.clipboard.writeText(text).then(
+      function () { rueckmeldung("Kopiert ✓", "var(--ok)"); },
+      function () { rueckmeldung("Fehler — manuell markieren", "var(--rec)"); }
+    );
   }
   el("kopierePrompt").addEventListener("click", function () { kopieren(promptBauen(), this); });
   el("kopiereBefehl").addEventListener("click", function () { kopieren(befehlBauen(), this); });
@@ -1020,7 +1081,7 @@
     if (!zustand.shots.length) return;
     var md = "# Storyboard — CineForge\n\n";
     zustand.shots.forEach(function (s, i) {
-      md += "## Shot " + (i + 1) + " — " + (s.subjekt || "ohne Titel") + "\n\n";
+      md += "## Shot " + (i + 1) + " — " + (s.subjekt || "ohne Motiv") + "\n\n";
       md += "```\n" + s.prompt + "\n```\n\n";
       md += "Agent-Befehl: `" + s.befehl + "`\n\n";
     });
@@ -1062,9 +1123,13 @@
     });
   });
 
-  // Gedämpfter Cursor-Glow (Damping 0.06, geclampt; nicht bei reduzierter Bewegung/Touch)
+  // Sparmodus: auf schwachen Geräten Ambient-Effekte abschalten
+  var sparmodus = (navigator.hardwareConcurrency || 4) <= 2;
+  if (sparmodus) document.body.classList.add("sparmodus");
+
+  // Gedämpfter Cursor-Glow (Damping 0.06, geclampt; nicht bei reduzierter Bewegung/Touch/Sparmodus)
   (function () {
-    if (reduzierteBewegung() || !window.matchMedia("(pointer: fine)").matches) return;
+    if (sparmodus || reduzierteBewegung() || !window.matchMedia("(pointer: fine)").matches) return;
     var glow = el("cursorGlow");
     var zx = innerWidth / 2, zy = innerHeight / 2, x = zx, y = zy;
     addEventListener("pointermove", function (e) { zx = e.clientX; zy = e.clientY; });
