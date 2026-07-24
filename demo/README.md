@@ -49,6 +49,7 @@ Keine Python-Pakete nötig — nur Standardbibliothek.
 |---|---|
 | `start.sh` | Ein Befehl: Hardware, Ollama, Modell, Demo |
 | `hardware.py` | Erkennt RAM und Grafikkarte, wählt das Modell |
+| `selbsttest.py` | Prüft den Ablauf ohne Ollama |
 | `extract.py` | Der Ablauf: Datei lesen → lokales Modell → geprüftes JSON |
 | `vorlagen/beleg.md` | Steuerkanzlei: Rechnungen und Belege auslesen |
 | `vorlagen/angebot.md` | Handwerk: aus Notizen ein Angebot strukturieren |
@@ -69,10 +70,23 @@ Bei der Pflege-Vorlage kommt dazu: keine Bewertung, keine Diagnose, Verantwortun
 bleibt bei der Pflegekraft. Sag das im Gespräch von dir aus — es ist der erste
 Einwand, der kommt.
 
+## Wenn etwas klemmt
+
+```bash
+python3 selbsttest.py
+```
+
+Der Selbsttest ersetzt Ollama durch einen Nachbau und prüft den ganzen Ablauf:
+Vorlage laden, Platzhalter ersetzen, Anfrage bauen, Antwort auswerten.
+
+- **Selbsttest läuft, echter Lauf nicht** → das Problem liegt bei Ollama oder am
+  Modell, nicht am Code.
+- **Selbsttest schlägt fehl** → Fehlermeldung hierher kopieren.
+
 ## Stand
 
-Ablauf, Fehlerbehandlung und Vorlagen sind geprüft. Gegen ein echtes Modell
-getestet ist noch nichts — das ist dein erster Schritt, sobald Ollama läuft.
+Ablauf, Fehlerbehandlung, Hardwareerkennung und Vorlagen sind geprüft, der
+Selbsttest läuft durch. Gegen ein echtes Modell gelaufen ist es noch nicht.
 Wenn die Ausgabe bei deinen eigenen Belegen daneben liegt, liegt es fast immer
 an der Vorlage, nicht am Modell: Schema schärfen, Regeln ergänzen.
 
