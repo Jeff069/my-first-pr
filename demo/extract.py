@@ -21,8 +21,9 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+import hardware
+
 OLLAMA_URL = "http://localhost:11434/api/generate"
-STANDARD_MODELL = "llama3.1:8b"
 VORLAGEN_DIR = Path(__file__).parent / "vorlagen"
 
 
@@ -89,13 +90,16 @@ def main() -> None:
     parser.add_argument("datei", type=Path, help="Eingabe (.txt oder .pdf)")
     parser.add_argument("--vorlage", required=True,
                         help="Name in vorlagen/ ohne Endung, z. B. beleg")
-    parser.add_argument("--modell", default=STANDARD_MODELL)
+    parser.add_argument("--modell", default=None,
+                        help="Standard: passend zur Hardware automatisch gewaehlt")
     parser.add_argument("--zeitlimit", type=int, default=180, help="Sekunden")
     parser.add_argument("--ausgabe", type=Path, help="JSON zusaetzlich hierhin schreiben")
     args = parser.parse_args()
 
     if not args.datei.is_file():
         sys.exit(f"Datei nicht gefunden: {args.datei}")
+
+    modell = args.modell or hardware.waehlen()[0]
 
     vorlage_pfad = VORLAGEN_DIR / f"{args.vorlage}.md"
     if not vorlage_pfad.is_file():
@@ -108,7 +112,7 @@ def main() -> None:
                  "Dann vorher OCR laufen lassen (ocrmypdf).")
 
     prompt = vorlage_pfad.read_text(encoding="utf-8").replace("{{INHALT}}", inhalt)
-    daten = json_bergen(modell_fragen(args.modell, prompt, args.zeitlimit))
+    daten = json_bergen(modell_fragen(modell, prompt, args.zeitlimit))
 
     ausgabe = json.dumps(daten, ensure_ascii=False, indent=2)
     print(ausgabe)

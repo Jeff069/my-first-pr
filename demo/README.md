@@ -3,27 +3,40 @@
 Unstrukturierter Text rein, saubere Daten raus — komplett auf deinem Rechner,
 ohne Cloud. Das ist das Stück, das du im Kundengespräch aufklappst.
 
-## Einrichten (einmalig, ~10 Minuten)
+## Starten
 
 ```bash
-# 1. Ollama installieren
-curl -fsSL https://ollama.com/install.sh | sh     # Linux/macOS
-#    Windows: Installer von ollama.com
-
-# 2. Modell holen (~5 GB)
-ollama pull llama3.1:8b
-
-# 3. Läuft es?
-ollama list
+bash start.sh
 ```
 
-## Benutzen
+Das ist alles. Das Skript prüft deine Hardware, wählt das passende Modell,
+installiert Ollama falls nötig, lädt das Modell und führt die Demo vor.
+Nichts zu entscheiden.
+
+Windows: vorher WSL2 öffnen, dort denselben Befehl.
+
+## Danach benutzen
 
 ```bash
 python3 extract.py --vorlage beleg   beispiele/beleg.txt
 python3 extract.py --vorlage angebot beispiele/angebot.txt
 python3 extract.py --vorlage pflege  meine_notiz.txt
 ```
+
+Das Modell wird automatisch zur Hardware gewählt. Was erkannt wurde:
+
+```bash
+python3 hardware.py
+```
+
+| Speicher | Modell |
+|---|---|
+| ab 32 GB | `qwen2.5:14b` |
+| ab 16 GB | `llama3.1:8b` |
+| ab 8 GB | `llama3.2:3b` |
+| darunter | `llama3.2:1b` (ungenau) |
+
+Überstimmen geht mit `--modell name`.
 
 PDFs gehen auch, dafür braucht es `pdftotext` (Paket `poppler-utils`).
 Gescannte PDFs vorher durch `ocrmypdf` schicken.
@@ -34,6 +47,8 @@ Keine Python-Pakete nötig — nur Standardbibliothek.
 
 | Datei | Zweck |
 |---|---|
+| `start.sh` | Ein Befehl: Hardware, Ollama, Modell, Demo |
+| `hardware.py` | Erkennt RAM und Grafikkarte, wählt das Modell |
 | `extract.py` | Der Ablauf: Datei lesen → lokales Modell → geprüftes JSON |
 | `vorlagen/beleg.md` | Steuerkanzlei: Rechnungen und Belege auslesen |
 | `vorlagen/angebot.md` | Handwerk: aus Notizen ein Angebot strukturieren |
