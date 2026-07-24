@@ -1,0 +1,20 @@
+Elektro Sauer GmbH
+Ringstraße 14, 34117 Kassel
+USt-IdNr.: DE 812 345 678
+
+RECHNUNG Nr. 2026-0417
+Datum: 12.03.2026
+Leistungszeitraum: 02.03.2026 - 09.03.2026
+
+Kunde: Bäckerei Winter, Marktplatz 3, 34117 Kassel
+
+Pos.  Bezeichnung                       Menge   Einzelpreis   Gesamt
+1     Montage Verteilerschrank           1        890,00      890,00
+2     Elektroinstallation Backstube     14,5 Std   72,50     1.051,25
+3     Kabel NYM-J 5x2,5 (Meter)          80         3,90       312,00
+
+                                        Netto             2.253,25
+                                        19% USt             428,12
+                                        Brutto            2.681,37
+
+Zahlbar ohne Abzug bis 26.03.2026.
