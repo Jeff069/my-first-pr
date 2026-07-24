@@ -30,9 +30,13 @@ Jeder kan einen Beitrag leisten — egal ob Anfänger oder Profi!
 | [`vertrieb/`](./vertrieb/) | Anschreiben, Gesprächsleitfaden und Angebotsvorlage für die ersten Kunden |
 | [`jarvis/`](./jarvis/) | Setup-Paket für einen eigenen Assistenten (NanoClaw) |
 
+**Ergebnis eines echten Laufs zum Anschauen:**
+https://claude.ai/code/artifact/27809c36-069f-42bc-9e65-fbf1bf858d35
+
 Schnellstart:
 
 ```bash
-bash demo/start.sh        # richtet alles ein und führt vor
-python3 demo/selbsttest.py   # prüft den Ablauf ohne Ollama
+python3 demo/ohne_modell.py demo/beispiele/beleg.txt   # sofort, ohne Installation
+bash demo/start.sh                                     # mit Sprachmodell
+python3 demo/selbsttest.py                             # prüft alles ohne Ollama
 ```

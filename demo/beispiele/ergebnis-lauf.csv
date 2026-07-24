@@ -1,0 +1,7 @@
+﻿datei;belegart;rechnungsnummer;datum;lieferant;ust_id;betrag_netto;umsatzsteuer;steuersatz;betrag_brutto;waehrung;zahlungsziel;geprueft;pruefen
+angebot.txt;unbekannt;;;Anruf Frau Özdemir, Lindenweg 22. Bad komplett neu fliesen, ca 18 qm Boden und;;;;;;EUR;;PRUEFEN;als Beleg nicht erkannt - weder Nummer noch Datum noch Betrag gefunden
+beleg.txt;Rechnung;2026-0417;2026-03-12;Elektro Sauer GmbH;DE 812 345 678;2253.25;428.12;19.0;2681.37;EUR;2026-03-26;ok;
+pflege.txt;unbekannt;;2026-07-14;Einsatz Frau Kowalski, 14.07.2026 gegen halb neun morgens.;;;;;;EUR;;PRUEFEN;nicht gefunden: rechnungsnummer, betrag_brutto
+v1_kleinunternehmer.txt;Rechnung;RE-2026/338;2026-06-04;Gärtnerei Blum;;780.0;0.0;0.0;780.0;EUR;;ok;
+v2_kassenbon.txt;Quittung;004512;2026-05-22;BAUHAUS Fachcentrum;DE 143 220 470;47.8;9.08;19.0;56.88;EUR;;ok;
+v3_dienstleister.txt;Rechnung;2026-K-0091;2026-04-30;Kanzlei Dr. Reinhardt & Partner mbB;DE 119 887 665;2847.5;541.03;19.0;3388.53;EUR;2026-05-14;ok;
