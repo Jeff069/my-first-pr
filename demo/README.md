@@ -20,7 +20,7 @@ Windows: vorher WSL2 öffnen, dort denselben Befehl.
 ```bash
 python3 extract.py --vorlage beleg   beispiele/beleg.txt
 python3 extract.py --vorlage angebot beispiele/angebot.txt
-python3 extract.py --vorlage pflege  meine_notiz.txt
+python3 extract.py --vorlage pflege  beispiele/pflege.txt
 ```
 
 Das Modell wird automatisch zur Hardware gewählt. Was erkannt wurde:
