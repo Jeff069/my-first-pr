@@ -5,6 +5,14 @@ ohne Cloud. Das ist das Stück, das du im Kundengespräch aufklappst.
 
 ## Starten
 
+**Windows** (PowerShell im Ordner `demo` öffnen):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File start.ps1
+```
+
+**Linux und macOS:**
+
 ```bash
 bash start.sh
 ```
@@ -13,7 +21,8 @@ Das ist alles. Das Skript prüft deine Hardware, wählt das passende Modell,
 installiert Ollama falls nötig, lädt das Modell und führt die Demo vor.
 Nichts zu entscheiden.
 
-Windows: vorher WSL2 öffnen, dort denselben Befehl.
+Auf Windows heißt Python meist `python` statt `python3` — das Skript findet das
+selbst heraus. Fehlt Python ganz: `winget install Python.Python.3.12`
 
 ## Danach benutzen
 
@@ -47,7 +56,8 @@ Keine Python-Pakete nötig — nur Standardbibliothek.
 
 | Datei | Zweck |
 |---|---|
-| `start.sh` | Ein Befehl: Hardware, Ollama, Modell, Demo |
+| `start.sh` | Ein Befehl für Linux und macOS |
+| `start.ps1` | Dasselbe für Windows |
 | `hardware.py` | Erkennt RAM und Grafikkarte, wählt das Modell |
 | `selbsttest.py` | Prüft den ganzen Ablauf ohne Ollama |
 | `pruefer.py` | Rechnet nach und schlägt im Original nach |

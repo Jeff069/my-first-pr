@@ -38,8 +38,10 @@ def text_einlesen(pfad: Path) -> str:
             )
             return ergebnis.stdout
         except FileNotFoundError:
-            sys.exit("pdftotext fehlt. Installieren: apt install poppler-utils "
-                     "(Linux) / brew install poppler (macOS)")
+            sys.exit("pdftotext fehlt. Installieren:\n"
+                     "  Linux    apt install poppler-utils\n"
+                     "  macOS    brew install poppler\n"
+                     "  Windows  winget install oschwartz10612.Poppler")
         except subprocess.CalledProcessError as fehler:
             sys.exit(f"PDF konnte nicht gelesen werden: {fehler.stderr.strip()}")
     return pfad.read_text(encoding="utf-8", errors="replace")
