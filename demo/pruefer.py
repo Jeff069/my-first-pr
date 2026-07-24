@@ -102,7 +102,9 @@ def belege_pruefen(daten: dict, quelltext: str) -> list[str]:
 
     for feld in ("betrag_netto", "umsatzsteuer", "betrag_brutto", "summe_netto"):
         wert = _als_zahl(daten.get(feld))
-        if wert is not None and f"{wert:.2f}" not in zahlen:
+        # Eine echte Null steht selten als Zahl im Text (z. B. § 19 UStG,
+        # keine Umsatzsteuer) - das ist keine Erfindung.
+        if wert not in (None, 0.0) and f"{wert:.2f}" not in zahlen:
             warnungen.append(f"'{feld}' ({wert:.2f}) steht so nicht im Original")
 
     for feld in ("rechnungsnummer", "ust_id"):
@@ -118,9 +120,28 @@ def belege_pruefen(daten: dict, quelltext: str) -> list[str]:
     return warnungen
 
 
+def vollstaendigkeit_pruefen(daten: dict) -> list[str]:
+    """Leere Felder sind der gefaehrlichste Fall: Sie widersprechen nichts und
+    rutschen sonst als 'ok' durch. Ein Beleg ohne Betrag ist kein Beleg."""
+    if "betrag_brutto" not in daten:      # andere Vorlage, andere Felder
+        return []
+
+    pflicht = {"rechnungsnummer": daten.get("rechnungsnummer"),
+               "datum": daten.get("datum"),
+               "betrag_brutto": daten.get("betrag_brutto")}
+    fehlend = [name for name, wert in pflicht.items() if wert in (None, "")]
+
+    if len(fehlend) == len(pflicht):
+        return ["als Beleg nicht erkannt - weder Nummer noch Datum noch Betrag gefunden"]
+    if fehlend:
+        return [f"nicht gefunden: {', '.join(fehlend)}"]
+    return []
+
+
 def alles_pruefen(daten: dict, quelltext: str) -> dict:
     """Haengt einen Pruefblock an die Daten an. Aendert die Werte selbst nie."""
-    warnungen = betraege_pruefen(daten) + datum_pruefen(daten) + belege_pruefen(daten, quelltext)
+    warnungen = (betraege_pruefen(daten) + datum_pruefen(daten)
+                 + belege_pruefen(daten, quelltext) + vollstaendigkeit_pruefen(daten))
 
     daten["pruefung"] = {
         "bestanden": not warnungen,

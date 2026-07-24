@@ -3,7 +3,25 @@
 Unstrukturierter Text rein, saubere Daten raus — komplett auf deinem Rechner,
 ohne Cloud. Das ist das Stück, das du im Kundengespräch aufklappst.
 
-## Starten
+## Sofort, ohne alles
+
+Für Rechnungen und Quittungen braucht es kein Modell und keine Installation:
+
+```bash
+python3 demo/ohne_modell.py demo/beispiele/beleg.txt
+```
+
+Reine Mustererkennung, nur Standardbibliothek. Erfindet grundsätzlich nichts —
+jeder Wert wird wörtlich aus dem Text genommen. Bei sauberen deutschen Rechnungen
+ist sie dem kleinen Sprachmodell überlegen.
+
+Ist Ollama nicht erreichbar, schalten `extract.py` und `stapel.py` bei Belegen
+automatisch darauf um.
+
+Grenzen: ungewöhnliche Layouts, Fließtext, Fremdsprachen — und alles, was kein
+Beleg ist (Angebotsnotizen, Pflegedokumentation). Dafür ist das Modell da.
+
+## Mit Modell starten
 
 **Windows** (PowerShell im Ordner `demo` öffnen):
 
@@ -63,6 +81,7 @@ Keine Python-Pakete nötig — nur Standardbibliothek.
 | `pruefer.py` | Rechnet nach und schlägt im Original nach |
 | `stapel.py` | Ganzen Ordner verarbeiten, Ergebnis als CSV |
 | `extract.py` | Der Ablauf: Datei lesen → lokales Modell → geprüftes JSON |
+| `ohne_modell.py` | Belegerkennung per Muster, ganz ohne Modell |
 | `vorlagen/beleg.md` | Steuerkanzlei: Rechnungen und Belege auslesen |
 | `vorlagen/angebot.md` | Handwerk: aus Notizen ein Angebot strukturieren |
 | `vorlagen/pflege.md` | Pflege: Einsatznotizen dokumentieren |
@@ -91,6 +110,8 @@ Nach jeder Extraktion läuft `pruefer.py`, ganz ohne Modell:
 - **Nachschlagen:** Steht jeder Betrag, die Rechnungsnummer, die USt-ID und der
   Lieferantenname überhaupt im Originaltext — oder hat das Modell sie erfunden?
 - **Datum:** gültiges Format, plausibler Zeitraum?
+- **Vollständigkeit:** fehlen Nummer, Datum und Betrag komplett, ist es kein Beleg —
+  leere Felder widersprechen nichts und würden sonst als „ok" durchrutschen.
 
 Was auffällt, landet im Feld `pruefung` und setzt `sicherheit` auf `niedrig`.
 Werte werden nie stillschweigend korrigiert.
@@ -125,8 +146,12 @@ Vorlage laden, Platzhalter ersetzen, Anfrage bauen, Antwort auswerten.
 
 ## Stand
 
-Ablauf, Fehlerbehandlung, Hardwareerkennung und Vorlagen sind geprüft, der
-Selbsttest läuft durch. Gegen ein echtes Modell gelaufen ist es noch nicht.
+Der Selbsttest deckt vier Bereiche ab und läuft grün: Einzellauf, Prüfungen,
+Stapellauf mit CSV und die modellfreie Erkennung. Letztere ist gegen vier
+verschiedene Belegarten geprüft — Handwerkerrechnung, Kleinunternehmer nach
+§ 19 UStG, Kassenbon und Kanzleirechnung mit Stundenpositionen.
+
+Gegen ein echtes Sprachmodell gelaufen ist es noch nicht.
 Wenn die Ausgabe bei deinen eigenen Belegen daneben liegt, liegt es fast immer
 an der Vorlage, nicht am Modell: Schema schärfen, Regeln ergänzen.
 

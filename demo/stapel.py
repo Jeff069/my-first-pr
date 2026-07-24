@@ -20,6 +20,7 @@ from pathlib import Path
 
 import extract
 import hardware
+import ohne_modell
 import pruefer
 
 ENDUNGEN = {".txt", ".pdf", ".md"}
@@ -62,6 +63,8 @@ def main() -> None:
     parser.add_argument("--json-ordner", type=Path, default=None,
                         help="Einzelergebnisse zusaetzlich als JSON ablegen")
     parser.add_argument("--zeitlimit", type=int, default=180)
+    parser.add_argument("--ohne-modell", action="store_true",
+                        help="nur Mustererkennung, ohne Ollama")
     args = parser.parse_args()
 
     if not args.ordner.is_dir():
@@ -85,6 +88,7 @@ def main() -> None:
     print(f"{len(dateien)} Datei(en), Modell {modell}\n", file=sys.stderr)
 
     zeilen, auffaellig, gescheitert = [], [], []
+    ohne_modell_hinweis = False
 
     for nummer, datei in enumerate(dateien, 1):
         print(f"  [{nummer}/{len(dateien)}] {datei.name} ... ", end="", flush=True, file=sys.stderr)
@@ -92,9 +96,20 @@ def main() -> None:
             inhalt = extract.text_einlesen(datei).strip()
             if not inhalt:
                 raise ValueError("kein Text lesbar (Scan ohne OCR?)")
-            antwort = extract.modell_fragen(modell, vorlage.replace("{{INHALT}}", inhalt),
-                                            args.zeitlimit)
-            daten = pruefer.alles_pruefen(extract.json_bergen(antwort), inhalt)
+            if args.ohne_modell:
+                roh = ohne_modell.auslesen(inhalt)
+            else:
+                try:
+                    antwort = extract.modell_fragen(
+                        modell, vorlage.replace("{{INHALT}}", inhalt), args.zeitlimit)
+                    roh = extract.json_bergen(antwort)
+                except ConnectionError:
+                    if not ohne_modell_hinweis:
+                        print("\n  (Ollama nicht erreichbar - Mustererkennung)",
+                              file=sys.stderr)
+                        ohne_modell_hinweis = True
+                    roh = ohne_modell.auslesen(inhalt)
+            daten = pruefer.alles_pruefen(roh, inhalt)
         except SystemExit as fehler:
             print("FEHLER", file=sys.stderr)
             gescheitert.append((datei.name, str(fehler)))

@@ -19,6 +19,7 @@ import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
+import ohne_modell
 import pruefer
 
 HIER = Path(__file__).parent
@@ -144,6 +145,40 @@ def test_stapel() -> list[str]:
         return fehler
 
 
+def test_ohne_modell() -> list[str]:
+    """Mustererkennung gegen vier verschiedene Belegarten - ganz ohne Modell."""
+    erwartet = {
+        "beleg.txt":               ("2026-0417",   2681.37, 3),
+        "v1_kleinunternehmer.txt": ("RE-2026/338",  780.00, 0),
+        "v2_kassenbon.txt":        ("004512",        56.88, 0),
+        "v3_dienstleister.txt":    ("2026-K-0091", 3388.53, 3),
+    }
+    fehler = []
+    for name, (nummer, brutto, anzahl) in erwartet.items():
+        pfad = HIER / "beispiele" / name
+        if not pfad.is_file():
+            fehler.append(f"{name} fehlt")
+            continue
+        text = pfad.read_text(encoding="utf-8")
+        daten = pruefer.alles_pruefen(ohne_modell.auslesen(text), text)
+
+        if daten.get("rechnungsnummer") != nummer:
+            fehler.append(f"{name}: Nummer {daten.get('rechnungsnummer')} statt {nummer}")
+        if daten.get("betrag_brutto") != brutto:
+            fehler.append(f"{name}: Brutto {daten.get('betrag_brutto')} statt {brutto}")
+        if len(daten.get("positionen") or []) != anzahl:
+            fehler.append(f"{name}: {len(daten.get('positionen') or [])} Positionen statt {anzahl}")
+        if not daten["pruefung"]["bestanden"]:
+            fehler.append(f"{name}: Pruefung beanstandet: {daten['pruefung']['warnungen']}")
+
+    # Kein Beleg darf nicht als 'ok' durchrutschen.
+    kein_beleg = "Notiz vom Kundentermin, Bad neu fliesen, Muster kommt noch."
+    geprueft = pruefer.alles_pruefen(ohne_modell.auslesen(kein_beleg), kein_beleg)
+    if geprueft["pruefung"]["bestanden"]:
+        fehler.append("Text ohne Belegmerkmale wurde als geprueft durchgewunken")
+    return fehler
+
+
 def main() -> None:
     try:
         server = HTTPServer(("127.0.0.1", 11434), Nachbau)
@@ -156,6 +191,7 @@ def main() -> None:
         ("Einzellauf   ", test_einzellauf),
         ("Pruefungen   ", test_pruefer),
         ("Stapel + CSV ", test_stapel),
+        ("Ohne Modell  ", test_ohne_modell),
     ]
 
     alle_fehler = []
@@ -173,8 +209,9 @@ def main() -> None:
         sys.exit(1)
 
     print("\nSelbsttest bestanden.")
-    print("Vorlagen, Anfrageformat, JSON-Bergung, Rechenpruefung, Stapellauf und CSV")
-    print("arbeiten korrekt. Ungeprueft bleibt nur, wie gut das echte Modell liest.")
+    print("Vorlagen, Anfrageformat, JSON-Bergung, Rechenpruefung, Stapellauf, CSV")
+    print("und die modellfreie Erkennung arbeiten korrekt.")
+    print("Ungeprueft bleibt nur, wie gut das echte Modell liest.")
 
 
 if __name__ == "__main__":

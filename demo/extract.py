@@ -22,6 +22,7 @@ import urllib.request
 from pathlib import Path
 
 import hardware
+import ohne_modell
 import pruefer
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
@@ -63,10 +64,8 @@ def modell_fragen(modell: str, prompt: str, zeitlimit: int) -> str:
     try:
         with urllib.request.urlopen(anfrage, timeout=zeitlimit) as antwort:
             return json.loads(antwort.read())["response"]
-    except urllib.error.URLError:
-        sys.exit("Ollama nicht erreichbar auf localhost:11434.\n"
-                 "  Laeuft es?   ollama serve\n"
-                 f"  Modell da?   ollama pull {modell}")
+    except urllib.error.URLError as fehler:
+        raise ConnectionError("Ollama nicht erreichbar auf localhost:11434") from fehler
     except TimeoutError:
         sys.exit(f"Zeitlimit von {zeitlimit}s ueberschritten. Kleineres Modell "
                  "probieren oder --zeitlimit erhoehen.")
@@ -97,6 +96,8 @@ def main() -> None:
                         help="Standard: passend zur Hardware automatisch gewaehlt")
     parser.add_argument("--zeitlimit", type=int, default=180, help="Sekunden")
     parser.add_argument("--ausgabe", type=Path, help="JSON zusaetzlich hierhin schreiben")
+    parser.add_argument("--ohne-modell", action="store_true",
+                        help="nur Mustererkennung, ohne Ollama (nur Belege)")
     args = parser.parse_args()
 
     if not args.datei.is_file():
@@ -115,7 +116,22 @@ def main() -> None:
                  "Dann vorher OCR laufen lassen (ocrmypdf).")
 
     prompt = vorlage_pfad.read_text(encoding="utf-8").replace("{{INHALT}}", inhalt)
-    daten = json_bergen(modell_fragen(modell, prompt, args.zeitlimit))
+
+    if args.ohne_modell:
+        daten = ohne_modell.auslesen(inhalt)
+    else:
+        try:
+            daten = json_bergen(modell_fragen(modell, prompt, args.zeitlimit))
+        except ConnectionError:
+            # Kein Ollama? Fuer Belege reicht die Mustererkennung.
+            if args.vorlage != "beleg":
+                sys.exit("Ollama nicht erreichbar auf localhost:11434.\n"
+                         "  Laeuft es?   ollama serve\n"
+                         f"  Modell da?   ollama pull {modell}\n"
+                         "  Fuer Belege geht es auch ohne:  --ohne-modell")
+            print("Ollama nicht erreichbar - weiter mit Mustererkennung.", file=sys.stderr)
+            daten = ohne_modell.auslesen(inhalt)
+
     daten = pruefer.alles_pruefen(daten, inhalt)
 
     ausgabe = json.dumps(daten, ensure_ascii=False, indent=2)
