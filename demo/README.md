@@ -49,7 +49,9 @@ Keine Python-Pakete nötig — nur Standardbibliothek.
 |---|---|
 | `start.sh` | Ein Befehl: Hardware, Ollama, Modell, Demo |
 | `hardware.py` | Erkennt RAM und Grafikkarte, wählt das Modell |
-| `selbsttest.py` | Prüft den Ablauf ohne Ollama |
+| `selbsttest.py` | Prüft den ganzen Ablauf ohne Ollama |
+| `pruefer.py` | Rechnet nach und schlägt im Original nach |
+| `stapel.py` | Ganzen Ordner verarbeiten, Ergebnis als CSV |
 | `extract.py` | Der Ablauf: Datei lesen → lokales Modell → geprüftes JSON |
 | `vorlagen/beleg.md` | Steuerkanzlei: Rechnungen und Belege auslesen |
 | `vorlagen/angebot.md` | Handwerk: aus Notizen ein Angebot strukturieren |
@@ -58,6 +60,34 @@ Keine Python-Pakete nötig — nur Standardbibliothek.
 
 Alle drei Vorlagen nutzen denselben Ablauf. Eine neue Branche heißt: eine neue
 Datei in `vorlagen/`, sonst nichts.
+
+## Ganzen Ordner verarbeiten
+
+```bash
+python3 stapel.py ./belege --csv maerz.csv --json-ordner ./ergebnisse
+```
+
+Ergebnis ist eine Tabelle mit einer Zeile pro Beleg, Spalte `geprueft` steht auf
+`ok` oder `PRUEFEN`. Semikolon-getrennt und mit BOM — Excel öffnet sie ohne
+Nachfragen. Fehlgeschlagene Dateien werden am Ende einzeln aufgeführt, nichts
+verschwindet still.
+
+## Die Prüfung — das eigentliche Verkaufsargument
+
+Nach jeder Extraktion läuft `pruefer.py`, ganz ohne Modell:
+
+- **Nachrechnen:** Netto + Steuer = Brutto? Passt der Steuerbetrag zum Satz?
+  Ergeben die Positionen die Nettosumme?
+- **Nachschlagen:** Steht jeder Betrag, die Rechnungsnummer, die USt-ID und der
+  Lieferantenname überhaupt im Originaltext — oder hat das Modell sie erfunden?
+- **Datum:** gültiges Format, plausibler Zeitraum?
+
+Was auffällt, landet im Feld `pruefung` und setzt `sicherheit` auf `niedrig`.
+Werte werden nie stillschweigend korrigiert.
+
+Das ist der Unterschied zwischen „KI liest Belege" und etwas, das man in einer
+Kanzlei einsetzen kann: Ein erfundener Betrag wird gleich doppelt gefangen —
+die Rechnung geht nicht auf, und die Zahl steht nicht im Original.
 
 ## Warum die Vorlagen so streng sind
 

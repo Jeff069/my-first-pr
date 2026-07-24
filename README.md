@@ -19,3 +19,20 @@ Ein Pull Request ermöglicht es, Änderugnen vorzuschlagen und von anderen über
 ## Mitmachen
 
 Jeder kan einen Beitrag leisten — egal ob Anfänger oder Profi!
+
+---
+
+## Inhalt dieses Repos
+
+| Ordner | Was drin ist |
+|---|---|
+| [`demo/`](./demo/) | Lokale Dokumentenverarbeitung: Beleg rein, geprüfte Daten raus — ohne Cloud |
+| [`vertrieb/`](./vertrieb/) | Anschreiben, Gesprächsleitfaden und Angebotsvorlage für die ersten Kunden |
+| [`jarvis/`](./jarvis/) | Setup-Paket für einen eigenen Assistenten (NanoClaw) |
+
+Schnellstart:
+
+```bash
+bash demo/start.sh        # richtet alles ein und führt vor
+python3 demo/selbsttest.py   # prüft den Ablauf ohne Ollama
+```

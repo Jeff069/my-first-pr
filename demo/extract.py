@@ -22,6 +22,7 @@ import urllib.request
 from pathlib import Path
 
 import hardware
+import pruefer
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
 VORLAGEN_DIR = Path(__file__).parent / "vorlagen"
@@ -113,9 +114,14 @@ def main() -> None:
 
     prompt = vorlage_pfad.read_text(encoding="utf-8").replace("{{INHALT}}", inhalt)
     daten = json_bergen(modell_fragen(modell, prompt, args.zeitlimit))
+    daten = pruefer.alles_pruefen(daten, inhalt)
 
     ausgabe = json.dumps(daten, ensure_ascii=False, indent=2)
     print(ausgabe)
+
+    if not daten["pruefung"]["bestanden"]:
+        print(f"\nPruefung: {len(daten['pruefung']['warnungen'])} Auffaelligkeit(en) "
+              "- siehe Feld 'pruefung'.", file=sys.stderr)
 
     if args.ausgabe:
         args.ausgabe.write_text(ausgabe + "\n", encoding="utf-8")
