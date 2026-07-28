@@ -1,0 +1,14 @@
+# Schnittliste — eine Zeile pro Clip, in der Reihenfolge des fertigen Videos.
+#
+# Format:  datei | startzeit | dauer
+#
+#   startzeit  ab wann aus dem Clip geschnitten wird (Sekunden oder MM:SS)
+#   dauer      wie viele Sekunden verwendet werden — leer lassen = bis zum Ende
+#
+# Alles ab '#' ist Kommentar, leere Zeilen werden ignoriert.
+
+clips/intro.mp4      | 0     | 4
+clips/aufnahme1.mov  | 00:12 | 15
+clips/aufnahme2.mov  | 3     | 20
+clips/b-roll.mp4     | 0     | 8
+clips/outro.mp4      | 0     |
