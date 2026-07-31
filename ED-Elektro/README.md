@@ -8,14 +8,14 @@ mit den Gewerken Klima, Elektro und Sanitär.
 
 | Datei | Zweck | Für wen |
 |---|---|---|
-| [`Master-Prompt.md`](./Master-Prompt.md) | Englischer Arbeitsauftrag für den Coding-Agenten: Codebasis-Fakten, Regeln, Rollenmodell, Features F1–F10, Definition of Done, Ideen-Backlog | Entwicklung — ins ED-Elektro-Clone legen (z. B. als `CLAUDE.local.md`) |
+| [`Master-Prompt.md`](./Master-Prompt.md) | Englischer Arbeitsauftrag für den Coding-Agenten: Codebasis-Fakten, Regeln, Rollenmodell, Features F1–F11, Definition of Done, Ideen-Backlog | Entwicklung — ins ED-Elektro-Clone legen (z. B. als `CLAUDE.local.md`) |
 | [`Aenderungsliste.md`](./Aenderungsliste.md) | Deutsche Stichpunktliste aller beschlossenen Änderungen, Grundsätze und geparkten Themen | Abstimmung mit GF / Bereichsleitung |
 
 ## Nutzung
 
 1. `Master-Prompt.md` in das ED-Elektro-Clone kopieren.
 2. Session starten mit: *"Read the master prompt. Implement Feature F1."*
-3. Features strikt in der Reihenfolge F1 → F10 abarbeiten, ein Feature pro Branch.
+3. Features strikt in der Reihenfolge F1 → F11 abarbeiten, ein Feature pro Branch.
 
 ## Vor der Chef-Demo
 

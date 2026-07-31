@@ -85,6 +85,7 @@ Gemeinsame Kernfähigkeit zuerst bauen: **„Sprache rein, Struktur raus"** (Aud
 - **Berichtsheft-Generator (Azubi)**: Wochenbericht-Entwurf aus Zeiterfassung + Bautagebuch, Azubi überarbeitet, Ausbilder zeichnet digital ab (PDF über vorhandenes OpenPDF)
 - **Erklär-Modus (Azubi)**: vorhandenen Fach-Chat als Lernwerkzeug nutzen
 - **Montagmorgen-Bericht (GF)**: wöchentliche Klartext-Zusammenfassung — Auftragseingang, Angebotsquote, Forderungen > 30 Tage, Projekte mit Kalkulationsdrift > 10 %, Auslastung, offene Reklamationen
+- **Persönlicher KI-Assistent je Nutzer** für GF, F&C, BL und PL: eigener Chat, der Aufträge/Projekte, Angebote, Artikel und Bautagebuch-Fotos sucht und Fragen zum Angebot beantwortet — nur lesend; die Rechte aus §1 gelten auch im Chat (serverseitig in den Suchwerkzeugen durchgesetzt); eigene, löschbare Chat-Historie je Nutzer. Nicht für Monteure und Azubi (Azubi behält den Erklär-Modus); Subunternehmer ausgeschlossen (extern)
 
 ## 8. Auswertungen & Werkzeuge je Rolle
 

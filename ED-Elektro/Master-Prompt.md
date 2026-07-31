@@ -179,6 +179,7 @@ Six fixed role templates — **role templates, not per-user custom ACLs**; with 
 | Dispatch board (F10) | ✅ | ✅ | ✅ edit — dispatching technicians is daily PL work | own row read | own row read | own row read |
 | Dunning / Skonto / 3-way match / payroll export (F10) | ✅ | read | ❌ | ❌ | ❌ | ❌ |
 | PWA (time tracking, My Day, forms) | ✅ | ✅ | ✅ | ✅ | ✅ | restricted (own jobs, expiring account) |
+| Personal AI assistant (F11) | ✅ | ✅ | ✅ | ❌ | ❌ (F9f explain mode instead) | ❌ (external — no assistant without an explicit new owner decision) |
 
 ¹ PL sees margin on **all** projects (not just their own) because the three PLs cover for each other during vacation/sickness; post-calculation labor costs are always shown as the **calculated hourly rate (Verrechnungssatz), never real individual wages** — that is the trick that makes margin transparency possible in a small family business without exposing what colleagues earn. *(This row is the one §8 decision still awaiting the GF's blessing; fallback if declined: restrict EK/margin to Admin + BL and re-target the F9a warnings at BL.)*
 
@@ -197,7 +198,7 @@ Until F3 is complete, the system must not be reachable beyond the trusted LAN/VP
 
 # PART III — FEATURE ROADMAP (implement strictly in this order)
 
-Deliberate ordering decision: two low-risk warm-up features (F1, F2) come before the security core (F3) so the developer learns the codebase on additive work first; F2 may be swapped to after F3 if desired. F4–F10 assume F3 exists.
+Deliberate ordering decision: two low-risk warm-up features (F1, F2) come before the security core (F3) so the developer learns the codebase on additive work first; F2 may be swapped to after F3 if desired. F4–F11 assume F3 exists; F11 comes last because it stitches together the data every earlier feature produces.
 
 ## F1 — Apprentice report-book generator (Berichtsheft)
 *(first feature: additive; reads existing data, writes only its own new entities; demo feature #1)*
@@ -352,6 +353,21 @@ Nine tools, each small, each mapped to a person from §2. Build in this order (d
 
 **Acceptance (per tool):** rules covered by unit tests; role visibility per §9 enforced and tested; every automated send logged; dunning/Skonto/3-way figures reconcile against fixture data; the Plantafel round-trips an Einsatz to My Day.
 
+## F11 — Personal AI assistant for office roles (GF, F&C, BL, PL)
+*(build last — requires F3 roles; article search becomes genuinely useful after F7; reuses the F1/F6/F9 AI foundations)*
+
+**Why:** Each office user gets their own chat assistant to *find things* instead of clicking through modules: "Zeig mir die offenen Klima-Aufträge", "Die Fotos von Baustelle Müller", "Was steht im Angebot 2025-114 zur Wärmepumpe?", "Such mir das 22er Kupferrohr". Per the owner's decision the assistant is **not** available to Monteure and Azubi (the Azubi keeps the F9f explain mode; Monteure interact through the F6 voice features) — and not to Subs, who are external users; giving Subs a data-searching chat would require an explicit new owner decision.
+
+**Architecture:**
+- **Extend the existing chat stack** (`KiHilfeController`, Gemini, Qdrant RAG) — do not build a second one. The new capability is **function calling over ERP data**: the model receives a set of read-only tools and composes answers from their results; RAG stays responsible for docs/knowledge questions.
+- **Read-only tool set v1** — each tool calls the same services the REST API uses, with the caller's identity and the §9 DTO variants, so the assistant can never surface more than the user's own UI would: `sucheAuftraege` (customer, trade, status, period), `sucheAngebote` + `angebotDetails`, `sucheArtikel` (name/number → article + prices per role), `sucheBautagebuchFotos` (project/customer/date → thumbnails via the existing `DateiController`), `sucheKunden`, `offenePosten` (resolves only for Admin/BL per §9).
+- **Permission enforcement lives in the tool layer, server-side — never in the prompt.** A PL asking for company-wide revenue gets a polite German refusal because the tool rejects the call, not because the model was asked to be discreet.
+- **Strictly read-only in v1:** the assistant answers, deep-links to entity pages, and shows thumbnails; it never creates, changes, deletes, or sends anything. Write actions would be a separate, explicitly approved feature.
+- **Per-user persisted conversation history** (own entity; the user can delete their own history — DSGVO); all §11 controls apply: kill switch, German UI, AI-call log with user identity, visible AI marker.
+- **Entry point:** the existing every-page chat widget becomes the personal assistant for permitted roles (desktop frontend); for Azubi it shows the F9f explain mode; for Monteur/Sub it is absent entirely.
+
+**Acceptance:** role-scoping tests — a PL asking for company-wide financials is refused at tool level; Monteur/Azubi/Sub accounts receive 403 on assistant endpoints; "Zeig mir die offenen Klima-Aufträge" returns deep links that resolve; photo search returns only thumbnails the caller may see; the assistant is absent with AI disabled; every call is logged with user identity; conversation history is per-user isolated (user A can never read user B's chats).
+
 ---
 
 # PART IV — CROSS-CUTTING RULES
@@ -363,6 +379,7 @@ Nine tools, each small, each mapped to a person from §2. Build in this order (d
 - **Structured output always:** every LLM call requests JSON against a schema and validates it; on failure retry once, then degrade gracefully — every AI feature must leave the system fully usable with AI off.
 - **Per-feature controls:** kill switch (config flag) and system prompt in config (German where output is user-facing); all calls logged to the F1 AI-call log; monthly budget alarm from F9.
 - **One shared speech-to-structure service** (built in F6) serves all audio features — no parallel pipelines.
+- **The F11 personal assistant reaches ERP data exclusively through permission-checked, read-only tools** (function calling); §9 is enforced in the tool layer, never via prompt instructions.
 - **The §6 hierarchy is absolute:** rules before AI; prices never from the model; human in the loop per §6.6 (internal AI reports exempt; rule-based transactional sends are not AI artifacts).
 
 ## 12. What NOT to do (standing prohibitions)
