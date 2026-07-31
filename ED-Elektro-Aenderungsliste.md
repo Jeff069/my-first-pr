@@ -1,6 +1,6 @@
-# ERP-Umbau — Änderungsliste
+# ED-Elektro — Änderungsliste
 
-**Basis:** Handwerkerprogramm (Open-Source-ERP, Java 23/Spring Boot + React + MariaDB), eigener Entwickler-Clone
+**Projekt:** ED-Elektro — eigener Entwickler-Clone auf Basis des Handwerkerprogramms (Open-Source-ERP, Java 23/Spring Boot + React + MariaDB)
 **Betrieb:** Familienbetrieb Klima / Elektro / Sanitär — 1× GF, 1× Finanz & Controlling, 1× Bereichsleiter, 3× Projektleiter, 1× Azubi, 4× Monteure, zeitweise Subunternehmer
 **Stand:** 31.07.2026 — zusammengefasst aus dem Planungsgespräch
 
