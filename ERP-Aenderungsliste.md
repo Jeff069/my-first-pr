@@ -21,7 +21,11 @@
 
 - Sechs feste Rollen-Vorlagen statt Einzelrechte: **Admin (GF, F&C), Bereichsleitung, Projektleitung, Monteur, Azubi, Subunternehmer**
 - GF und F&C vergeben Rechte selbst (Admin-Oberfläche)
-- Einkaufspreise, Margen, Löhne: nur Admin + BL — Monteure sehen keine Preise
+- Sichtbarkeit von Preisen und Zahlen:
+  - Löhne/Gehälter: nur Admin (GF, F&C) — sonst niemand
+  - Firmenweite Finanzauswertungen (Gesamtumsatz, Forderungen, Liquidität): Admin + BL
+  - Projektleiter: EK- und VK-Preise sowie Marge/Nachkalkulation auf Projektebene — nötig zum Kalkulieren und Gegensteuern; wegen Vertretung auf allen Projekten. Personalkosten erscheinen dort nur als kalkulatorischer Stundensatz, nie als echter Lohn
+  - Monteure und Azubi: keine Preise
 - Subunternehmer: nur eigene Projekte, keine Preise, keine Kundenhistorie, Zugang mit Ablaufdatum
 - Vertretungsregelung für Urlaub/Krankheit (z. B. Rechnungsfreigabe, wenn F&C fehlt)
 - Jede Rechteänderung landet selbst in der Historie
