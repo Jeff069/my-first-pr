@@ -12,8 +12,13 @@ Bildschirm, nicht der Compiler.
 
 - `pruefer-dashboard` — Aufbau, Daten, Zustände, Interaktion des Dashboards
 - `pruefer-design` — visuelle Sprache, Abstände, Farben, Typografie, Konsistenz
+- `pruefer-barrierefreiheit` — Tastatur, Screenreader, Kontrast, Fokus
 
-Starte beide **in einer Nachricht**, damit sie parallel laufen.
+Starte alle **in einer Nachricht**, damit sie parallel laufen.
+Gibt es kein Dashboard, entfällt `pruefer-dashboard` — sag es im Bericht.
+
+`pruefer-design` und `pruefer-barrierefreiheit` überschneiden sich beim Kontrast.
+Das ist gewollt (zwei Blickwinkel), aber im Bericht wird daraus **ein** Eintrag.
 
 ## Vorgehen
 

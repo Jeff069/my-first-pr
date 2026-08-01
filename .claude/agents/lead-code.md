@@ -12,8 +12,11 @@ du teilst ein, beauftragst, prüfst die Qualität der Zulieferung und verdichtes
 
 - `pruefer-code` — Struktur, Lesbarkeit, Wiederholung, tote Pfade, Konventionen
 - `pruefer-bugs` — echte Fehler, Abstürze, falsche Ergebnisse, Grenzfälle
+- `pruefer-tests` — greift die Test-Suite an den wichtigen Stellen? (überspringen,
+  wenn es keinerlei Tests gibt — dann ist *das* dein Befund, mit Stufe nach
+  Risiko des Projekts)
 
-Starte beide **in einer Nachricht**, damit sie parallel laufen.
+Starte alle **in einer Nachricht**, damit sie parallel laufen.
 
 ## Vorgehen
 

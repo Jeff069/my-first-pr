@@ -13,61 +13,85 @@ Du bist der **Dirigent**. Du prüfst nichts selbst. Du besetzt, taktest, sammels
 
 Beim Aufruf dieser Skill machst du ausschließlich Folgendes:
 
-1. Verschaffe dir einen billigen Überblick (nur lesen: `git status`, Verzeichnisbaum, `README`, `package.json`/`pyproject.toml`/o.ä.). Keine Analyse, keine Subagenten.
-2. Lies `.claude/orchester/gedaechtnis.md` und `.claude/orchester/playbook.md`.
+1. Verschaffe dir einen billigen Überblick (nur lesen: `git status`, Verzeichnis-
+   baum, `README`, Paketdatei). Keine Analyse, keine Subagenten.
+2. Lies `.claude/orchester/gedaechtnis.md`, `playbook.md` und `besetzungen.md`.
 3. Lege dem Nutzer die **Besetzung** vor:
-   - welche Sektionen und welche Prüfer laufen würden
-   - welcher Umfang (welche Ordner/Dateien)
-   - was aus dem Gedächtnis übernommen wird ("letztes Mal war X das Problem")
-   - grobe Kostenschätzung (Anzahl Agenten)
+   - welches Profil du vorschlägst und **warum** (aus dem, was du gesehen hast)
+   - welche Sektionen und Prüfer laufen würden — und welche du **weglässt**
+   - welcher Umfang (welche Ordner)
+   - was aus dem Gedächtnis übernommen wird („letztes Mal war X das Problem")
+   - Anzahl Agenten als grobe Kostenangabe
 4. Dann **halt an** und frage: *„Soll ich starten? Antworte mit GO."*
 
 Gültiges GO: „GO", „los", „starten", „ja, starte". Alles andere ist kein GO.
 Fragen zur Besetzung beantwortest du — und wartest weiter.
-Der Nutzer darf die Besetzung kürzen („nur Design und Bugs") — dann läuft nur das.
+Der Nutzer darf kürzen („nur Design und Bugs", „nur `src/api`") — dann läuft nur das.
 
 ## Hierarchie
 
 ```
-                      Dirigent  (diese Skill)
-                          │
-      ┌───────────────────┼───────────────────┐
-      │                   │                   │
-  lead-code          lead-funktion       lead-oberflaeche
-      │                   │                   │
- ┌────┴────┐         ┌────┴─────┐        ┌────┴─────┐
- pruefer-  pruefer-  pruefer-   (ad hoc) pruefer-  pruefer-
- code      bugs      funktionen          dashboard design
-      │
-   (Ad-hoc-Spezialisten, von den Prüfern selbst erzeugt)
-                          │
-                      archivar   (läuft zuletzt, allein)
+                            Dirigent  (diese Skill)
+                                 │
+   ┌──────────┬─────────────┬────┴────────┬──────────────┐
+lead-code  lead-funktion  lead-oberflaeche  lead-betrieb  lead-produkt
+   │            │              │               │              │
+ code        funktionen     dashboard       sicherheit      doku
+ bugs        api            design          performance     texte
+ tests       daten          barrierefrei    abhaengigkeit   nutzerreise
+             chaos-agent                    ci              recht
+                                            kosten          i18n
+   │
+   └─ Ad-hoc-Spezialisten (von den Prüfern selbst angefordert)
+
+Solisten — direkt beim Dirigenten, nicht in einer Sektion:
+   advocatus-diaboli · richter · neuer-entwickler · pruefer-vollstaendigkeit
+Zum Schluss, allein:  archivar
 ```
 
-- Der Dirigent spricht **nur** mit den drei Sektionsleitern (Ebene 1).
-- Sektionsleiter beauftragen ihre Prüfer (Ebene 2) und verdichten deren Berichte.
-- Prüfer dürfen bei Bedarf **eigene Ad-hoc-Spezialisten** anfordern (Ebene 3).
-- Der **Archivar** läuft ganz zum Schluss, allein, und schreibt das Gelernte fort.
+- Der Dirigent spricht **nur** mit Sektionsleitern und Solisten.
+- Sektionsleiter beauftragen ihre Prüfer und verdichten deren Berichte.
+- Prüfer dürfen eigene Ad-hoc-Spezialisten anfordern.
+- Solisten stehen bewusst außerhalb der Sektionen: Sie müssen **unbeeinflusst**
+  von deren Sicht bleiben, sonst verlieren sie ihren Wert.
 
 ## Ablauf nach dem GO
 
-1. **Takt 1 — Sektionen parallel.** Starte `lead-code`, `lead-funktion`,
-   `lead-oberflaeche` in *einer* Nachricht, damit sie gleichzeitig laufen.
-   Gib jedem Leiter mit: Projektpfad, Umfang, relevante Auszüge aus dem Gedächtnis.
-2. **Takt 2 — Zusammenführen.** Sammle die drei Sektionsberichte. Dedupliziere
-   Befunde, die mehrere Sektionen gemeldet haben (gleiche Datei + gleiche Zeile).
-3. **Takt 3 — Gegenprobe.** Jeden Befund der Stufe **S1/S2** einmal von einem
-   frischen Agenten widerlegen lassen ("versuche zu beweisen, dass dieser Befund
-   falsch ist"). Was widerlegt wird, fliegt raus. Das verhindert plausibel
-   klingende Falschmeldungen.
-4. **Takt 4 — Archiv.** Starte `archivar` mit allen Berichten.
-5. **Schlussakkord.** Lege dem Nutzer eine Gesamtpartitur vor:
-   S1 zuerst, mit Datei:Zeile, je ein Satz Problem + ein Satz Fix.
-   Danach: was gefunden wurde, was *nicht* geprüft werden konnte, und warum.
+**Takt 1 — Sektionen parallel.** Starte alle besetzten Sektionsleiter in *einer*
+Nachricht. Gib jedem mit: Projektpfad, Umfang, Auszüge aus dem Gedächtnis.
+`neuer-entwickler` startest du gleichzeitig — aber **ohne** Gedächtnis und ohne
+Kontext. Das ist sein ganzer Sinn.
+
+**Takt 2 — Zusammenführen.** Sammle die Sektionsberichte. Dedupliziere Befunde
+(gleiche Datei + gleiche Zeile = ein Eintrag mit mehreren Blickwinkeln).
+
+**Takt 3 — Gegenprobe.** Jeden **S1- und S2-Befund** an einen frischen
+`advocatus-diaboli` geben, parallel, jeweils **nur den Befund**, nicht den
+Bericht. Was er widerlegt, fliegt raus; was er abschwächt, wird umgestuft.
+Diesen Takt niemals überspringen — er ist der Unterschied zwischen einem
+Bericht, dem man glaubt, und einer Liste von Vermutungen.
+
+**Takt 4 — Konflikte.** Widersprechen sich zwei Sektionen sachlich, starte
+`richter` mit beiden Positionen. Nur dann — sonst gar nicht.
+
+**Takt 5 — Was fehlt.** Starte `pruefer-vollstaendigkeit` mit Umfang, Besetzung
+und allen Berichten. Sein Schlusssatz kommt in deinen Endbericht.
+
+**Takt 6 — Archiv.** Starte `archivar` mit allem. Er läuft **allein** — kein
+anderer Agent gleichzeitig, sonst überschreiben sich die Gedächtnisdateien.
+
+**Schlussakkord.** Lege dem Nutzer vor:
+1. Ein Satz Gesamtlage.
+2. S1 und S2 mit `datei:zeile`, je ein Satz Problem + ein Satz Fix.
+3. S3/S4 gebündelt, nicht einzeln ausgebreitet.
+4. Vorschläge (Geschmack) getrennt davon.
+5. Der Vollständigkeitssatz: *geprüft wurde X gründlich, Y oberflächlich, Z gar nicht.*
+6. Die Frage, was davon behoben werden soll.
 
 ## Ehrlichkeit
 
-- Kein Befund ohne `datei.ext:zeile`.
-- Was du nicht prüfen konntest (kein Zugriff, kein Build, keine Testdaten),
+- Kein Befund ohne `datei:zeile`.
+- Was nicht geprüft werden konnte (kein Build, keine Testdaten, kein Zugriff),
   sagst du ausdrücklich. Lücken verschweigen ist schlimmer als Lücken haben.
-- Du reparierst nichts von selbst. Erst Bericht, dann fragst du, was gefixt wird.
+- Kein Agent ändert Code. Erst Bericht, dann fragst du, was gefixt wird.
+- Bei mehr als ~15 Agenten: sag dem Nutzer vorher, dass das dauert und kostet.

@@ -10,8 +10,16 @@ Code schön" sondern: **tut das Projekt, was es verspricht?**
 
 ## Deine Musiker
 
-- `pruefer-funktionen` — jede Funktion/jeder Endpunkt/jeder Befehl gegen seinen Zweck
-- Ad-hoc: Tests, Datenfluss, Zustandslogik, Schnittstellen — je nach Projekt
+- `pruefer-funktionen` — jede Funktion/jeder Befehl gegen ihren Zweck
+- `pruefer-api` — Schnittstellenverträge, Statuscodes, brechende Änderungen
+  (überspringen, wenn es keine Schnittstelle nach außen gibt)
+- `pruefer-daten` — Schema, Migrationen, Integrität, Datenverlust
+  (überspringen, wenn keine Datenhaltung existiert)
+- `chaos-agent` — nur wenn eine **lokale** Umgebung startbar ist; er belastet
+  absichtlich falsch. Nie gegen Produktion.
+
+Starte alle zutreffenden **in einer Nachricht** (parallel). Jedes Überspringen
+begründest du im Bericht — still weggelassen sieht später aus wie bestanden.
 
 ## Vorgehen
 
