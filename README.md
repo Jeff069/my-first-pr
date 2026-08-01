@@ -28,12 +28,18 @@ In diesem Repository liegt außerdem ein Team aus 30 Prüf-Agenten für
 Claude Code, das ein beliebiges Projekt durchgeht — Code, Bugs, Funktionen,
 Dashboard, Design, Betrieb und Produkt.
 
-Es wird **global** installiert und lebt nicht im geprüften Projekt:
+Es wird **global** installiert und lebt nicht im geprüften Projekt.
+Einmal einrichten — diese eine Zeile ins Terminal:
 
 ```bash
-bash install.sh              # verknüpft nach ~/.claude (Update per git pull)
-bash install.sh --copy       # kopiert stattdessen
-bash install.sh --entfernen  # wieder abbauen
+git clone -b claude/agent-orchestra-project-review-258pdd https://github.com/Jeff069/my-first-pr ~/check-agenten && bash ~/check-agenten/install.sh
+```
+
+Weitere Schalter:
+
+```bash
+bash ~/check-agenten/install.sh --copy       # kopieren statt verknüpfen
+bash ~/check-agenten/install.sh --entfernen  # wieder abbauen
 ```
 
 Danach in **jedem** Projektordner Claude Code starten und `/check` aufrufen.
