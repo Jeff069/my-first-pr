@@ -22,9 +22,9 @@ Jeder kan einen Beitrag leisten — egal ob Anfänger oder Profi!
 
 ---
 
-## Das Prüf-Orchester
+## Der Check — 30 Prüf-Agenten
 
-In diesem Repository liegt außerdem ein Ensemble aus 30 Prüf-Agenten für
+In diesem Repository liegt außerdem ein Team aus 30 Prüf-Agenten für
 Claude Code, das ein beliebiges Projekt durchgeht — Code, Bugs, Funktionen,
 Dashboard, Design, Betrieb und Produkt.
 
@@ -36,10 +36,10 @@ bash install.sh --copy       # kopiert stattdessen
 bash install.sh --entfernen  # wieder abbauen
 ```
 
-Danach in **jedem** Projektordner Claude Code starten und `/orchester` aufrufen.
-Der Dirigent schlägt eine Besetzung vor und wartet auf dein **GO** — vorher
+Danach in **jedem** Projektordner Claude Code starten und `/check` aufrufen.
+Die Leitung schlägt eine Aufstellung vor und wartet auf dein **GO** — vorher
 läuft kein Agent. Im geprüften Projekt entsteht keine einzige Datei; Berichte,
-Gedächtnis und Verlauf liegen unter `~/.claude/orchester/projekte/<name>/`.
+Gedächtnis und Verlauf liegen unter `~/.claude/check/projekte/<name>/`.
 
-Ausführliche Beschreibung: [`orchester/doku/README.md`](orchester/doku/README.md)
-· Besetzungen: [`orchester/doku/besetzungen.md`](orchester/doku/besetzungen.md)
+Ausführliche Beschreibung: [`check/doku/README.md`](check/doku/README.md)
+· Aufstellungen: [`check/doku/aufstellungen.md`](check/doku/aufstellungen.md)

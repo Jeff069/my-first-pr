@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installiert das Prüf-Orchester global nach ~/.claude/
+# Installiert die Prüf-Agenten (/check) global nach ~/.claude/
 # Das geprüfte Projekt bleibt dabei unberührt — dort wird nichts abgelegt.
 #
 #   bash install.sh            # verknüpft (symlink) — Updates per git pull
@@ -7,7 +7,7 @@
 #   bash install.sh --entfernen
 set -euo pipefail
 
-QUELLE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/orchester"
+QUELLE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/check"
 ZIEL="${CLAUDE_HOME:-$HOME/.claude}"
 MODUS="${1:---link}"
 
@@ -19,9 +19,9 @@ entfernen() {
     z="$ZIEL/agents/$(basename "$datei")"
     if [ -e "$z" ] || [ -L "$z" ]; then rm -f "$z"; n=$((n+1)); fi
   done < <(agentenliste)
-  rm -rf "$ZIEL/skills/orchester"
-  echo "Entfernt: $n Agenten und die Skill /orchester."
-  echo "Erhalten bleibt: $ZIEL/orchester (Gedächtnis, Playbook, Berichte)."
+  rm -rf "$ZIEL/skills/check"
+  echo "Entfernt: $n Agenten und die Skill /check."
+  echo "Erhalten bleibt: $ZIEL/check (Gedächtnis, Playbook, Berichte)."
   echo "Das löschst du bei Bedarf selbst — dann ist alles Gelernte weg."
 }
 
@@ -29,7 +29,7 @@ if [ "$MODUS" = "--entfernen" ] || [ "$MODUS" = "--uninstall" ]; then
   entfernen; exit 0
 fi
 
-mkdir -p "$ZIEL/agents" "$ZIEL/skills" "$ZIEL/orchester/projekte"
+mkdir -p "$ZIEL/agents" "$ZIEL/skills" "$ZIEL/check/projekte"
 
 # 1. Agenten
 anzahl=0
@@ -39,24 +39,24 @@ while IFS= read -r datei; do
   anzahl=$((anzahl+1))
 done < <(agentenliste)
 
-# 2. Skill /orchester
-rm -rf "$ZIEL/skills/orchester"
+# 2. Skill /check
+rm -rf "$ZIEL/skills/check"
 if [ "$MODUS" = "--copy" ]; then
-  cp -R "$QUELLE/skills/orchester" "$ZIEL/skills/orchester"
+  cp -R "$QUELLE/skills/check" "$ZIEL/skills/check"
 else
-  ln -sfn "$QUELLE/skills/orchester" "$ZIEL/skills/orchester"
+  ln -sfn "$QUELLE/skills/check" "$ZIEL/skills/check"
 fi
 
 # 3. Doku und Vorlagen — nur anlegen, nie überschreiben (dein Gelerntes bleibt)
-cp -f "$QUELLE/doku/besetzungen.md" "$ZIEL/orchester/besetzungen.md"
-cp -f "$QUELLE/doku/README.md"      "$ZIEL/orchester/README.md"
-[ -f "$ZIEL/orchester/playbook.md" ] || cp "$QUELLE/vorlagen/playbook.md" "$ZIEL/orchester/playbook.md"
+cp -f "$QUELLE/doku/aufstellungen.md" "$ZIEL/check/aufstellungen.md"
+cp -f "$QUELLE/doku/README.md"      "$ZIEL/check/README.md"
+[ -f "$ZIEL/check/playbook.md" ] || cp "$QUELLE/vorlagen/playbook.md" "$ZIEL/check/playbook.md"
 
-echo "Orchester installiert nach $ZIEL"
+echo "Check installiert nach $ZIEL"
 echo "  $anzahl Agenten in  $ZIEL/agents/"
-echo "  Skill /orchester in $ZIEL/skills/orchester/"
-echo "  Archiv in           $ZIEL/orchester/projekte/<projektname>/"
+echo "  Skill /check in $ZIEL/skills/check/"
+echo "  Archiv in           $ZIEL/check/projekte/<projektname>/"
 [ "$MODUS" = "--copy" ] || echo "  (verknüpft — 'git pull' hier aktualisiert die Agenten sofort)"
 echo
-echo "Claude Code im Projektordner starten und /orchester aufrufen."
+echo "Claude Code im Projektordner starten und /check aufrufen."
 echo "Im Projekt selbst wird nichts angelegt."
