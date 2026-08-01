@@ -19,3 +19,27 @@ Ein Pull Request ermöglicht es, Änderugnen vorzuschlagen und von anderen über
 ## Mitmachen
 
 Jeder kan einen Beitrag leisten — egal ob Anfänger oder Profi!
+
+---
+
+## Das Prüf-Orchester
+
+In diesem Repository liegt außerdem ein Ensemble aus 30 Prüf-Agenten für
+Claude Code, das ein beliebiges Projekt durchgeht — Code, Bugs, Funktionen,
+Dashboard, Design, Betrieb und Produkt.
+
+Es wird **global** installiert und lebt nicht im geprüften Projekt:
+
+```bash
+bash install.sh              # verknüpft nach ~/.claude (Update per git pull)
+bash install.sh --copy       # kopiert stattdessen
+bash install.sh --entfernen  # wieder abbauen
+```
+
+Danach in **jedem** Projektordner Claude Code starten und `/orchester` aufrufen.
+Der Dirigent schlägt eine Besetzung vor und wartet auf dein **GO** — vorher
+läuft kein Agent. Im geprüften Projekt entsteht keine einzige Datei; Berichte,
+Gedächtnis und Verlauf liegen unter `~/.claude/orchester/projekte/<name>/`.
+
+Ausführliche Beschreibung: [`orchester/doku/README.md`](orchester/doku/README.md)
+· Besetzungen: [`orchester/doku/besetzungen.md`](orchester/doku/besetzungen.md)
