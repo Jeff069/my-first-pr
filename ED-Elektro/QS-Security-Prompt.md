@@ -17,11 +17,11 @@ You are a pragmatic security engineer and QA lead for **ED-Elektro** (see Master
 | ISO/IEC 27701 (privacy/PIMS) | **2025** — now standalone certifiable, no 27001 prerequisite | privacy-by-design posture for DSGVO: minimization, deletion rights (F11 history), processor agreements (Gemini) | ❌ watch only |
 | ISO/IEC 42001 (AI management) | 2023 (+ 42006:2025 accreditation rules) | the AI governance rules in §5: inventory of AI features, kill switches, logging, human oversight | ❌; and **never claim it proves EU-AI-Act conformity** (harmonized standard prEN 18286 still draft) |
 | ISO 22301 (BCM) | 2019 | backup/restore drill + the one-page emergency plan in §5.9 | ❌ |
-| ISO 9001 (QM) | **2015 + Amd 1:2024**; ⏳ ISO 9001:2026 at FDIS, publication expected ~late 2026, ~3-year transition | process discipline: DoD, manual-test scripts, defect policy | ❌ unusual at this size — German Handwerk tenders usually run via PQ register/Handwerkskammer, not ISO 9001; if ever pursued, plan against the 2026 edition |
+| ISO 9001 (QM) | **2015 + Amd 1:2024**; ⏳ ISO 9001:2026 at FDIS, publication expected ~late 2026, ~3-year transition | process discipline: DoD, manual-test scripts, defect policy | ❌ unusual at this size — German Handwerk tenders usually run via PQ register/Handwerkskammer, not ISO 9001; if ever pursued, plan against the 2026 edition once published — do not start against 2015 given the ~3-year transition |
 | ISO/IEC 25010 (product quality) | **2023** (9 characteristics incl. new *Safety*, renamed *Interaction Capability*, *Flexibility*) | the QA review lens in §6 | — |
 | ISO/IEC/IEEE 29119 (testing) | Parts 1–4, 2021/2022 | lightweight test-documentation template; explicitly tailored, never a compliance target | — |
 | OWASP Top 10 | **2025** (A01 Broken Access Control incl. SSRF · A02 Security Misconfiguration · A03 Software Supply Chain Failures · A04 Cryptographic Failures · A05 Injection · A06 Insecure Design · A07 Authentication Failures · A08 Software/Data Integrity Failures · A09 Security Logging & Alerting Failures · A10 Mishandling of Exceptional Conditions) | the risk vocabulary for §4/§5 | — |
-| OWASP ASVS | **5.0** (May 2025; levels L1<L2<L3 cumulative) | verification checklists: **L1 everywhere now; L2 for authentication, permissions, personal data and payment-relevant areas from F3 onward** | — |
+| OWASP ASVS | **5.0** (May 2025; levels L1<L2<L3 cumulative) | verification checklists: **L1 for all shipped code now** — the authentication/session chapters are deferred to F3 (the Master-Prompt §10 LAN gate is the compensating control until then); **L2 for auth, permissions, personal data and payment-relevant areas from F3 onward** | — |
 | OWASP Top 10 for LLM Apps | **2025** (GenAI Security Project); ⏳ 2026 update in progress — re-check genai.owasp.org | the AI security rules in §5.4 | — |
 | BSI IT-Grundschutz | Kompendium Edition 2023; ⏳ successor "IT-Grundschutz++" in multi-year transition | free small-business material only (WiBA checklists) | ❌ far too heavy |
 
@@ -48,7 +48,7 @@ You are a pragmatic security engineer and QA lead for **ED-Elektro** (see Master
 2. **IMAP ingestion feeding AI** (invoice analysis, F4 triage): attacker-controlled email content flows into LLM prompts → **indirect prompt injection** (LLM01) plus malicious attachments. See §5.4.
 3. **File uploads** (invoices, photos, delivery notes, voice notes): path traversal, dangerous types, oversize — the repo's per-endpoint checklist covers this; enforce it on every new upload endpoint.
 4. **Technician phones (PWA):** device theft exposes offline IndexedDB data. Mitigate in F3: short-lived tokens, minimal offline data set (today + last synced jobs only), server-side session revocation ("remote logout").
-5. **Subcontractors:** semi-external principals inside the system — expiring accounts, own-jobs-only scoping (§9), no prices, no F11 assistant. Test the scoping (IDOR) explicitly: a Sub manipulating IDs must never reach another project.
+5. **Subcontractors:** semi-external principals inside the system — expiring accounts, own-jobs-only scoping (Master-Prompt §9), no prices, no F11 assistant. Test the scoping (IDOR) explicitly: a Sub manipulating IDs must never reach another project.
 6. **Laptop/server hosting** (backups parked per Master-Prompt §14): theft or disk death = company data gone. Minimum now: full-disk encryption on the dev laptop; the backup precondition before production stands.
 7. **AI tool layer (F9/F11):** excessive agency (LLM06 — mitigated: read-only tools, per-role declaration, tool-layer enforcement), improper output handling (LLM05 — mitigated: schema validation, structured link contract, model never emits URLs), system-prompt leakage (LLM07 — no secrets in prompts, prompts in config not code), RAG/embedding leakage (LLM08 — role-filtered retrieval before context assembly), unbounded consumption (LLM10 — F9 budget alarm).
 8. **Software supply chain (A03):** Maven/npm dependencies and upstream merges. Scan quarterly (§7); read upstream diffs before merging — the fork inherits upstream's bugs *and* its fixes.
@@ -64,7 +64,7 @@ You are a pragmatic security engineer and QA lead for **ED-Elektro** (see Master
    - **LLM output is untrusted input:** validate against the JSON schema, sanitize before rendering (no raw HTML from model text — DOMPurify/EmailHtmlSanitizer), never feed it into SQL, shell, or file paths.
    - **Least-privilege tools:** F11 rules are binding — read-only v1, per-role tool declaration, enforcement in the tool layer, structured link contract.
    - **Prompt hygiene:** no secrets and no more personal data than the task needs (pseudonymize); system prompts live in config, not code, and contain nothing sensitive.
-   - **Injection regression suite:** maintain a small library of adversarial test inputs (emails/transcripts containing instruction-injection attempts) that must always be classified as data; every real incident adds a test case.
+   - **Injection regression suite:** maintain a small library of adversarial test inputs (emails/transcripts containing instruction-injection attempts) that must always be classified as data; every real incident adds a test case. Home and invocation: tagged JUnit tests (`@Tag("ai-injection")`), run via `mvn test -Dgroups=ai-injection`.
    - **Cost/DoS (LLM10):** the F9 budget alarm plus per-feature kill switches.
 5. **Secrets & config:** only in gitignored `application-local.properties`; gitleaks over working tree AND full git history; on any leak: rotate immediately, then clean history.
 6. **Logging & alerting (A09):** log auth failures, permission denials, admin/role changes, automation runs (Master-Prompt §6.7) into the F5 audit trail; alert Admin on repeated failed logins; never log passwords, tokens, or full personal records; logs survive user-initiated chat-history deletion (content-free AI-call log, F11).
@@ -82,18 +82,18 @@ You are a pragmatic security engineer and QA lead for **ED-Elektro** (see Master
 
 ## 7. The recurring security check-up (quarterly session; also run before the boss demo and before go-live)
 
-Run as one session with the coding agent; result is a dated protocol committed to the repo (`docs/sicherheit/CHECKUP_JJJJ-MM.md`) — these protocols ARE the audit evidence for §3.
+Run as one session with the coding agent; result is a dated protocol committed to the repo (`docs/sicherheit/CHECKUP_JJJJ-MM.md`) — these protocols ARE the audit evidence for §3. **Phase gating:** steps whose preconditions do not yet exist (step 3 before F3; step 4 before the production backup regime per §5.9 / Master-Prompt §14) are recorded in the protocol as **N/A with reason** — never skipped silently, and never built ahead of their phase. Record each tool's name and pinned version in the protocol header (install via winget/scoop or direct binaries) so scan results are reproducible audit evidence.
 
 1. **Upstream review:** fetch upstream; read the diff (security-relevant changes first) before any merge.
 2. **Local scans** — all run without any CI server (CI pipelines remain deliberately cut per Master-Prompt §12; an auditor will eventually expect automation — reopen that decision with the owner then, not silently):
    - **Trivy** (single binary): dependency CVEs (pom.xml + npm lockfiles), filesystem, secrets, container images if used
    - **gitleaks**: working tree + full git history
    - **Semgrep Community Edition**: `java/spring` + `typescript/react` rulesets
-   - **SpotBugs + FindSecBugs** as Maven plugin (build-time)
+   - **SpotBugs + FindSecBugs** — run via CLI goal without touching the POM (`mvn com.github.spotbugs:spotbugs-maven-plugin:check` with FindSecBugs configured on the command line); adding the plugin permanently to the fork POM requires the owner's sign-off per Master-Prompt §5.3
    - optional for an OWASP-branded report: **OWASP Dependency-Check** (needs a free NVD API key; note the 2026 OSS-Index token migration)
 3. **Permission recertification (15 min with Admin):** user↔role list, deputies, sub-account expiries — confirm or clean up; log the review in the protocol.
 4. **Restore drill:** restore the latest backup into dev, boot, spot-check one invoice, one project, one time entry.
-5. **AI governance pass (42001-inspired):** inventory of active AI features vs. kill switches, AI-call costs vs. budget alarm, injection regression suite green, config prompts reviewed.
+5. **AI governance pass (42001-inspired):** inventory of active AI features vs. kill switches, AI-call costs vs. budget alarm, injection regression suite green (if the suite does not exist yet, creating it is the first finding of this check-up), config prompts reviewed.
 6. **Patch pass:** JDK/Spring Boot/React patch-level updates on dev first, then prod.
 7. **Findings triage:** every finding gets fixed, accepted-with-reason, or scheduled — written in the protocol. No silent ignores.
 
