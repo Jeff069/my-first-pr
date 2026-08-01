@@ -10,6 +10,7 @@ mit den Gewerken Klima, Elektro und Sanitär.
 |---|---|---|
 | [`Master-Prompt.md`](./Master-Prompt.md) | Englischer Arbeitsauftrag für den Coding-Agenten: Codebasis-Fakten, Regeln, Rollenmodell, Features F1–F11, Definition of Done, Ideen-Backlog | Entwicklung — ins ED-Elektro-Clone legen (z. B. als `CLAUDE.local.md`) |
 | [`Aenderungsliste.md`](./Aenderungsliste.md) | Deutsche Stichpunktliste aller beschlossenen Änderungen, Grundsätze und geparkten Themen | Abstimmung mit GF / Bereichsleitung |
+| [`QS-Security-Prompt.md`](./QS-Security-Prompt.md) | Englischer Companion-Prompt für Qualitätssicherung & Cyber-Security: Normen-Stand (ISO 27001:2022, 27701:2025, 42001, OWASP 2025), Bedrohungsmodell, Sicherheitsregeln je Baustein, vierteljährlicher Security-Check-up, Zertifizierungs-Treppe (CyberRisikoCheck → VdS 10000) | Entwicklung + Vorlage fürs GF-Gespräch zu Zertifizierungen |
 
 ## Nutzung
 
