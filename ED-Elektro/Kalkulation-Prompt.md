@@ -47,7 +47,28 @@ These facts come from the running installation and were confirmed by the project
 **Goal:** labor gets a price, exactly the way the company prices it today.
 
 - `Lohngruppe` (nummer, bezeichnung, selbstkostenSatz, gewinnProzent, vkSatz, familie ENUM('PROJEKT','KURZEINSATZ'), typ ENUM('EIGEN','SUB'), aktiv, gueltigAb, gueltigBis). `vkSatz = selbstkostenSatz × (1 + gewinnProzent/100)` — store all three, changing one recomputes the third.
-- Seed with the company's real structure (names and rates come from the project lead; the current set is in `Powerbird-Screens.md` §7): Monteur / Obermonteur / Meister-Techniker-Bauleiter / Azubi-Fachhelfer, each once as `PROJEKT` ("ab 3 Std.") and once as `KURZEINSATZ` ("AW … bis 3 Std."), plus subcontractor groups.
+- **Seed exactly with these rates — the company's live values. Leave `bezeichnung` EMPTY; the company fills the labels itself.** `selbstkostenSatz` and `vkSatz` are the authoritative pair; `gewinnProzent` is derived (`(vk/sk − 1) × 100`) and only displayed, never the source of truth.
+
+  | LG | Selbstkosten | VK |
+  |---|---|---|
+  | 0 | 0,00 | 0,00 |
+  | 1 | 48,00 | 90,00 |
+  | 2 | 48,00 | 78,00 |
+  | 3 | 48,00 | 78,00 |
+  | 4 | 20,00 | 0,00 |
+  | 5 | 16,00 | 35,00 |
+  | 6 | 16,00 | 86,00 |
+  | 7 | 28,00 | 106,00 |
+  | 8 | 28,00 | 117,20 |
+  | 9 | 29,00 | 0,00 |
+  | 10 | 29,00 | 50,00 |
+  | 11 | 24,00 | 64,00 |
+  | 12 | 0,00 | 40,00 |
+  | 13 | 0,00 | 35,00 |
+  | 14 | 30,00 | 30,00 |
+  | 15 | 42,15 | 55,00 |
+
+  Groups with VK 0,00 stay `aktiv = false` (unused/reserve). Do not invent names, families or subcontractor assignments — `familie` and `typ` default to `PROJEKT`/`EIGEN` and are set by the company later.
 - **Document-scoped copies — the central rule:** when a calculation is created, the currently valid Lohngruppen are **copied into it** (`KalkulationLohngruppe`). The copy is editable inside the document and is what all its positions use. Changing global master data never alters an existing calculation. This is exactly how the company works today (90 €/h in a project offer, 132 €/h in a maintenance offer for the same group number).
 - Wire the existing `VerrechnungslohnService` as the source for `selbstkostenSatz`; manual override allowed.
 - Admin UI for the global set (Admin/BL per §9); an editing dialog for the document copy (PL).
