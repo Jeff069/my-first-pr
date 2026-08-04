@@ -40,7 +40,7 @@ Implement Feature F3 from the master prompt, and only F3. This is the security c
 
 ## F4 — Anfragen-Board
 ```
-Implement Feature F4 from the master prompt, and only F4. Watch out for: check first whether Bestellwesen already has an "Anfrage" entity — if yes, name yours KundenAnfrage. The AI triage produces suggestions only; assignment stays a human action by Admin/BL. Illegal status transitions must be rejected server-side, not just hidden in the UI. Stop after F4.
+Implement Feature F4 from the master prompt, and only F4. NOTE: the F4 spec was rewritten after seeing the company's real monday.com board — if an earlier build used the placeholder five-stage chain, rework it to the 18 real stages. Watch out for: extend the EXISTING Anfrage entity, do not create a new one; status is a configurable entity with colours, not a hard-coded enum; Gewerk is multi-select; the board must show offer value and margin next to each inquiry. The AI triage produces suggestions only; assignment stays a human action by Admin/BL. Stop after F4.
 ```
 
 ## F5 — Historie & Aktivitäts-Feed

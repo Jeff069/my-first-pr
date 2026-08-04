@@ -272,19 +272,39 @@ Deliberate ordering decision: two low-risk warm-up features (F1, F2) come before
 
 ## F4 — Inquiry board (Anfragen-Board)
 
-**Why:** Inquiries arrive via website, email, and phone and today live in heads and inboxes. Untouched inquiries are the quietest way a craft business loses revenue. One inbox, explicit assignment, an SLA timer, and a mandatory loss reason turn "we should call back" into a managed pipeline.
+**Why:** This board **replaces monday.com**, which the managing director uses today (`ed-elektro.monday.com`, board "Vertrieb | Kundenanfragen") while the documents live in Powerbird — with nothing connecting the two, so every inquiry that becomes an offer is typed twice. Rebuilding it here ends that double entry **and** adds what monday can never show: the offer value and the margin next to each inquiry.
 
-**Data model — EXTEND the existing entity, do not create one.** `domain/Anfrage.java` already exists as a customer inquiry (bauvorhaben, betrag, project address, kurzbeschreibung, documents, notes, images) at `/api/anfragen`, but without status, assignment, trade or loss-reason fields. Add via a `V9xx` migration: `Anfrage` (+ kanal ENUM('WEBSITE','EMAIL','TELEFON'), eingangsZeit, kundeRef nullable + free-text contact fields, gewerk ENUM('KLIMA','ELEKTRO','SANITAER','UNKLAR'), dringlichkeit ENUM, status ENUM('NEU','ZUGEWIESEN','BESICHTIGUNG','ANGEBOT','GEWONNEN','VERLOREN'), zugewiesenAn nullable, slaDeadline, verlustgrund ENUM('ZU_TEUER','KEINE_KAPAZITAET','ZU_SPAET','SONSTIGES') + verlustKommentar, angebotRef nullable).
+⚠️ **This spec was rewritten after seeing the company's real board. If an earlier build of F4 used the placeholder five-stage chain, it needs rework to the process below — that is a real process, not a suggestion.**
+
+**Data model — EXTEND the existing entity, do not create one.** `domain/Anfrage.java` already exists as a customer inquiry (bauvorhaben, betrag, project address, kurzbeschreibung, documents, notes, images) at `/api/anfragen`. Add via `V9xx` migrations:
+`Anfrage` (+ kanal ENUM('WEBSITE','EMAIL','TELEFON','MANUELL'), eingangsZeit, kundeRef nullable + free-text contact fields (name, telefon, email), **vorhabenBeschreibung TEXT** (the customer's own words, verbatim), adresseBvh, **faelligkeitsDatum**, **prioritaet ENUM('KRITISCH','HOCH','MITTEL','NIEDRIG')**, **verantwortlicherRef** (PL), status, slaDeadline, verlustgrund ENUM('ZU_TEUER','KEINE_KAPAZITAET','ZU_SPAET','SONSTIGES') + verlustKommentar, angebotRef nullable, kalkulationRef nullable)
+`AnfrageGewerk` — **multi-select, not a single enum**: an inquiry can be Wärmepumpe *and* Klimaanlage at once (real board data). Values: WAERMEPUMPE, KLIMAANLAGE, LUEFTUNG, ELEKTRO, SANITAER, WARTUNG, SONSTIGES.
+`AnfrageStatus` — configurable status entity (code, bezeichnung, reihenfolge, farbe, phase, istEndstatus) rather than a hard-coded enum, because the company owns this process and will adjust it.
+
+**The real 18-stage process** (seed data; AN = Angebotsnummer, AB = Angebot, AT = Auftrag):
+| Phase | Stufen |
+|---|---|
+| Aufnahme | `Anfrage neu` → `PL zuweisen` → `Aufmaß vor Ort` |
+| Preisinfo | `Preisinfo versenden` → `Preisinfo nachfassen` |
+| Beta-Angebot | `Beta AN erstellen` → `Beta AN nachfassen` |
+| Finales Angebot | `AN final erstellen` → `AN final nachfassen` → `AB versenden` |
+| Auftragsvorbereitung | `Zahlungsplan erstellen` → `Material bestellen` → `AT vorb. erl.` → `AT Beschr. versenden` → `Terminplan abstimmen` |
+| Ausführung & Abrechnung | `AT Ausführung` → `AT Rechnung erstellen` → `Rechnung versenden` |
+Plus the terminal state `Verloren` (requires a loss reason). Each stage carries its own colour — colour coding is a stated requirement, not decoration: with 18 stages across dozens of live inquiries it is the only way to keep an overview.
 
 **Requirements:**
-- Feeds: existing website-lead pipeline (hook where leads are persisted), the 60-s email import (emails matching inquiry heuristics create an `Anfrage` in `NEU`), and a quick manual-entry form for phone calls.
-- **AI triage on creation** (suggestion object, never auto-applied): detect trade, estimate urgency, extract customer data (name, address, phone, concern), suggest an assignee — applied only when BL/GF confirms. Customer dedupe against the existing base before creating duplicates (the lead pipeline already dedupes — reuse it).
-- **Assignment is performed only by Admin (GF/F&C) and BL; assignees are PL or BL; PL accept/decline — Monteure and Azubis are never assignees.**
-- **SLA:** `@Scheduled` job — untouched 48 h → escalation notification to BL; visible SLA badge on cards (green/amber/red).
-- Board UI (desktop): kanban columns per status, drag between columns where the transition is legal (illegal transitions rejected server-side); closing as `VERLOREN` requires the loss reason. Simple statistics view: won/lost per trade and per loss reason over time — after a year this answers *where* the company actually loses business (price? capacity? speed?).
-- Wire the "won" transition to the existing offer lifecycle (Angebot `abgeschlossen` → Projekt creation): winning an Anfrage links it to its Angebot/Projekt chain.
+- **Two views on the same data, both needed** (monday has both): a **Kanban board** grouped by status with drag between stages, and a **table view** that is sortable, filterable and groupable (by responsible person, Gewerk, priority, due date).
+- **Columns of the table view:** Kunde · Fälligkeitsdatum (with overdue marker) · Vorhaben (Kurzbeschreibung) · Adresse BVH · **Letztes Update (wer + wann)** · Status (coloured) · Priorität · Dateien · Verantwortlicher — **plus the two columns monday cannot have: Angebotssumme und Marge** from the linked calculation. That pairing is the whole point of moving the board into the ERP.
+- **Intake form:** a public form (the equivalent of monday's "Formular" view) that the website posts into, creating an `Anfrage` in `Anfrage neu` with attachments. Reuse the existing website-lead pipeline and its spam filter and customer dedupe; the 60-s email import and a quick phone-entry mask feed the same inbox.
+- **Photos from the start:** customers attach pictures to inquiries (real board data shows several per inquiry). The existing `AnfrageNotizBild`/document plumbing carries them.
+- **AI triage on creation** (suggestion object, never auto-applied): detect Gewerk(e), estimate priority, extract customer data, suggest a responsible PL — applied only on human confirmation.
+- **Assignment by Admin (GF/F&C) and BL; assignees are PL or BL; PL accept/decline** — Monteure and Azubis are never assignees.
+- **Two clocks, both real:** the manual `faelligkeitsDatum` per inquiry (overdue marker, like today) **and** an `@Scheduled` SLA job that escalates to BL when an inquiry sits untouched for 48 h.
+- **Follow-up is a first-class step, not an afterthought** — the process contains "nachfassen" three times (Preisinfo, Beta, final). Every `…nachfassen` stage carries a due date and appears in the escalation cockpit when it lapses.
+- Statistics: won/lost per Gewerk and loss reason, plus how long inquiries sit in each stage — that shows where the pipeline actually stalls.
+- Wire the transitions into the document chain: the calculation (see `Kalkulation-Prompt.md`) hangs off the Anfrage, so `Beta AN erstellen` and `AN final erstellen` open it directly and the offer number stays with the project.
 
-**Acceptance:** an emailed inquiry appears on the board within one polling cycle; SLA escalation fires in a time-warped test; illegal status transitions rejected server-side; loss reasons aggregate per trade; AI triage suggestions are visibly marked and require confirmation.
+**Acceptance:** an emailed or form-submitted inquiry appears on the board within one polling cycle, with attachments; a PL sees offer value and margin on the board; the 18 seeded stages are editable by Admin without a code change; illegal status transitions are rejected server-side; overdue and untouched-48 h both surface; loss reasons aggregate per Gewerk; AI triage suggestions are visibly marked and require confirmation.
 
 ## F5 — Audit history & activity feed
 
@@ -323,7 +343,7 @@ Deliberate ordering decision: two low-risk warm-up features (F1, F2) come before
 - Offer editor and `{{LEISTUNGEN_TABELLE}}` rendering resolve prices **through the engine** — a catalog position lands in an offer with the correct VK and zero manual steps. Rule changes affect new price resolutions only; stored positions never reprice automatically in any state — drafts get an explicit "Preise aktualisieren" action in the editor, sent offers never change.
 - **Labor pricing:** combine `analysiereKategorie()` hours-per-unit forecasts with configurable hourly rates. **Complete phases 2–3 of `docs/PLAN_VERRECHNUNGSLOHN_RECHNER.md`** (a `VerrechnungslohnService` computing the minimum billable hourly rate from payroll costs + overhead ÷ billable hours, retrospective and current-year modes, plus the interactive margin-slider dialog with one-click application) — this becomes the baseline the F9a check compares against; if that plan doc is missing from the clone, implement exactly this parenthetical summary as the spec and note the substitution in the plan. Treat regression forecasts as advisory until ~a year of own-trade time data exists (the training data is Metallbau).
 - **IDS-Connect:** stub the interface (deep link to wholesaler shop, cart return) for later; do not implement the full round-trip now.
-- **Angebotskalkulation (die Kalkulationsmaske): specified separately.** Powerbird is being retired; the offer-calculation module has its own staged build prompt — see `Kalkulation-Prompt.md` in this folder (stages K1–K8: Zuschlags-Engine, DATANORM-Import, Lohnarten, Leistungskatalog mit Lohnminuten, Kalkulationsmaske, Angebots-PDF, Sollmengen/Nachkalkulation, Migration). Do not specify or build it from this file; F7 here covers only the engine-side prerequisites it consumes.
+- **Angebotskalkulation (die Kalkulationsmaske): specified separately.** Powerbird is being retired; the offer-calculation module has its own staged build prompt — see `Kalkulation-Prompt.md` (Fassung 2) in this folder — stages **K1** Lohngruppen & Stundensätze · **K2** Kalkulationsmaske (freies Erfassen, das Herzstück) · **K3** Leistungskatalog mit Stückliste und Bauzeit · **K4** Kostenarten & Dokument-Kalkulation · **K5** Angebots-PDF · **K6** Datanorm-Import · **K7** Sollmengen & Nachkalkulation · **K8** Validierung & Umstieg. Do not specify or build it from this file; F7 here covers only the engine-side prerequisites it consumes. Note the order: the company enters material **freely** (verified: 17 010 € free-entered against 59 € from the catalog), so the mask comes before the import.
 
 **Acceptance:** golden-file DATANORM import test is idempotent; markup unit tests cover every resolution level and tie-breaks; changing a rule re-prices new offers but never alters existing sent offers; the Verrechnungslohn dialog reproduces the plan doc's phase-2/3 spec; all price-bearing endpoints respect §9 visibility. (The Angebotskalkulation screen has its own acceptance criteria in `Kalkulation-Prompt.md`.)
 
