@@ -73,6 +73,7 @@
   - optional je Kundengruppe (Privat / Gewerbe / Stammkunde)
   - vorher prüfen, was die vorhandene Kalkulation im Angebotswesen schon kann
 - **Kalkulations-Check (KI) vor Angebotsversand**: Marge unter Schwelle? Anfahrt/Entsorgung/Kleinmaterial vergessen? Stundensatz weicht ab? Position ohne Aufschlag?
+- **Angebotskalkulations-Maske**: Angebot Position für Position zusammenstellen — Artikel selbst suchen (Datanorm), Menge erfassen, Monteurzeit je Position in h/min eintragen (Vorschlag aus der Stunden-pro-Einheit-Statistik), Lohn über den Verrechnungssatz, Material über die Zuschlagsregeln, laufende Summen inkl. Marge — und am Ende erzeugt die Kalkulation selbstständig das Angebots-PDF über den vorhandenen Dokument-Generator; Positionen inkl. geschätzter Zeiten bleiben für die Nachkalkulation gespeichert
 
 ## 7. KI-Funktionen
 

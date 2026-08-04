@@ -55,7 +55,7 @@ Implement Feature F6 from the master prompt, and only F6. Watch out for: build O
 
 ## F7 — Kalkulation & DATANORM
 ```
-Implement Feature F7 from the master prompt, and only F7. This decides your margins — no guessing. Watch out for: the markup resolution order and the multiplicative customer-group factor exactly as specified; EK = lowest current supplier price with the used supplier stored per position; the DATANORM import must be idempotent (prove it with a golden-file test); no price value may ever come from an LLM. Stop after F7.
+Implement Feature F7 from the master prompt, and only F7. This decides your margins — no guessing. Watch out for: the markup resolution order and the multiplicative customer-group factor exactly as specified; EK = lowest current supplier price with the used supplier stored per position; the DATANORM import must be idempotent (prove it with a golden-file test); no price value may ever come from an LLM. Build the Angebotskalkulation screen last, after engine and import work — it must generate its PDF through the existing DocumentBuilder stack, never a second PDF path. Stop after F7.
 ```
 
 ## F8 — Wartungsmodul & QR-Anlagenakte
