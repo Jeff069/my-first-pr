@@ -73,7 +73,7 @@
   - optional je Kundengruppe (Privat / Gewerbe / Stammkunde)
   - vorher prüfen, was die vorhandene Kalkulation im Angebotswesen schon kann
 - **Kalkulations-Check (KI) vor Angebotsversand**: Marge unter Schwelle? Anfahrt/Entsorgung/Kleinmaterial vergessen? Stundensatz weicht ab? Position ohne Aufschlag?
-- **Angebotskalkulations-Maske**: Angebot Position für Position zusammenstellen — Artikel selbst suchen (Datanorm), Menge erfassen, Monteurzeit je Position in h/min eintragen (Vorschlag aus der Stunden-pro-Einheit-Statistik), Lohn über den Verrechnungssatz, Material über die Zuschlagsregeln, laufende Summen inkl. Marge — und am Ende erzeugt die Kalkulation selbstständig das Angebots-PDF über den vorhandenen Dokument-Generator; Positionen inkl. geschätzter Zeiten bleiben für die Nachkalkulation gespeichert
+- **Angebotskalkulations-Maske nach Powerbird-Vorbild** (siehe Powerbird-Analyse.md): Titel-/Gruppenbaum mit gemischten Positionsarten (Artikel, Leistung mit Artikeln + Lohnminuten, Jumbo/Set mit Ein-Preis-Druck, Text, Zuschlag, Alternativ-Flag); je Position EK → Zuschlagsregeln + Lohnminuten × Lohnart-Satz (2–3 Lohnarten aus dem Verrechnungslohn), Preisdetails-Ansicht, Preisspiegel aus den Datanorm-Preisen mehrerer Großhändler, Dokumentrabatt, Positionen aus Alt-Angeboten kopieren; PDF über den vorhandenen Dokument-Generator; Positionen werden Sollmengen fürs Projekt (Soll/Ist in der Nachkalkulation); Katalog-Befüllung über KFE/ZVEH-Daten und GAEB-Export aus dem eigenen Powerbird
 
 ## 7. KI-Funktionen
 
