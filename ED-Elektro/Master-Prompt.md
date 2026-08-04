@@ -90,26 +90,40 @@ German plural resources under `/api/…` (`/api/angebote`, `/api/projekte`, `/ap
 - **Calculation & controlling:** real-time pre/post calculation from four sources (times, material, articles, incoming invoices); hierarchical product categories ("Dach > Flachdach") with units; `analysiereKategorie()` computes "Stunden pro Einheit" via linear regression over past projects (trained on the previous owner's **Metallbau** data — treat its outputs as advisory for your trades until ~a year of own data exists); controlling dashboard (profit, revenue, material/labor costs, offer conversion, top-10 customers, regional heatmap); `MonatsSaldo` cache pattern (Flyway cache table — reportedly V204 — + `MonatsSaldoWarmupService` at startup; see the §4.6 migration-count verification) — copy this pattern for any expensive aggregation.
 - **Misc:** form designer (Canva-like WYSIWYG, 12 element types, multi-page templates — candidate base for F6 protocol forms); CAD/Excel network-storage integration (`openfile://` protocol); rental management module (not your business — leave untouched).
 
-### 4.5 Critical gaps the research confirmed
+### 4.5 State of play — VERIFIED IN CODE (read directly from upstream `main`; supersedes the docs, which are outdated)
 
-- **No real authentication.** Upstream issue #72 (labels: backend, frontend, size L): the mobile chain runs without authentication; only a department-based access scheme exists (`AbteilungBerechtigungController`, `/api/abteilungen` — e.g. Abt. 2 Buchhaltung sees only approved documents, Abt. 3 Büro has approval rights). No Spring Security/JWT documented. This is why F3 exists and why the SECURITY GATE below is absolute.
-- **No price/markup engine.** An `Angebot` carries a single `betrag`; no documented EK/VK markup logic anywhere. The natural insertion point for F7 is between Bestellwesen's Lieferantenpreise and the offer positions / `{{LEISTUNGEN_TABELLE}}` rendering.
-- **No DATANORM import.**
-- **No dispatch/assignment mechanism** (who works where on which day) — F2 introduces a minimal one, F10 the full Plantafel.
-- A **Verrechnungslohn calculator** is planned in `docs/PLAN_VERRECHNUNGSLOHN_RECHNER.md` — phase 1 (backend basics) done, phases 2–3 (service + interactive margin dialog) open. F7 finishes it.
-- The system's **origin is a Metallbau company** (HiCAD/Tenado integration, kg-based profile calculations). Master data, categories, and the regression model reflect that trade — your Klima/Elektro/Sanitär master data must be built up via F7 (DATANORM) and F8 (assets).
+**Authentication EXISTS — F3 is an extension, not a greenfield build.** Spring Security is a dependency (`spring-boot-starter-security` + `spring-security-test`). `config/SecurityConfig.java` defines five ordered filter chains; `AuthController` serves `/api/auth/{login,logout,register,me,me/credentials,bootstrap-status}`; users are `FrontendUser*` with a password encoder and a bootstrap initializer; `CloudflareAccessJwtFilter` handles tunnelled access. The main `/api/**` chain (`@Order(3)`) runs session-based `formLogin` with CSRF protection and ends in `anyRequest().authenticated()`.
 
-### 4.6 Verify in code before relying on it (docs conflict)
+**A role model exists, but with only two roles:** `domain/FrontendUserRole` = `{ADMIN, USER}`, mapped to `ROLE_*` authorities in `FrontendUserPrincipal`, already enforced via `hasRole("ADMIN")` on roughly eight endpoint groups (`/api/firma/**`, `/api/settings/**`, `/api/frontend-users/**`, `/api/admin/**`, POST `/api/verrechnungslohn/uebernehmen`, POST `/api/mahnwesen/lauf`, POST `/api/emails/admin/**`, DELETE `/api/lieferant-dokumente/**`). **F3 extends this to the six roles of §9 — it does not invent authentication.**
 
-| Question | Docs say | Action |
-|---|---|---|
-| DB engine | MariaDB 11 (README) vs MySQL 8 (BUSINESS_CASES) | read datasource config |
-| Max Flyway version | "63" vs "207+" (the V204 cache-table reference in §4.4 makes 207+ the plausible figure) | list `src/main/resources/db/migration/` to confirm |
-| Backend port | 8080 vs 8082 | read `application.properties` |
-| Time-tracking endpoints | `/stempeln` vs `/start`,`/stop`,`/pause` | read the Zeiterfassung controller |
-| DATEV export | not mentioned | search code before building payroll exports (F10) |
-| Abschlags-/Schlussrechnung cumulative accounting | produced, depth unknown | read invoice services before F10 billing-adjacent work |
-| Spring Security on classpath | not documented | check `pom.xml` before F3 design |
+**The real exposure (this is what upstream issue #72 is about):** the `@Order(1)` `zeiterfassungFilterChain` applies `permitAll()` + `csrf.disable()` to `ZEITERFASSUNG_PATHS`, and that list is broad. Besides `/api/zeiterfassung/**`, `/api/mitarbeiter/by-token/**`, `/api/urlaub/**`, `/api/abwesenheit/**`, `/api/kalender/mobile/**` and `/api/push/**`, it also covers **`/api/kunden/**`, `/api/projekte/**`, `/api/anfragen/**`, `/api/lieferanten/**`, `/api/dokumente/**`, `/api/images/**`**, parts of `/api/reklamationen/*`, `/api/produktkategorien/**` and `/api/arbeitsgaenge/**`. Anyone who reaches that chain reads customer, project and document data without logging in. Compensating controls that DO exist: `ZeiterfassungSecurityFilter` (default `zeiterfassung.security.enabled=true`) passes local/LAN IPs plus an allow-list and filters the rest, and the Cloudflare Access JWT filter guards tunnelled access. **Authenticating those paths per role is the core of F3.**
+
+**Genuinely absent — true greenfield (verified by search):**
+- **No price/markup engine.** `Angebot` carries a single `betrag`; no Zuschlag/markup logic anywhere. Supplier (EK) prices live in Bestellwesen; the insertion point for F7 is between them and the offer positions / `{{LEISTUNGEN_TABELLE}}` rendering.
+- **No DATANORM import** (no match in code or resources). → F7
+- **No dispatch/assignment entity** (no Einsatz/Plantafel/Termin domain class). → F2 minimal, F10 full
+- **No maintenance module** (no Wartung/Anlage domain classes). → F8
+- **No Berichtsheft/Azubi entities.** → F1
+- **No DATEV export** (only a passing mention in a comment in `AutoMahnVersandService`). → F10.8
+
+**Further along than the docs suggest — check before building:**
+- **`Anfrage` already exists as a CUSTOMER inquiry entity** (`domain/Anfrage.java`: bauvorhaben, betrag, project address, kurzbeschreibung, plus `AnfrageDokument`, `AnfrageNotiz`, `AnfrageNotizBild`, `AnfrageGeschaeftsdokument`), served at `/api/anfragen`. It has **no** status, assignment, Gewerk or loss-reason fields. → **F4 extends this entity; it creates nothing new, and there is no supplier-RFQ naming collision to avoid.**
+- **Verrechnungslohn is largely built**: `VerrechnungslohnService`, `VerrechnungslohnController`, DTOs, `SvSatzTyp`, ADMIN-only POST `/api/verrechnungslohn/uebernehmen`. → F7 verifies what is actually missing instead of implementing "phases 2–3" blind.
+- **Dunning has a run endpoint** (`POST /api/mahnwesen/lauf`, ADMIN-only) plus `AutoMahnVersandService`. → F10.5 extends rather than creates.
+- **Ollama is already wired** (`service/OllamaService.java`) next to the Gemini clients — the provider-neutral/local option exists in code today.
+
+**Origin caveat unchanged:** the system comes from a **Metallbau** company (HiCAD/Tenado integration, kg-based profile calculations). Master data, product categories and the regression model reflect that trade — Klima/Elektro/Sanitär master data must still be built up via F7 (DATANORM) and F8 (assets).
+
+### 4.6 Facts resolved in code (the earlier doc conflicts are settled)
+
+| Question | Verified answer |
+|---|---|
+| DB engine | **MariaDB** for server/docker (`jdbc:mariadb://…`); an **H2** file profile exists for the standalone Windows installer; a `testdb` profile points at a production snapshot on port 3307 |
+| Max Flyway version | **77 migrations, highest `V335`** — neither "63" nor "207+". The fork's `V9xx__` range is safely clear |
+| Spring Security | **present and configured** (see §4.5) |
+| DATEV export | **does not exist** — build it in F10.8 |
+| `Anfrage` naming | **exists as a customer inquiry** (see §4.5) — F4 extends it |
+| Still open — verify when you get there | exact time-tracking endpoint names (`/stempeln` vs `/start`,`/stop`,`/pause`); backend port; whether Abschlags-/Schlussrechnung supports cumulative accounting; the Tailwind theme mapping behind `rose-600`/`#dc2626` |
 
 ## 5. Repo-native rules — the fork ships its own AI-development machinery. Obey it.
 
@@ -192,7 +206,9 @@ Six fixed role templates — **role templates, not per-user custom ACLs**; with 
 
 ## 10. SECURITY GATE (absolute until F3 ships)
 
-Until F3 is complete, the system must not be reachable beyond the trusted LAN/VPN — **no Cloudflare tunnel, no port forwarding, no public exposure**. Upstream issue #72 confirms the mobile chain is currently unauthenticated; anyone reaching the API can read and write. Tailscale/VPN for remote access is acceptable in the interim. This gate also blocks giving subcontractors any access before F3.
+Until F3 is complete, the system must not be reachable beyond the trusted LAN/VPN — **no Cloudflare tunnel, no port forwarding, no public exposure** — and no subcontractor may be given access.
+
+Reason, verified in code (§4.5): the `@Order(1)` mobile filter chain applies `permitAll()` to `ZEITERFASSUNG_PATHS`, which includes `/api/kunden/**`, `/api/projekte/**`, `/api/anfragen/**`, `/api/lieferanten/**`, `/api/dokumente/**` and `/api/images/**`. `ZeiterfassungSecurityFilter` (IP allow-list) and `CloudflareAccessJwtFilter` mitigate this from the outside, but **on the LAN those paths are readable by anyone who can reach the port** — including a guest on the office WLAN. Tailscale/VPN for remote access is acceptable in the interim.
 
 ---
 
@@ -237,15 +253,16 @@ Deliberate ordering decision: two low-risk warm-up features (F1, F2) come before
 
 **Acceptance:** loads in <2 s on mid-range Android; fully usable offline with last-synced data; an assignment created in the admin view appears on the technician's My Day after sync; Vitest tests colocated.
 
-## F3 — Authentication + roles & permissions
-*(expanded scope — closes upstream issue #72; the sanctioned exception to the additive rule)*
+## F3 — Roles & permissions on top of the existing authentication
+*(closes upstream issue #72; the sanctioned exception to the additive rule)*
 
-**Why:** There is no login. Nothing customer-facing, nothing external, no subcontractor access, no exposure beyond the LAN until this ships. Also the foundation for every "who did what" feature (F5) and every role rule (§9).
+**Why:** Login and a two-role model already exist (§4.5) — but the mobile filter chain serves customer, project and document data with `permitAll()`, and the six roles of §9 do not exist yet. Until both are fixed, nothing may be exposed beyond the LAN, no subcontractor may get access, and F5's "who did what" has no reliable identity.
 
 **Requirements:**
-- **Token-based authentication** (short-lived JWT + refresh token; device-friendly for the offline PWA queue — queued writes replay with a refreshed token after reconnect) for desktop frontend, PWA, and all REST endpoints; replace the plain time-tracking `token` identity with the authenticated principal.
-- Check `pom.xml` for Spring Security first; introduce it if absent. A `LoginPage.tsx` exists in the desktop frontend per research — verify what it actually does today before building.
-- **Role model per §9:** role enum/entities, server-side enforcement on ALL endpoints (new and existing — sweep the `TODO(F3)` markers from F1/F2); method-level or filter-based checks; price-free DTO variants for Monteur/Azubi/Sub so prices never serialize for them.
+- **Extend, do not rebuild:** keep the existing session-based `formLogin` + CSRF setup and `AuthController`; extend `FrontendUserRole` from `{ADMIN, USER}` to the six roles of §9 with a migration that maps existing users sensibly (default the current ADMINs to Admin, everyone else to the role their job implies — list the mapping in your plan before running it).
+- **Close the open chain:** go through `ZEITERFASSUNG_PATHS` in `SecurityConfig` path by path. Each path either (a) requires authentication with a role check, or (b) stays open with a written justification in the code comment. `/api/kunden/**`, `/api/projekte/**`, `/api/anfragen/**`, `/api/lieferanten/**`, `/api/dokumente/**` and `/api/images/**` must end up in group (a) — the PWA calls them as an authenticated Monteur, not anonymously. Keep `ZeiterfassungSecurityFilter` and the Cloudflare filter as defence in depth; do not remove them.
+- **PWA login:** the mobile app must authenticate (the offline queue replays its writes with a valid session/token after reconnect). Decide session-cookie vs. token in your plan; whichever you pick must survive the offline→online replay.
+- **Role enforcement everywhere:** server-side on ALL endpoints (new and existing — sweep the `TODO(F3)` markers from F1/F2); price-free DTO variants for Monteur/Azubi/Sub so prices never serialize for them.
 - **Existing Abteilung scheme** (`/api/abteilungen`): read its code, then either map departments onto the six roles or cleanly supersede it — prefer mapping; document the decision in the plan.
 - **Admin UI** (Admin only): user↔role assignment, deputy configuration (time-boxed), sub-account expiry date; migration assigning sensible default roles to existing users; every permission change audit-logged — written to a minimal append-only log table created in F3's own migration, which the F5 activity feed later reads and surfaces.
 - Password handling for 11 users can be admin-driven (Admin sets initial/reset passwords) — no self-service email reset flow needed at this size.
@@ -256,7 +273,7 @@ Deliberate ordering decision: two low-risk warm-up features (F1, F2) come before
 
 **Why:** Inquiries arrive via website, email, and phone and today live in heads and inboxes. Untouched inquiries are the quietest way a craft business loses revenue. One inbox, explicit assignment, an SLA timer, and a mandatory loss reason turn "we should call back" into a managed pipeline.
 
-**Data model sketch** *(naming: Bestellwesen's four-stage chain already begins with a supplier-RFQ "Anfrage" — check for an existing entity/table of that name first; if it exists, name this entity `KundenAnfrage` with base path `/api/kundenanfragen`)*: `Anfrage` (id, kanal ENUM('WEBSITE','EMAIL','TELEFON'), eingangsZeit, kundeRef nullable + free-text contact fields, gewerk ENUM('KLIMA','ELEKTRO','SANITAER','UNKLAR'), dringlichkeit ENUM, status ENUM('NEU','ZUGEWIESEN','BESICHTIGUNG','ANGEBOT','GEWONNEN','VERLOREN'), zugewiesenAn nullable, slaDeadline, verlustgrund ENUM('ZU_TEUER','KEINE_KAPAZITAET','ZU_SPAET','SONSTIGES') + verlustKommentar, angebotRef nullable).
+**Data model — EXTEND the existing entity, do not create one.** `domain/Anfrage.java` already exists as a customer inquiry (bauvorhaben, betrag, project address, kurzbeschreibung, documents, notes, images) at `/api/anfragen`, but without status, assignment, trade or loss-reason fields. Add via a `V9xx` migration: `Anfrage` (+ kanal ENUM('WEBSITE','EMAIL','TELEFON'), eingangsZeit, kundeRef nullable + free-text contact fields, gewerk ENUM('KLIMA','ELEKTRO','SANITAER','UNKLAR'), dringlichkeit ENUM, status ENUM('NEU','ZUGEWIESEN','BESICHTIGUNG','ANGEBOT','GEWONNEN','VERLOREN'), zugewiesenAn nullable, slaDeadline, verlustgrund ENUM('ZU_TEUER','KEINE_KAPAZITAET','ZU_SPAET','SONSTIGES') + verlustKommentar, angebotRef nullable).
 
 **Requirements:**
 - Feeds: existing website-lead pipeline (hook where leads are persisted), the 60-s email import (emails matching inquiry heuristics create an `Anfrage` in `NEU`), and a quick manual-entry form for phone calls.
