@@ -91,3 +91,14 @@ Stop. Do not fix anything yet. Explain in German what went wrong, what you alrea
 ```
 Stop here. Commit the current state to a WIP branch with a German message describing exactly where you stopped and what is missing. Write me a three-line German summary of where we are.
 ```
+
+---
+
+# Kalkulations-Stufen (eigener Prompt: `Kalkulation-Prompt.md`)
+
+Powerbird wird abgelöst — die Angebotskalkulation hat einen eigenen Bau-Prompt. Eine Stufe pro Sitzung, K1 → K8.
+
+```
+Read Kalkulation-Prompt.md and CLAUDE.local.md. Implement stage K1 (Preisfindungs- und Zuschlags-Engine), and only K1. Stop when its acceptance criteria hold.
+```
+Für die weiteren Stufen dieselbe Zeile mit **K2** (DATANORM-Import), **K3** (Lohnarten & Stundensätze), **K4** (Leistungskatalog mit Lohnminuten), **K5** (Kalkulationsmaske), **K6** (Angebots-PDF), **K7** (Sollmengen & Nachkalkulation), **K8** (Migration & Umstieg).
