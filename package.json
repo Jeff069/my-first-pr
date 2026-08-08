@@ -1,0 +1,13 @@
+{
+  "name": "my-first-pr",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Übungs-Repository zum Erlernen des Pull-Request-Workflows.",
+  "scripts": {
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
+  },
+  "devDependencies": {
+    "prettier": "3.9.6"
+  }
+}

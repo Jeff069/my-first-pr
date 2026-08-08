@@ -1,0 +1,4 @@
+# Erzwingt LF im Repository — passend zur .editorconfig (end_of_line = lf).
+# Ohne diese Datei checkt Git for Windows mit CRLF aus und Prettier meldet
+# jede Datei als falsch formatiert.
+* text=auto eol=lf
