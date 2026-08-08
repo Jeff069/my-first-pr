@@ -1,0 +1,26 @@
+# Betriebssystem
+.DS_Store
+Thumbs.db
+
+# Editoren
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Abhängigkeiten & Build-Artefakte
+node_modules/
+dist/
+build/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Umgebungsvariablen & Geheimnisse — niemals committen!
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
