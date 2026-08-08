@@ -1,0 +1,18 @@
+{
+  // Diese Einstellungen gelten nur für dieses Projekt und werden mitversioniert
+  // (siehe die Ausnahme für .vscode/settings.json in der .gitignore).
+
+  // Beim Speichern automatisch formatieren — das ist der Grund, warum du
+  // "npm run format" im Alltag nie tippen musst.
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // Neue Dateien mit LF anlegen, passend zu .editorconfig und .gitattributes.
+  "files.eol": "\n",
+
+  // Für Markdown ausdrücklich Prettier verwenden — VS Code bringt einen
+  // eigenen Markdown-Formatierer mit, der sonst dazwischenfunken kann.
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
