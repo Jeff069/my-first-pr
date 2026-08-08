@@ -47,11 +47,11 @@ Zusammenarbeit über Branches und Pull Requests.
 
 - Offizielle Seite: <https://git-scm.com/downloads>
 
-| System  | Befehl |
-| ------- | ------ |
+| System  | Befehl                                           |
+| ------- | ------------------------------------------------ |
 | Windows | `winget install --id Git.Git -e --source winget` |
-| macOS   | `brew install git` |
-| Linux   | `sudo apt-get install git` |
+| macOS   | `brew install git`                               |
+| Linux   | `sudo apt-get install git`                       |
 
 Danach einmalig konfigurieren (wichtig für saubere Commits):
 
@@ -68,10 +68,10 @@ Git-Integration und riesigem Extension-Marktplatz.
 
 - Offizielle Seite: <https://code.visualstudio.com>
 
-| System  | Befehl |
-| ------- | ------ |
-| Windows | `winget install -e --id Microsoft.VisualStudioCode` |
-| macOS   | `brew install --cask visual-studio-code` |
+| System  | Befehl                                                                                           |
+| ------- | ------------------------------------------------------------------------------------------------ |
+| Windows | `winget install -e --id Microsoft.VisualStudioCode`                                              |
+| macOS   | `brew install --cask visual-studio-code`                                                         |
 | Linux   | `.deb` von <https://code.visualstudio.com/download> laden, dann `sudo apt install ./<datei>.deb` |
 
 > Wenn du dieses Repository in VS Code öffnest, schlägt dir der Editor
@@ -101,10 +101,10 @@ diesem Repository.
 
 - Offizielle Seite: <https://cli.github.com>
 
-| System  | Befehl |
-| ------- | ------ |
-| Windows | `winget install --id GitHub.cli --source winget` |
-| macOS   | `brew install gh` |
+| System  | Befehl                                                                   |
+| ------- | ------------------------------------------------------------------------ |
+| Windows | `winget install --id GitHub.cli --source winget`                         |
+| macOS   | `brew install gh`                                                        |
 | Linux   | Anleitung: <https://github.com/cli/cli/blob/trunk/docs/install_linux.md> |
 
 Danach anmelden:
@@ -125,11 +125,11 @@ Entwicklungsaufgaben.
 
 - Quickstart: <https://code.claude.com/docs/en/quickstart>
 
-| System  | Befehl |
-| ------- | ------ |
+| System  | Befehl                                                  |
+| ------- | ------------------------------------------------------- |
 | Windows | `irm https://claude.ai/install.ps1 \| iex` (PowerShell) |
-| macOS   | `curl -fsSL https://claude.ai/install.sh \| bash` |
-| Linux   | `curl -fsSL https://claude.ai/install.sh \| bash` |
+| macOS   | `curl -fsSL https://claude.ai/install.sh \| bash`       |
+| Linux   | `curl -fsSL https://claude.ai/install.sh \| bash`       |
 
 Alternativ überall: `npm install -g @anthropic-ai/claude-code` (benötigt Node.js 22+).
 Der native Installer wird offiziell empfohlen und aktualisiert sich automatisch.
@@ -178,10 +178,10 @@ JavaScript-Laufzeitumgebung inkl. Paketmanager `npm`. Installiert wird sie über
 den Versionsmanager **fnm** — der aktuell von <https://nodejs.org/en/download>
 empfohlene Weg, mit dem du mehrere Node-Versionen parallel verwalten kannst.
 
-| System  | Befehl |
-| ------- | ------ |
-| Windows | `winget install Schniz.fnm`, Terminal neu starten, dann `fnm install 24` |
-| macOS   | `brew install fnm && fnm install 24` |
+| System  | Befehl                                                                                         |
+| ------- | ---------------------------------------------------------------------------------------------- |
+| Windows | `winget install Schniz.fnm`, Terminal neu starten, dann `fnm install 24`                       |
+| macOS   | `brew install fnm && fnm install 24`                                                           |
 | Linux   | `curl -o- https://fnm.vercel.app/install \| bash`, Terminal neu starten, dann `fnm install 24` |
 
 Prüfen mit `node -v` und `npm -v`.
@@ -194,10 +194,10 @@ einem Werkzeug.
 
 - Offizielle Doku: <https://docs.astral.sh/uv/getting-started/installation/>
 
-| System  | Befehl |
-| ------- | ------ |
-| Windows | `winget install --id=astral-sh.uv -e` |
-| macOS   | `brew install uv` |
+| System  | Befehl                                             |
+| ------- | -------------------------------------------------- |
+| Windows | `winget install --id=astral-sh.uv -e`              |
+| macOS   | `brew install uv`                                  |
 | Linux   | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
 
 Danach Python installieren:
@@ -212,11 +212,11 @@ uv python install
 
 Sauberer Code ist kein Zufall: Formatter und Linter erledigen das automatisch.
 
-| Werkzeug | Für | Installation | Nutzung |
-| -------- | --- | ------------ | ------- |
-| [Prettier](https://prettier.io/docs/install) | JS/TS, CSS, HTML, JSON, Markdown — Formatierung | `npm install --save-dev --save-exact prettier` | `npx prettier . --write` |
-| [ESLint](https://eslint.org/docs/latest/use/getting-started) | JS/TS — findet Fehler & Anti-Patterns | `npm init @eslint/config@latest` | `npx eslint .` |
-| [Ruff](https://docs.astral.sh/ruff/installation/) | Python — Linter **und** Formatter in einem | `uv tool install ruff` | `ruff check` / `ruff format` |
+| Werkzeug                                                     | Für                                             | Installation                                   | Nutzung                      |
+| ------------------------------------------------------------ | ----------------------------------------------- | ---------------------------------------------- | ---------------------------- |
+| [Prettier](https://prettier.io/docs/install)                 | JS/TS, CSS, HTML, JSON, Markdown — Formatierung | `npm install --save-dev --save-exact prettier` | `npx prettier . --write`     |
+| [ESLint](https://eslint.org/docs/latest/use/getting-started) | JS/TS — findet Fehler & Anti-Patterns           | `npm init @eslint/config@latest`               | `npx eslint .`               |
+| [Ruff](https://docs.astral.sh/ruff/installation/)            | Python — Linter **und** Formatter in einem      | `uv tool install ruff`                         | `ruff check` / `ruff format` |
 
 > Tipp: Formatter nicht diskutieren, sondern einfach laufen lassen — das
 > beendet jede Stil-Debatte im Team.
@@ -233,8 +233,8 @@ zur vollen Profi-Ausstattung:
   Doku: <https://learn.microsoft.com/windows/wsl/install>
 - **Docker Desktop** — Container für reproduzierbare Entwicklungsumgebungen
   und lokale Dienste (z. B. Datenbanken). Windows: `winget install -e --id
-  Docker.DockerDesktop` (nutzt WSL 2), macOS: `brew install --cask
-  docker-desktop`. Doku: <https://docs.docker.com/desktop/>
+Docker.DockerDesktop` (nutzt WSL 2), macOS: `brew install --cask
+docker-desktop`. Doku: <https://docs.docker.com/desktop/>
 
 ---
 
