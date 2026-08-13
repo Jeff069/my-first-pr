@@ -1,0 +1,312 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="4516" height="1368" viewBox="-58 -150 4516 1368">
+<rect x="-58" y="-150" width="4516" height="1368" fill="#ffffff"/>
+<rect x="-18.0" y="88.0" width="1204.0" height="740.0" rx="8" fill="#dbe4ff" stroke="#4a9eed" stroke-width="1" opacity="0.3"/>
+<text x="0.0" y="114.5" font-family="Segoe Print, Comic Sans MS, cursive" font-size="18" fill="#4a9eed" text-anchor="start" xml:space="preserve">Phase A  -  Fundament</text>
+<rect x="1194.0" y="88.0" width="1204.0" height="740.0" rx="8" fill="#e5dbff" stroke="#8b5cf6" stroke-width="1" opacity="0.3"/>
+<text x="1212.0" y="114.5" font-family="Segoe Print, Comic Sans MS, cursive" font-size="18" fill="#8b5cf6" text-anchor="start" xml:space="preserve">Phase B  -  Kernplattform</text>
+<rect x="2406.0" y="88.0" width="1204.0" height="740.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="0.3"/>
+<text x="2424.0" y="114.5" font-family="Segoe Print, Comic Sans MS, cursive" font-size="18" fill="#f59e0b" text-anchor="start" xml:space="preserve">Phase C  -  Auswertung &amp; Automatisierung</text>
+<rect x="3618.0" y="88.0" width="800.0" height="740.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="0.3"/>
+<text x="3636.0" y="114.5" font-family="Segoe Print, Comic Sans MS, cursive" font-size="18" fill="#22c55e" text-anchor="start" xml:space="preserve">Phase D  -  Einführung</text>
+<text x="0.0" y="-64.9" font-family="Segoe Print, Comic Sans MS, cursive" font-size="44" fill="#1e1e1e" text-anchor="start" xml:space="preserve">ED WorkOS  -  Stufenplanung</text>
+<text x="0.0" y="-31.5" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="20" fill="#495057" text-anchor="start" xml:space="preserve">Ziel: monday.com und Kraaft langfristig durch eine zentrale interne Arbeitsplattform ergänzen bzw. ersetzen.</text>
+<text x="0.0" y="-5.6" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#757575" text-anchor="start" xml:space="preserve">Lesart: jede Stufe = ein Arbeitspaket mit Ziel, Aufgaben, Ergebnis und Abhängigkeit. Reihenfolge von links nach rechts.</text>
+<rect x="0.0" y="150.0" width="360.0" height="104.0" rx="8" fill="#a5d8ff" stroke="#4a9eed" stroke-width="2" opacity="1.0"/>
+<text x="180.0" y="197.1" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">STUFE 0</text>
+<text x="180.0" y="224.6" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">IST-Analyse</text>
+<rect x="0.0" y="280.0" width="360.0" height="96.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="1.0"/>
+<text x="16.0" y="306.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#b45309" text-anchor="start" xml:space="preserve">ZIEL</text>
+<text x="16.0" y="330.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Verstehen, welche Funktionen im</text>
+<text x="16.0" y="350.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Unternehmen wirklich gebraucht werden.</text>
+<rect x="0.0" y="392.0" width="360.0" height="248.0" rx="8" fill="#ffffff" stroke="#868e96" stroke-width="1" opacity="1.0"/>
+<text x="16.0" y="418.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">AUFGABEN</text>
+<text x="16.0" y="442.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- monday.com erfassen: Boards, Aufgaben,</text>
+<text x="16.0" y="462.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Status, Dashboards, Automationen,</text>
+<text x="16.0" y="482.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Auswertungen</text>
+<text x="16.0" y="506.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Kraaft erfassen: Baustellen-Chats,</text>
+<text x="16.0" y="526.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Fotos, Dokumente, Berichte, Aufgaben</text>
+<text x="16.0" y="550.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Doppelte Eingaben, Medienbrüche und</text>
+<text x="16.0" y="570.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  häufige Tool-Wechsel dokumentieren</text>
+<rect x="0.0" y="656.0" width="360.0" height="96.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="1.0"/>
+<text x="16.0" y="682.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#15803d" text-anchor="start" xml:space="preserve">ERGEBNIS</text>
+<text x="16.0" y="706.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Muss-Funktionen, Kann-Funktionen und</text>
+<text x="16.0" y="726.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">nicht benötigte Funktionen</text>
+<rect x="0.0" y="768.0" width="360.0" height="38.0" rx="8" fill="#f1f3f5" stroke="#adb5bd" stroke-width="1" opacity="1.0" stroke-dasharray="8 6"/>
+<text x="16.0" y="792.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">Start - keine Vorstufe</text>
+<rect x="404.0" y="150.0" width="360.0" height="104.0" rx="8" fill="#a5d8ff" stroke="#4a9eed" stroke-width="2" opacity="1.0"/>
+<text x="584.0" y="197.1" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">STUFE 1</text>
+<text x="584.0" y="224.6" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">ED Datenmodell</text>
+<rect x="404.0" y="280.0" width="360.0" height="96.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="1.0"/>
+<text x="420.0" y="306.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#b45309" text-anchor="start" xml:space="preserve">ZIEL</text>
+<text x="420.0" y="330.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Eine gemeinsame Datenbasis für Büro und</text>
+<text x="420.0" y="350.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Baustelle definieren.</text>
+<rect x="404.0" y="392.0" width="360.0" height="248.0" rx="8" fill="#ffffff" stroke="#868e96" stroke-width="1" opacity="1.0"/>
+<text x="420.0" y="418.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">AUFGABEN</text>
+<text x="420.0" y="442.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Grundobjekte: Kunden, Projekte,</text>
+<text x="420.0" y="462.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Baustellen, Mitarbeiter, Aufgaben,</text>
+<text x="420.0" y="482.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Termine</text>
+<text x="420.0" y="506.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Dokumente, Fotos, Berichte und Kosten</text>
+<text x="420.0" y="526.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  ergänzen</text>
+<text x="420.0" y="550.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Festlegen, welche Informationen</text>
+<text x="420.0" y="570.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  miteinander verknüpft sind</text>
+<text x="420.0" y="594.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Eindeutige Projektakte als zentrale</text>
+<text x="420.0" y="614.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Datenquelle vorsehen</text>
+<rect x="404.0" y="656.0" width="360.0" height="96.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="1.0"/>
+<text x="420.0" y="682.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#15803d" text-anchor="start" xml:space="preserve">ERGEBNIS</text>
+<text x="420.0" y="706.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Datenmodell als Grundlage für Datenbank</text>
+<text x="420.0" y="726.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">und API</text>
+<rect x="404.0" y="768.0" width="360.0" height="38.0" rx="8" fill="#f1f3f5" stroke="#adb5bd" stroke-width="1" opacity="1.0" stroke-dasharray="8 6"/>
+<text x="420.0" y="792.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">setzt Stufe 0 voraus</text>
+<rect x="808.0" y="150.0" width="360.0" height="104.0" rx="8" fill="#a5d8ff" stroke="#4a9eed" stroke-width="2" opacity="1.0"/>
+<text x="988.0" y="197.1" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">STUFE 2</text>
+<text x="988.0" y="224.6" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">Benutzer &amp; Rechte</text>
+<rect x="808.0" y="280.0" width="360.0" height="96.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="1.0"/>
+<text x="824.0" y="306.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#b45309" text-anchor="start" xml:space="preserve">ZIEL</text>
+<text x="824.0" y="330.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Jeder Benutzer sieht nur die für seine</text>
+<text x="824.0" y="350.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Arbeit relevanten Informationen.</text>
+<rect x="808.0" y="392.0" width="360.0" height="248.0" rx="8" fill="#ffffff" stroke="#868e96" stroke-width="1" opacity="1.0"/>
+<text x="824.0" y="418.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">AUFGABEN</text>
+<text x="824.0" y="442.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Rollen: Geschäftsführung, Finanz &amp;</text>
+<text x="824.0" y="462.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Controlling, Bereichsleiter,</text>
+<text x="824.0" y="482.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Projektleiter, Monteur</text>
+<text x="824.0" y="506.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Lese-, Schreib-, Freigabe- und</text>
+<text x="824.0" y="526.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Administrationsrechte definieren</text>
+<text x="824.0" y="550.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Mobile Oberfläche für operative</text>
+<text x="824.0" y="570.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Mitarbeiter möglichst einfach halten</text>
+<rect x="808.0" y="656.0" width="360.0" height="96.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="1.0"/>
+<text x="824.0" y="682.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#15803d" text-anchor="start" xml:space="preserve">ERGEBNIS</text>
+<text x="824.0" y="706.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Rollen- und Rechtekonzept</text>
+<rect x="808.0" y="768.0" width="360.0" height="38.0" rx="8" fill="#f1f3f5" stroke="#adb5bd" stroke-width="1" opacity="1.0" stroke-dasharray="8 6"/>
+<text x="824.0" y="792.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">setzt Stufe 1 voraus</text>
+<rect x="1212.0" y="150.0" width="360.0" height="104.0" rx="8" fill="#d0bfff" stroke="#8b5cf6" stroke-width="2" opacity="1.0"/>
+<text x="1392.0" y="197.1" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">STUFE 3</text>
+<text x="1392.0" y="224.6" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">Projektzentrale</text>
+<rect x="1212.0" y="280.0" width="360.0" height="96.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="1.0"/>
+<text x="1228.0" y="306.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#b45309" text-anchor="start" xml:space="preserve">ZIEL</text>
+<text x="1228.0" y="330.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Alle wichtigen Projektinformationen auf</text>
+<text x="1228.0" y="350.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">einer zentralen Seite bündeln.</text>
+<rect x="1212.0" y="392.0" width="360.0" height="248.0" rx="8" fill="#ffffff" stroke="#868e96" stroke-width="1" opacity="1.0"/>
+<text x="1228.0" y="418.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">AUFGABEN</text>
+<text x="1228.0" y="442.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Projektübersicht mit Status,</text>
+<text x="1228.0" y="462.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Verantwortlichen, Terminen, offenen</text>
+<text x="1228.0" y="482.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Punkten</text>
+<text x="1228.0" y="506.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Register: Übersicht, Aufgaben,</text>
+<text x="1228.0" y="526.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Baustelle, Mitarbeiter, Dokumente</text>
+<text x="1228.0" y="550.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Register: Fotos, Berichte, Finanzen</text>
+<text x="1228.0" y="570.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  und Verlauf</text>
+<text x="1228.0" y="594.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Änderungen und wichtige Ereignisse</text>
+<text x="1228.0" y="614.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  nachvollziehbar darstellen</text>
+<rect x="1212.0" y="656.0" width="360.0" height="96.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="1.0"/>
+<text x="1228.0" y="682.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#15803d" text-anchor="start" xml:space="preserve">ERGEBNIS</text>
+<text x="1228.0" y="706.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Single Source of Truth für jedes Projekt</text>
+<rect x="1212.0" y="768.0" width="360.0" height="38.0" rx="8" fill="#f1f3f5" stroke="#adb5bd" stroke-width="1" opacity="1.0" stroke-dasharray="8 6"/>
+<text x="1228.0" y="792.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">setzt Stufe 1 + 2 voraus</text>
+<rect x="1616.0" y="150.0" width="360.0" height="104.0" rx="8" fill="#d0bfff" stroke="#8b5cf6" stroke-width="2" opacity="1.0"/>
+<text x="1796.0" y="197.1" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">STUFE 4</text>
+<text x="1796.0" y="224.6" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">Büro-Modul</text>
+<rect x="1616.0" y="280.0" width="360.0" height="96.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="1.0"/>
+<text x="1632.0" y="306.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#b45309" text-anchor="start" xml:space="preserve">ZIEL</text>
+<text x="1632.0" y="330.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Projektsteuerung und tägliche Büroarbeit</text>
+<text x="1632.0" y="350.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">vereinfachen.</text>
+<rect x="1616.0" y="392.0" width="360.0" height="248.0" rx="8" fill="#ffffff" stroke="#868e96" stroke-width="1" opacity="1.0"/>
+<text x="1632.0" y="418.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">AUFGABEN</text>
+<text x="1632.0" y="442.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Dashboard für laufende Projekte und</text>
+<text x="1632.0" y="462.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  kritische Punkte</text>
+<text x="1632.0" y="486.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Aufgaben, Zuständigkeiten,</text>
+<text x="1632.0" y="506.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Prioritäten, Termine und Projektstatus</text>
+<text x="1632.0" y="530.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Filter nach Bereich, Verantwortlichem</text>
+<text x="1632.0" y="550.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  und Projekt</text>
+<rect x="1616.0" y="656.0" width="360.0" height="96.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="1.0"/>
+<text x="1632.0" y="682.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#15803d" text-anchor="start" xml:space="preserve">ERGEBNIS</text>
+<text x="1632.0" y="706.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Die heute in monday.com genutzten</text>
+<text x="1632.0" y="726.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Kernabläufe in eigener Oberfläche</text>
+<rect x="1616.0" y="768.0" width="360.0" height="38.0" rx="8" fill="#f1f3f5" stroke="#adb5bd" stroke-width="1" opacity="1.0" stroke-dasharray="8 6"/>
+<text x="1632.0" y="792.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">setzt Stufe 3 voraus</text>
+<rect x="2020.0" y="150.0" width="360.0" height="104.0" rx="8" fill="#d0bfff" stroke="#8b5cf6" stroke-width="2" opacity="1.0"/>
+<text x="2200.0" y="197.1" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">STUFE 5</text>
+<text x="2200.0" y="224.6" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">Baustellen-Modul</text>
+<rect x="2020.0" y="280.0" width="360.0" height="96.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="1.0"/>
+<text x="2036.0" y="306.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#b45309" text-anchor="start" xml:space="preserve">ZIEL</text>
+<text x="2036.0" y="330.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Informationen von der Baustelle direkt</text>
+<text x="2036.0" y="350.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">in die zentrale Projektakte bringen.</text>
+<rect x="2020.0" y="392.0" width="360.0" height="248.0" rx="8" fill="#ffffff" stroke="#868e96" stroke-width="1" opacity="1.0"/>
+<text x="2036.0" y="418.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">AUFGABEN</text>
+<text x="2036.0" y="442.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Mobile Ansicht mit 'Meine Baustelle'</text>
+<text x="2036.0" y="462.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  und 'Meine Aufgaben'</text>
+<text x="2036.0" y="486.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Fotos aufnehmen und direkt dem Projekt</text>
+<text x="2036.0" y="506.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  bzw. Vorgang zuordnen</text>
+<text x="2036.0" y="530.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Nachrichten, Dokumente, Berichte und</text>
+<text x="2036.0" y="550.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Mängel erfassen</text>
+<rect x="2020.0" y="656.0" width="360.0" height="96.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="1.0"/>
+<text x="2036.0" y="682.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#15803d" text-anchor="start" xml:space="preserve">ERGEBNIS</text>
+<text x="2036.0" y="706.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Die operativen Abläufe, die heute über</text>
+<text x="2036.0" y="726.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Kraaft laufen</text>
+<rect x="2020.0" y="768.0" width="360.0" height="38.0" rx="8" fill="#f1f3f5" stroke="#adb5bd" stroke-width="1" opacity="1.0" stroke-dasharray="8 6"/>
+<text x="2036.0" y="792.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">setzt Stufe 3 voraus</text>
+<rect x="2424.0" y="150.0" width="360.0" height="104.0" rx="8" fill="#ffd8a8" stroke="#f59e0b" stroke-width="2" opacity="1.0"/>
+<text x="2604.0" y="197.1" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">STUFE 6</text>
+<text x="2604.0" y="224.6" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">Finanz &amp; Controlling</text>
+<rect x="2424.0" y="280.0" width="360.0" height="96.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="1.0"/>
+<text x="2440.0" y="306.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#b45309" text-anchor="start" xml:space="preserve">ZIEL</text>
+<text x="2440.0" y="330.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Projektfortschritt und wirtschaftliche</text>
+<text x="2440.0" y="350.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Kennzahlen zusammenführen.</text>
+<rect x="2424.0" y="392.0" width="360.0" height="248.0" rx="8" fill="#ffffff" stroke="#868e96" stroke-width="1" opacity="1.0"/>
+<text x="2440.0" y="418.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">AUFGABEN</text>
+<text x="2440.0" y="442.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Budget, Soll/Ist, Kosten und relevante</text>
+<text x="2440.0" y="462.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Projektkennzahlen darstellen</text>
+<text x="2440.0" y="486.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Auswertungen pro Projekt, Bereich oder</text>
+<text x="2440.0" y="506.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Zeitraum</text>
+<text x="2440.0" y="530.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Warnungen bei Abweichungen oder</text>
+<text x="2440.0" y="550.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  fehlenden Informationen vorbereiten</text>
+<rect x="2424.0" y="656.0" width="360.0" height="96.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="1.0"/>
+<text x="2440.0" y="682.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#15803d" text-anchor="start" xml:space="preserve">ERGEBNIS</text>
+<text x="2440.0" y="706.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Management- und Controlling-Dashboard</text>
+<text x="2440.0" y="726.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">ohne Tool-Wechsel</text>
+<rect x="2424.0" y="768.0" width="360.0" height="38.0" rx="8" fill="#f1f3f5" stroke="#adb5bd" stroke-width="1" opacity="1.0" stroke-dasharray="8 6"/>
+<text x="2440.0" y="792.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">setzt Stufe 3 + 4 voraus</text>
+<rect x="2828.0" y="150.0" width="360.0" height="104.0" rx="8" fill="#ffd8a8" stroke="#f59e0b" stroke-width="2" opacity="1.0"/>
+<text x="3008.0" y="197.1" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">STUFE 7</text>
+<text x="3008.0" y="224.6" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">n8n Automation</text>
+<rect x="2828.0" y="280.0" width="360.0" height="96.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="1.0"/>
+<text x="2844.0" y="306.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#b45309" text-anchor="start" xml:space="preserve">ZIEL</text>
+<text x="2844.0" y="330.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Wiederkehrende Arbeit im Hintergrund</text>
+<text x="2844.0" y="350.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">automatisieren.</text>
+<rect x="2828.0" y="392.0" width="360.0" height="248.0" rx="8" fill="#ffffff" stroke="#868e96" stroke-width="1" opacity="1.0"/>
+<text x="2844.0" y="418.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">AUFGABEN</text>
+<text x="2844.0" y="442.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Kette: Baustellenbericht &gt;</text>
+<text x="2844.0" y="462.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Verarbeitung &gt; Projekt aktualisieren</text>
+<text x="2844.0" y="486.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Kette weiter: Aufgabe erzeugen &gt;</text>
+<text x="2844.0" y="506.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Verantwortlichen informieren</text>
+<text x="2844.0" y="530.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- E-Mail, Dokumentenablage,</text>
+<text x="2844.0" y="550.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Benachrichtigungen und Systeme</text>
+<text x="2844.0" y="570.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  anbinden</text>
+<text x="2844.0" y="594.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Automationen transparent und</text>
+<text x="2844.0" y="614.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  nachvollziehbar aufbauen</text>
+<rect x="2828.0" y="656.0" width="360.0" height="96.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="1.0"/>
+<text x="2844.0" y="682.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#15803d" text-anchor="start" xml:space="preserve">ERGEBNIS</text>
+<text x="2844.0" y="706.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Weniger manuelle Übertragung und weniger</text>
+<text x="2844.0" y="726.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">doppelte Eingabe</text>
+<rect x="2828.0" y="768.0" width="360.0" height="38.0" rx="8" fill="#f1f3f5" stroke="#adb5bd" stroke-width="1" opacity="1.0" stroke-dasharray="8 6"/>
+<text x="2844.0" y="792.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">setzt Stufe 3 - 5 voraus</text>
+<rect x="3232.0" y="150.0" width="360.0" height="104.0" rx="8" fill="#ffd8a8" stroke="#f59e0b" stroke-width="2" opacity="1.0"/>
+<text x="3412.0" y="197.1" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">STUFE 8</text>
+<text x="3412.0" y="224.6" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">KI / Paperclip</text>
+<rect x="3232.0" y="280.0" width="360.0" height="96.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="1.0"/>
+<text x="3248.0" y="306.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#b45309" text-anchor="start" xml:space="preserve">ZIEL</text>
+<text x="3248.0" y="330.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Vorhandene Projektinformationen</text>
+<text x="3248.0" y="350.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">intelligenter nutzbar machen.</text>
+<rect x="3232.0" y="392.0" width="360.0" height="248.0" rx="8" fill="#ffffff" stroke="#868e96" stroke-width="1" opacity="1.0"/>
+<text x="3248.0" y="418.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">AUFGABEN</text>
+<text x="3248.0" y="442.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Projektverläufe und Berichte</text>
+<text x="3248.0" y="462.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  zusammenfassen</text>
+<text x="3248.0" y="486.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Dokumente analysieren und relevante</text>
+<text x="3248.0" y="506.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Informationen extrahieren</text>
+<text x="3248.0" y="530.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Fragen zu Projekten auf Basis der</text>
+<text x="3248.0" y="550.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  vorhandenen Daten beantworten</text>
+<text x="3248.0" y="574.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Auffälligkeiten und fehlende</text>
+<text x="3248.0" y="594.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Informationen markieren</text>
+<rect x="3232.0" y="656.0" width="360.0" height="96.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="1.0"/>
+<text x="3248.0" y="682.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#15803d" text-anchor="start" xml:space="preserve">ERGEBNIS</text>
+<text x="3248.0" y="706.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Assistenzfunktionen ergänzen die stabile</text>
+<text x="3248.0" y="726.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Basisplattform</text>
+<rect x="3232.0" y="768.0" width="360.0" height="38.0" rx="8" fill="#f1f3f5" stroke="#adb5bd" stroke-width="1" opacity="1.0" stroke-dasharray="8 6"/>
+<text x="3248.0" y="792.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">setzt Stufe 6 + 7 voraus</text>
+<rect x="3636.0" y="150.0" width="360.0" height="104.0" rx="8" fill="#b2f2bb" stroke="#22c55e" stroke-width="2" opacity="1.0"/>
+<text x="3816.0" y="197.1" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">STUFE 9</text>
+<text x="3816.0" y="224.6" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">Pilotprojekt</text>
+<rect x="3636.0" y="280.0" width="360.0" height="96.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="1.0"/>
+<text x="3652.0" y="306.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#b45309" text-anchor="start" xml:space="preserve">ZIEL</text>
+<text x="3652.0" y="330.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Das System unter realen Bedingungen</text>
+<text x="3652.0" y="350.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">testen, bevor Werkzeuge ersetzt werden.</text>
+<rect x="3636.0" y="392.0" width="360.0" height="248.0" rx="8" fill="#ffffff" stroke="#868e96" stroke-width="1" opacity="1.0"/>
+<text x="3652.0" y="418.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">AUFGABEN</text>
+<text x="3652.0" y="442.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Eine geeignete echte Baustelle</text>
+<text x="3652.0" y="462.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  auswählen</text>
+<text x="3652.0" y="486.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Büro und Baustelle arbeiten im</text>
+<text x="3652.0" y="506.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  Pilotumfang mit ED WorkOS</text>
+<text x="3652.0" y="530.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Fehler, fehlende Funktionen und</text>
+<text x="3652.0" y="550.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  unnötige Schritte dokumentieren</text>
+<rect x="3636.0" y="656.0" width="360.0" height="96.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="1.0"/>
+<text x="3652.0" y="682.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#15803d" text-anchor="start" xml:space="preserve">ERGEBNIS</text>
+<text x="3652.0" y="706.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Entscheidung: bereit für den breiteren</text>
+<text x="3652.0" y="726.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Einsatz - ja oder nein</text>
+<rect x="3636.0" y="768.0" width="360.0" height="38.0" rx="8" fill="#f1f3f5" stroke="#adb5bd" stroke-width="1" opacity="1.0" stroke-dasharray="8 6"/>
+<text x="3652.0" y="792.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">setzt Stufe 4 + 5 voraus</text>
+<rect x="4040.0" y="150.0" width="360.0" height="104.0" rx="8" fill="#b2f2bb" stroke="#22c55e" stroke-width="2" opacity="1.0"/>
+<text x="4220.0" y="197.1" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">STUFE 10</text>
+<text x="4220.0" y="224.6" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#1e1e1e" text-anchor="middle" xml:space="preserve">Migration &amp; Rollout</text>
+<rect x="4040.0" y="280.0" width="360.0" height="96.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="1.0"/>
+<text x="4056.0" y="306.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#b45309" text-anchor="start" xml:space="preserve">ZIEL</text>
+<text x="4056.0" y="330.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Bestehende Systeme kontrolliert ablösen</text>
+<text x="4056.0" y="350.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">und das System einführen.</text>
+<rect x="4040.0" y="392.0" width="360.0" height="248.0" rx="8" fill="#ffffff" stroke="#868e96" stroke-width="1" opacity="1.0"/>
+<text x="4056.0" y="418.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">AUFGABEN</text>
+<text x="4056.0" y="442.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Bestandsdaten übernehmen, soweit</text>
+<text x="4056.0" y="462.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  technisch und rechtlich möglich</text>
+<text x="4056.0" y="486.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Mitarbeiter nach Rollen schulen</text>
+<text x="4056.0" y="510.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Schrittweise Einführung statt</text>
+<text x="4056.0" y="530.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  sofortiger Komplettabschaltung</text>
+<text x="4056.0" y="554.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- monday.com / Kraaft erst kündigen,</text>
+<text x="4056.0" y="574.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">  wenn Abläufe nachweislich laufen</text>
+<rect x="4040.0" y="656.0" width="360.0" height="96.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="1.0"/>
+<text x="4056.0" y="682.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="14" fill="#15803d" text-anchor="start" xml:space="preserve">ERGEBNIS</text>
+<text x="4056.0" y="706.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Eine zentrale Plattform für Büro,</text>
+<text x="4056.0" y="726.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Controlling, Leitung und Baustelle</text>
+<rect x="4040.0" y="768.0" width="360.0" height="38.0" rx="8" fill="#f1f3f5" stroke="#adb5bd" stroke-width="1" opacity="1.0" stroke-dasharray="8 6"/>
+<text x="4056.0" y="792.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#495057" text-anchor="start" xml:space="preserve">setzt Stufe 9 voraus</text>
+<line x1="366.0" y1="202.0" x2="398.0" y2="202.0" stroke="#495057" stroke-width="2"/>
+<polygon points="398.0,202.0 388.0,197.0 388.0,207.0" fill="#495057"/>
+<line x1="770.0" y1="202.0" x2="802.0" y2="202.0" stroke="#495057" stroke-width="2"/>
+<polygon points="802.0,202.0 792.0,197.0 792.0,207.0" fill="#495057"/>
+<line x1="1174.0" y1="202.0" x2="1206.0" y2="202.0" stroke="#495057" stroke-width="2"/>
+<polygon points="1206.0,202.0 1196.0,197.0 1196.0,207.0" fill="#495057"/>
+<line x1="1578.0" y1="202.0" x2="1610.0" y2="202.0" stroke="#495057" stroke-width="2"/>
+<polygon points="1610.0,202.0 1600.0,197.0 1600.0,207.0" fill="#495057"/>
+<line x1="1982.0" y1="202.0" x2="2014.0" y2="202.0" stroke="#495057" stroke-width="2"/>
+<polygon points="2014.0,202.0 2004.0,197.0 2004.0,207.0" fill="#495057"/>
+<line x1="2386.0" y1="202.0" x2="2418.0" y2="202.0" stroke="#495057" stroke-width="2"/>
+<polygon points="2418.0,202.0 2408.0,197.0 2408.0,207.0" fill="#495057"/>
+<line x1="2790.0" y1="202.0" x2="2822.0" y2="202.0" stroke="#495057" stroke-width="2"/>
+<polygon points="2822.0,202.0 2812.0,197.0 2812.0,207.0" fill="#495057"/>
+<line x1="3194.0" y1="202.0" x2="3226.0" y2="202.0" stroke="#495057" stroke-width="2"/>
+<polygon points="3226.0,202.0 3216.0,197.0 3216.0,207.0" fill="#495057"/>
+<line x1="3598.0" y1="202.0" x2="3630.0" y2="202.0" stroke="#495057" stroke-width="2"/>
+<polygon points="3630.0,202.0 3620.0,197.0 3620.0,207.0" fill="#495057"/>
+<line x1="4002.0" y1="202.0" x2="4034.0" y2="202.0" stroke="#495057" stroke-width="2"/>
+<polygon points="4034.0,202.0 4024.0,197.0 4024.0,207.0" fill="#495057"/>
+<line x1="0.0" y1="888.0" x2="4400.0" y2="888.0" stroke="#adb5bd" stroke-width="2"/>
+<text x="0.0" y="874.5" font-family="Segoe Print, Comic Sans MS, cursive" font-size="20" fill="#495057" text-anchor="start" xml:space="preserve">Meilensteine</text>
+<polygon points="988.0,871 1005.0,888.0 988.0,905 971.0,888.0" fill="#ffd8a8" stroke="#f59e0b" stroke-width="2"/>
+<text x="888.0" y="932.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="16" fill="#b45309" text-anchor="start" xml:space="preserve">M1  Fundament steht</text>
+<text x="888.0" y="952.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#757575" text-anchor="start" xml:space="preserve">nach Stufe 2</text>
+<polygon points="2200.0,871 2217.0,888.0 2200.0,905 2183.0,888.0" fill="#ffd8a8" stroke="#f59e0b" stroke-width="2"/>
+<text x="2100.0" y="932.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="16" fill="#b45309" text-anchor="start" xml:space="preserve">M2  Plattform nutzbar</text>
+<text x="2100.0" y="952.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#757575" text-anchor="start" xml:space="preserve">nach Stufe 5</text>
+<polygon points="3412.0,871 3429.0,888.0 3412.0,905 3395.0,888.0" fill="#ffd8a8" stroke="#f59e0b" stroke-width="2"/>
+<text x="3312.0" y="932.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="16" fill="#b45309" text-anchor="start" xml:space="preserve">M3  Steuerung &amp; Automation</text>
+<text x="3312.0" y="952.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#757575" text-anchor="start" xml:space="preserve">nach Stufe 8</text>
+<polygon points="4220.0,871 4237.0,888.0 4220.0,905 4203.0,888.0" fill="#ffd8a8" stroke="#f59e0b" stroke-width="2"/>
+<text x="4120.0" y="932.4" font-family="Segoe Print, Comic Sans MS, cursive" font-size="16" fill="#b45309" text-anchor="start" xml:space="preserve">M4  Go-Live</text>
+<text x="4120.0" y="952.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="14" fill="#757575" text-anchor="start" xml:space="preserve">nach Stufe 10</text>
+<rect x="0.0" y="998.0" width="800.0" height="138.0" rx="8" fill="#ffc9c9" stroke="#ef4444" stroke-width="2" opacity="1.0"/>
+<text x="20.0" y="1034.5" font-family="Segoe Print, Comic Sans MS, cursive" font-size="20" fill="#b91c1c" text-anchor="start" xml:space="preserve">Planungsprinzip</text>
+<text x="20.0" y="1064.5" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="18" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Nicht monday.com und Kraaft vollständig nachbauen. Zuerst die tatsächlich</text>
+<text x="20.0" y="1087.0" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="18" fill="#1e1e1e" text-anchor="start" xml:space="preserve">genutzten Kernfunktionen identifizieren und daraus ein schlankes ED-System</text>
+<text x="20.0" y="1109.5" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="18" fill="#1e1e1e" text-anchor="start" xml:space="preserve">entwickeln.</text>
+<rect x="860.0" y="998.0" width="800.0" height="150.0" rx="8" fill="#e7f5ff" stroke="#4a9eed" stroke-width="2" opacity="1.0"/>
+<text x="880.0" y="1034.5" font-family="Segoe Print, Comic Sans MS, cursive" font-size="20" fill="#1864ab" text-anchor="start" xml:space="preserve">Leitplanken für die Umsetzung</text>
+<text x="880.0" y="1062.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Reihenfolge einhalten: Daten und Rechte vor Oberflächen, Oberflächen vor Automation.</text>
+<text x="880.0" y="1082.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Jede Stufe hat ein abnehmbares Ergebnis - erst dann startet die nächste.</text>
+<text x="880.0" y="1102.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Automation (7) und KI (8) erst, wenn die Basisprozesse stabil laufen.</text>
+<text x="880.0" y="1122.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">- Altsysteme erst kündigen, wenn Stufe 9 den Nachweis erbracht hat.</text>
+<rect x="1720.0" y="998.0" width="560.0" height="180.0" rx="8" fill="#ffffff" stroke="#adb5bd" stroke-width="1" opacity="1.0"/>
+<text x="1740.0" y="1034.5" font-family="Segoe Print, Comic Sans MS, cursive" font-size="20" fill="#495057" text-anchor="start" xml:space="preserve">Legende</text>
+<rect x="1740.0" y="1048.0" width="28.0" height="20.0" rx="8" fill="#fff3bf" stroke="#f59e0b" stroke-width="1" opacity="1.0"/>
+<text x="1778.0" y="1065.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Ziel der Stufe</text>
+<rect x="1740.0" y="1078.0" width="28.0" height="20.0" rx="8" fill="#ffffff" stroke="#868e96" stroke-width="1" opacity="1.0"/>
+<text x="1778.0" y="1095.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Aufgaben / Arbeitspakete</text>
+<rect x="1740.0" y="1108.0" width="28.0" height="20.0" rx="8" fill="#d3f9d8" stroke="#22c55e" stroke-width="1" opacity="1.0"/>
+<text x="1778.0" y="1125.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Ergebnis (Abnahmekriterium)</text>
+<rect x="1740.0" y="1138.0" width="28.0" height="20.0" rx="8" fill="#f1f3f5" stroke="#adb5bd" stroke-width="1" opacity="1.0"/>
+<text x="1778.0" y="1155.4" font-family="Nunito, Helvetica, Arial, sans-serif" font-size="16" fill="#1e1e1e" text-anchor="start" xml:space="preserve">Abhängigkeit / Voraussetzung</text>
+</svg>
