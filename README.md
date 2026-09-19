@@ -91,6 +91,49 @@ identisch.
   Sprungmarke zum Inhalt, Beschriftungen an jedem Feld, Ergebnisbereiche als `aria-live`.
   Klickflächen mindestens 44 px hoch.
 
+## Gemeinsamer Stand für zwei Geräte
+
+Ohne Einrichtung bleibt alles im Browser. Wer den Stand zu zweit führen möchte, hinterlegt in
+`js/konfig.js` die Zugangsdaten eines kostenlosen [Supabase](https://supabase.com)-Projekts:
+
+```js
+window.HB.konfig = {
+  url: 'https://<kennung>.supabase.co',
+  schluessel: '<anon public key>',
+  haushalt: 'haushalt'
+};
+```
+
+Der `anon`-Schlüssel ist zur Veröffentlichung gedacht und darf im Repository stehen: Er allein
+öffnet nichts. Zugriff gibt es nur nach Anmeldung mit E-Mail und Passwort, geregelt über die
+Zeilensicherheit der Datenbank.
+
+Einmalig im Supabase-Projekt anzulegen (SQL-Editor):
+
+```sql
+create table if not exists haushalte (
+  id text primary key,
+  daten jsonb not null,
+  aktualisiert timestamptz not null default now()
+);
+
+alter table haushalte enable row level security;
+
+create policy "angemeldete lesen"    on haushalte for select to authenticated using (true);
+create policy "angemeldete anlegen"  on haushalte for insert to authenticated with check (true);
+create policy "angemeldete aendern"  on haushalte for update to authenticated using (true) with check (true);
+```
+
+Dazu unter *Authentication* die Selbstregistrierung abschalten und die beiden Konten von Hand
+anlegen – sonst könnte sich mit dem öffentlichen Schlüssel jeder ein Konto erstellen.
+
+**Wie der Abgleich arbeitet:** Nach jeder Änderung wartet die App anderthalb Sekunden, holt dann
+den entfernten Stand, führt ihn mit dem eigenen zusammen und schreibt das Ergebnis zurück. Alle
+25 Sekunden schaut sie von sich aus nach. Zusammengeführt wird pro Eintrag über einen Zeitstempel;
+Gelöschtes hinterlässt einen Grabstein, damit es nicht vom anderen Gerät zurückkehrt. Wird ein
+gelöschter Eintrag später wieder bearbeitet, gewinnt die Bearbeitung. Ohne Netz arbeitet die App
+normal weiter und gleicht beim nächsten Mal ab.
+
 ## Wo die Daten liegen
 
 Ausschließlich im `localStorage` deines Browsers. Nichts wird übertragen, es gibt keinen Server und
@@ -112,6 +155,9 @@ styles.css          Gestaltung, heller und dunkler Modus
 js/format.js        Beträge, Datums- und Monatsformate (deutsch)
 js/store.js         Speichern, Laden, Export/Import – die einzige Stelle mit localStorage
 js/model.js         Rechenkern: Summen, Auswertungen, Daueraufträge (ohne DOM)
+js/merge.js         Zusammenführen zweier Stände beim Abgleich (ohne DOM)
+js/wolke.js         Anmeldung und Austausch mit Supabase
+js/konfig.js        Zugangsdaten für den gemeinsamen Stand (leer = nur lokal)
 js/charts.js        Diagramme als handgeschriebenes SVG bzw. CSS, ohne Bibliothek
 js/app.js           Oberfläche: Rendering und Bedienung
 tests/              Tests für den Rechenkern

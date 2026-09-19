@@ -177,9 +177,12 @@ test('Export und Import ergeben denselben Stand', () => {
     [buchung('2026-09-01', 'ausgabe', 12345, { notiz: 'REWE Großeinkauf' })],
     [{ id: 'd1', bezeichnung: 'Strom', art: 'ausgabe', betrag: 8900, kategorieId: 'kat_wohnen', person: 'gemeinsam', tagImMonat: 5, intervall: 'monatlich', startMonat: '2026-01', endMonat: null, aktiv: true }]
   );
-  const ergebnis = store.importJson(store.exportJson(daten));
+  /* Gegen den normalisierten Stand vergleichen: beim Laden werden fehlende
+     Felder wie die Zeitstempel für den Abgleich ergänzt. */
+  const normalisiert = store.migrieren(daten);
+  const ergebnis = store.importJson(store.exportJson(normalisiert));
   assert.equal(ergebnis.ok, true);
-  assert.deepEqual(ergebnis.daten, daten);
+  assert.deepEqual(ergebnis.daten, normalisiert);
 });
 
 test('Kaputte oder fremde Dateien werden abgewiesen, nicht übernommen', () => {

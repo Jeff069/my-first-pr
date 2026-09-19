@@ -7,6 +7,8 @@
   var store = global.HB.store;
   var model = global.HB.model;
   var charts = global.HB.charts;
+  var merge = global.HB.merge;
+  var wolke = global.HB.wolke;
 
   var daten = store.laden();
   var aktuellerMonat = format.heuteIso().slice(0, 7);
@@ -55,13 +57,22 @@
     return el;
   }
 
+  /* Ein Grabstein hält fest, dass dieser Eintrag bewusst weg ist - sonst käme er
+     beim nächsten Abgleich vom anderen Gerät zurück. */
+  function grabstein(id) {
+    daten.geloescht = (daten.geloescht || []).filter(function (e) { return e.id !== id; });
+    daten.geloescht.push({ id: id, zeit: merge.jetzt() });
+  }
+
   function sichern() {
+    daten.aktualisiert = merge.jetzt();
     var erfolg = store.speichern(daten);
     var hinweis = q('speicherHinweis');
     hinweis.textContent = erfolg
       ? ''
       : 'Achtung: Dieser Browser speichert nichts dauerhaft (privates Fenster?). Bitte vor dem Schließen ein Backup exportieren.';
     hinweis.className = erfolg ? '' : 'fehler';
+    abgleichAnstossen();
   }
 
   function personName(schluessel) {
@@ -150,6 +161,7 @@
     if (monat > format.heuteIso().slice(0, 7)) return;
     var neue = model.faelligeBuchungen(daten, monat);
     if (!neue.length) return;
+    neue.forEach(function (b) { b.geaendert = merge.jetzt(); });
     daten.buchungen = daten.buchungen.concat(neue);
     sichern();
   }
@@ -233,6 +245,7 @@
       daten.ausgeblendet = (daten.ausgeblendet || []).concat(b.quelle.dauerId + '|' + b.quelle.monat);
     }
     daten.buchungen = daten.buchungen.filter(function (x) { return x.id !== b.id; });
+    grabstein(b.id);
     if (bearbeiteBuchung === b.id) buchungFormZuruecksetzen();
     sichern();
     alleszeigen();
@@ -271,7 +284,8 @@
       kategorieId: q('buchungKategorie').value || null,
       notiz: q('buchungNotiz').value.trim(),
       person: q('buchungPerson').value,
-      quelle: null
+      quelle: null,
+      geaendert: merge.jetzt()
     };
 
     if (bearbeiteBuchung) {
@@ -433,7 +447,8 @@
       intervall: q('dauerIntervall').value,
       startMonat: q('dauerStart').value,
       endMonat: q('dauerEnde').value || null,
-      aktiv: true
+      aktiv: true,
+      geaendert: merge.jetzt()
     };
 
     if (bearbeiteDauer) {
@@ -488,6 +503,7 @@
       pause.type = 'button';
       pause.addEventListener('click', function () {
         d.aktiv = !d.aktiv;
+        d.geaendert = merge.jetzt();
         sichern();
         alleszeigen();
       });
@@ -497,6 +513,7 @@
       loeschen.addEventListener('click', function () {
         if (!global.confirm('Dauerauftrag „' + d.bezeichnung + '" löschen? Bereits erzeugte Buchungen bleiben erhalten.')) return;
         daten.dauerauftraege = daten.dauerauftraege.filter(function (x) { return x.id !== d.id; });
+        grabstein(d.id);
         if (bearbeiteDauer === d.id) dauerFormZuruecksetzen();
         sichern();
         alleszeigen();
@@ -516,6 +533,7 @@
     e.preventDefault();
     daten.einstellungen.personA = q('personA').value.trim() || 'Ich';
     daten.einstellungen.personB = q('personB').value.trim() || 'Partnerin';
+    daten.einstellungen.geaendert = merge.jetzt();
     sichern();
     alleszeigen();
   });
@@ -550,6 +568,7 @@
       name.setAttribute('aria-label', 'Name der Kategorie');
       name.addEventListener('change', function () {
         k.name = name.value.trim() || k.name;
+        k.geaendert = merge.jetzt();
         name.value = k.name;
         sichern();
         alleszeigen();
@@ -560,6 +579,7 @@
 
       li.appendChild(farbAuswahl(k.slot, function (slot) {
         k.slot = slot;
+        k.geaendert = merge.jetzt();
         sichern();
         alleszeigen();
       }));
@@ -575,8 +595,13 @@
           : 'Kategorie „' + k.name + '" löschen?';
         if (!global.confirm(text)) return;
         daten.kategorien = daten.kategorien.filter(function (x) { return x.id !== k.id; });
-        daten.buchungen.forEach(function (b) { if (b.kategorieId === k.id) b.kategorieId = null; });
-        daten.dauerauftraege.forEach(function (d) { if (d.kategorieId === k.id) d.kategorieId = null; });
+        grabstein(k.id);
+        daten.buchungen.forEach(function (b) {
+          if (b.kategorieId === k.id) { b.kategorieId = null; b.geaendert = merge.jetzt(); }
+        });
+        daten.dauerauftraege.forEach(function (d) {
+          if (d.kategorieId === k.id) { d.kategorieId = null; d.geaendert = merge.jetzt(); }
+        });
         sichern();
         alleszeigen();
       });
@@ -594,7 +619,8 @@
       id: store.neueId('kat'),
       name: name,
       typ: q('katTyp').value,
-      slot: parseInt(q('katSlot').value, 10) || 8
+      slot: parseInt(q('katSlot').value, 10) || 8,
+      geaendert: merge.jetzt()
     });
     q('katName').value = '';
     sichern();
@@ -721,6 +747,7 @@
     beispiele.forEach(function (b) {
       daten.buchungen.push({
         id: store.neueId('b'),
+        geaendert: merge.jetzt(),
         datum: monat + '-' + b.tag,
         art: b.art,
         betrag: b.betrag,
@@ -733,6 +760,117 @@
     sichern();
     alleszeigen();
   });
+
+  /* ---------------- Gemeinsamer Stand ---------------- */
+
+  var abgleichLaeuft = false;
+  var abgleichGeplant = null;
+  var abgleichTakt = null;
+
+  function statusZeigen(text, art) {
+    var zeile = q('abgleichStatus');
+    zeile.hidden = !text;
+    zeile.textContent = text || '';
+    zeile.className = 'abgleich-status' + (art ? ' ' + art : '');
+  }
+
+  function wolkeFehlerZeigen(text) {
+    var feld = q('wolkeFehler');
+    feld.hidden = !text;
+    feld.textContent = text || '';
+  }
+
+  /* Holen, mit dem eigenen Stand zusammenführen, zurückschreiben.
+     Der Abgleich ist absichtlich in dieser Reihenfolge: erst lesen, dann
+     mischen, dann schreiben - so überschreibt niemand die Einträge des anderen. */
+  async function abgleichen(stillOderLaut) {
+    if (!wolke.eingerichtet() || !wolke.angemeldet() || abgleichLaeuft) return;
+    abgleichLaeuft = true;
+    if (stillOderLaut !== 'still') statusZeigen('Gleicht ab …', 'laeuft');
+
+    try {
+      var fern = await wolke.holen();
+      var gemischt = merge.staendeMischen(daten, fern);
+      var veraendert = JSON.stringify(gemischt) !== JSON.stringify(daten);
+
+      daten = store.migrieren(gemischt);
+      store.speichern(daten);
+      await wolke.sichern(daten);
+
+      if (veraendert) alleszeigen();
+      statusZeigen('Gemeinsamer Stand · zuletzt ' + new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }));
+      wolkeFehlerZeigen('');
+    } catch (fehler) {
+      /* Kein Netz ist kein Drama: lokal ist alles gespeichert, der nächste
+         Versuch holt es nach. */
+      statusZeigen('Nicht abgeglichen – letzter Versuch fehlgeschlagen', 'fehler');
+      if (stillOderLaut !== 'still') wolkeFehlerZeigen('Abgleich fehlgeschlagen: ' + fehler.message);
+    } finally {
+      abgleichLaeuft = false;
+    }
+  }
+
+  /* Nach einer Änderung kurz warten, damit eine Folge von Eingaben
+     zu einem einzigen Abgleich wird. */
+  function abgleichAnstossen() {
+    if (!wolke.eingerichtet() || !wolke.angemeldet()) return;
+    clearTimeout(abgleichGeplant);
+    abgleichGeplant = setTimeout(function () { abgleichen('still'); }, 1500);
+  }
+
+  function wolkeAnsichtSetzen() {
+    if (!wolke.eingerichtet()) return;
+    q('wolkeKarte').hidden = false;
+
+    var an = wolke.angemeldet();
+    q('wolkeForm').hidden = an;
+    q('wolkeAngemeldet').hidden = !an;
+    if (an) {
+      q('wolkeStatus').textContent = 'Angemeldet als ' + wolke.benutzer()
+        + '. Änderungen gehen automatisch an den gemeinsamen Stand.';
+    } else {
+      statusZeigen('');
+    }
+  }
+
+  function taktSetzen() {
+    clearInterval(abgleichTakt);
+    if (!wolke.eingerichtet() || !wolke.angemeldet()) return;
+    /* Alle 25 Sekunden nachschauen, ob der andere etwas eingetragen hat. */
+    abgleichTakt = setInterval(function () {
+      if (!document.hidden) abgleichen('still');
+    }, 25000);
+  }
+
+  if (global.HB.wolke.eingerichtet()) {
+    q('wolkeForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      wolkeFehlerZeigen('');
+      try {
+        await wolke.anmelden(q('wolkeEmail').value.trim(), q('wolkePasswort').value);
+        q('wolkePasswort').value = '';
+        wolkeAnsichtSetzen();
+        taktSetzen();
+        await abgleichen();
+      } catch (fehler) {
+        wolkeFehlerZeigen('Anmeldung fehlgeschlagen: ' + fehler.message);
+      }
+    });
+
+    q('wolkeAbmelden').addEventListener('click', function () {
+      wolke.abmelden();
+      clearInterval(abgleichTakt);
+      statusZeigen('');
+      wolkeAnsichtSetzen();
+    });
+
+    q('wolkeJetzt').addEventListener('click', function () { abgleichen(); });
+
+    /* Beim Zurückkehren auf die Seite sofort nachschauen. */
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) abgleichen('still');
+    });
+  }
 
   /* ---------------- Gesamtausgabe ---------------- */
 
@@ -776,6 +914,9 @@
   dauerFormZuruecksetzen();
   alleszeigen();
   indikatorSetzen();
+  wolkeAnsichtSetzen();
+  taktSetzen();
+  abgleichen('still');
 
   /* Service Worker: macht die App installierbar und offline lauffähig.
      Nur auf einer echten Adresse und nicht in einer eingebetteten Ansicht -

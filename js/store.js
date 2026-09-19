@@ -30,30 +30,34 @@
   var SLOTS = 8;
 
   function standardKategorien() {
+    var anfang = '1970-01-01T00:00:00.000Z';
     return [
-      { id: 'kat_wohnen', name: 'Wohnen & Miete', typ: 'ausgabe', slot: 1 },
-      { id: 'kat_lebensmittel', name: 'Lebensmittel', typ: 'ausgabe', slot: 2 },
-      { id: 'kat_mobilitaet', name: 'Auto & Mobilität', typ: 'ausgabe', slot: 3 },
-      { id: 'kat_versicherung', name: 'Versicherungen', typ: 'ausgabe', slot: 4 },
-      { id: 'kat_abos', name: 'Abos & Verträge', typ: 'ausgabe', slot: 5 },
-      { id: 'kat_freizeit', name: 'Freizeit', typ: 'ausgabe', slot: 6 },
-      { id: 'kat_gesundheit', name: 'Gesundheit', typ: 'ausgabe', slot: 7 },
-      { id: 'kat_sonstiges', name: 'Sonstiges', typ: 'ausgabe', slot: 8 },
-      { id: 'kat_gehalt', name: 'Gehalt', typ: 'einnahme', slot: 6 },
-      { id: 'kat_sonstige_einnahme', name: 'Sonstige Einnahmen', typ: 'einnahme', slot: 3 }
+      { id: 'kat_wohnen', name: 'Wohnen & Miete', typ: 'ausgabe', slot: 1, geaendert: anfang },
+      { id: 'kat_lebensmittel', name: 'Lebensmittel', typ: 'ausgabe', slot: 2, geaendert: anfang },
+      { id: 'kat_mobilitaet', name: 'Auto & Mobilität', typ: 'ausgabe', slot: 3, geaendert: anfang },
+      { id: 'kat_versicherung', name: 'Versicherungen', typ: 'ausgabe', slot: 4, geaendert: anfang },
+      { id: 'kat_abos', name: 'Abos & Verträge', typ: 'ausgabe', slot: 5, geaendert: anfang },
+      { id: 'kat_freizeit', name: 'Freizeit', typ: 'ausgabe', slot: 6, geaendert: anfang },
+      { id: 'kat_gesundheit', name: 'Gesundheit', typ: 'ausgabe', slot: 7, geaendert: anfang },
+      { id: 'kat_sonstiges', name: 'Sonstiges', typ: 'ausgabe', slot: 8, geaendert: anfang },
+      { id: 'kat_gehalt', name: 'Gehalt', typ: 'einnahme', slot: 6, geaendert: anfang },
+      { id: 'kat_sonstige_einnahme', name: 'Sonstige Einnahmen', typ: 'einnahme', slot: 3, geaendert: anfang }
     ];
   }
 
   function leereDaten() {
     return {
       version: VERSION,
-      einstellungen: { personA: 'Ich', personB: 'Partnerin', startsaldo: 0 },
+      einstellungen: { personA: 'Ich', personB: 'Partnerin', startsaldo: 0, geaendert: '1970-01-01T00:00:00.000Z' },
       kategorien: standardKategorien(),
       buchungen: [],
       dauerauftraege: [],
       /* Merkzettel für gelöschte Dauerauftrags-Buchungen ("dauerId|monat"),
          damit eine bewusst entfernte Buchung nicht beim nächsten Laden zurückkehrt. */
-      ausgeblendet: []
+      ausgeblendet: [],
+      /* Grabsteine gelöschter Einträge für den Abgleich mit dem zweiten Gerät. */
+      geloescht: [],
+      aktualisiert: null
     };
   }
 
@@ -71,13 +75,19 @@
               id: k.id,
               name: k.name || 'Ohne Namen',
               typ: k.typ === 'einnahme' ? 'einnahme' : 'ausgabe',
-              slot: Math.min(SLOTS, Math.max(1, parseInt(k.slot, 10) || 8))
+              slot: Math.min(SLOTS, Math.max(1, parseInt(k.slot, 10) || 8)),
+              geaendert: k.geaendert || '1970-01-01T00:00:00.000Z'
             };
           })
         : vorlage.kategorien,
       buchungen: Array.isArray(roh.buchungen) ? roh.buchungen : [],
       dauerauftraege: Array.isArray(roh.dauerauftraege) ? roh.dauerauftraege : [],
-      ausgeblendet: Array.isArray(roh.ausgeblendet) ? roh.ausgeblendet.filter(function (e) { return typeof e === 'string'; }) : []
+      ausgeblendet: Array.isArray(roh.ausgeblendet) ? roh.ausgeblendet.filter(function (e) { return typeof e === 'string'; }) : [],
+      /* Grabsteine gelöschter Einträge, damit sie beim Abgleich nicht zurückkehren. */
+      geloescht: Array.isArray(roh.geloescht)
+        ? roh.geloescht.filter(function (e) { return e && e.id && e.zeit; }).map(function (e) { return { id: e.id, zeit: e.zeit }; })
+        : [],
+      aktualisiert: roh.aktualisiert || null
     };
 
     daten.buchungen = daten.buchungen.filter(function (b) {
@@ -91,7 +101,9 @@
         kategorieId: b.kategorieId || null,
         notiz: typeof b.notiz === 'string' ? b.notiz : '',
         person: b.person === 'a' || b.person === 'b' ? b.person : 'gemeinsam',
-        quelle: b.quelle && b.quelle.dauerId ? { dauerId: b.quelle.dauerId, monat: b.quelle.monat } : null
+        quelle: b.quelle && b.quelle.dauerId ? { dauerId: b.quelle.dauerId, monat: b.quelle.monat } : null,
+        /* Zeitstempel für den Abgleich zwischen zwei Geräten. */
+        geaendert: b.geaendert || '1970-01-01T00:00:00.000Z'
       };
     });
 
@@ -109,7 +121,8 @@
         intervall: d.intervall === 'vierteljaehrlich' || d.intervall === 'jaehrlich' ? d.intervall : 'monatlich',
         startMonat: d.startMonat || '2000-01',
         endMonat: d.endMonat || null,
-        aktiv: d.aktiv !== false
+        aktiv: d.aktiv !== false,
+        geaendert: d.geaendert || '1970-01-01T00:00:00.000Z'
       };
     });
 
