@@ -1,0 +1,17 @@
+{
+  "name": "Haushaltsbuch",
+  "short_name": "Haushalt",
+  "description": "Einnahmen, Ausgaben und Abbuchungen für zwei Personen im Blick.",
+  "lang": "de",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f2ece0",
+  "theme_color": "#14563f",
+  "icons": [
+    { "src": "icons/symbol-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/symbol-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/symbol-maskierbar-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

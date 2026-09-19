@@ -42,6 +42,30 @@ Ein paar Details, die im Alltag zählen:
 - Beträge liegen intern als ganze Cent vor, damit sich keine Rundungsfehler ansammeln.
 - Dunkelmodus, Bedienung per Tastatur und ein Layout, das auf dem Handy funktioniert.
 
+## Als App aufs Handy
+
+Die App ist installierbar: eigenes Symbol auf dem Startbildschirm, Start im Vollbild ohne
+Browserleiste, Start auch ohne Internetverbindung. Dafür braucht sie eine echte Adresse –
+über GitHub Pages ist das in zwei Minuten erledigt:
+
+1. Im Repository auf **Settings → Pages**
+2. Unter *Source* **Deploy from a branch** wählen
+3. Branch auf `claude/planmodus-3635uv` (oder später `main`) stellen, Ordner `/ (root)`, **Save**
+4. Nach ein paar Minuten liegt die App unter `https://<benutzername>.github.io/my-first-pr/`
+
+Dann auf dem Telefon öffnen:
+
+- **Android (Chrome):** Menü ⋮ → *App installieren*
+- **iPhone (Safari):** Teilen-Symbol → *Zum Home-Bildschirm*
+
+Danach startet das Haushaltsbuch wie eine normale App. Die Dateien liegen dann im Gerät
+(`sw.js`), es funktioniert also auch im Funkloch – der Kontostand im Supermarkt ist erreichbar,
+ohne Empfang.
+
+Wer etwas am Code ändert, zählt in `sw.js` die `VERSION` hoch; sonst zeigt das installierte
+Exemplar noch die alte Fassung. Die Symbole liegen in `icons/` und lassen sich mit
+`node tools/symbole.mjs` neu erzeugen.
+
 ## Gestaltung und Barrierefreiheit
 
 Die Oberfläche ist einem geführten Kassenbuch nachempfunden: Cremepapier statt Weiß,
@@ -85,6 +109,10 @@ js/model.js         Rechenkern: Summen, Auswertungen, Daueraufträge (ohne DOM)
 js/charts.js        Diagramme als handgeschriebenes SVG bzw. CSS, ohne Bibliothek
 js/app.js           Oberfläche: Rendering und Bedienung
 tests/              Tests für den Rechenkern
+manifest.webmanifest  Angaben für die Installation als App
+sw.js               Service Worker: macht die App offline lauffähig
+icons/              App-Symbole (erzeugt von tools/symbole.mjs)
+tools/              Hilfsskripte: Symbole zeichnen, Ansicht für die Veröffentlichung
 ```
 
 Die Trennung zwischen `model.js` (rechnet) und `app.js` (zeigt an) ist Absicht: nur dadurch lassen

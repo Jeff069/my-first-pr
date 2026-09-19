@@ -776,4 +776,17 @@
   dauerFormZuruecksetzen();
   alleszeigen();
   indikatorSetzen();
+
+  /* Service Worker: macht die App installierbar und offline lauffähig.
+     Nur auf einer echten Adresse und nicht in einer eingebetteten Ansicht -
+     dort ist die Registrierung ohnehin gesperrt. */
+  if (global.navigator && 'serviceWorker' in global.navigator
+      && global.location.protocol.indexOf('http') === 0
+      && global.top === global.self) {
+    global.addEventListener('load', function () {
+      global.navigator.serviceWorker.register('sw.js').catch(function () {
+        /* Ohne Service Worker läuft die App genauso, nur nicht offline. */
+      });
+    });
+  }
 })(window);
