@@ -939,6 +939,35 @@
       }
     });
 
+    q('wolkeRegistrieren').addEventListener('click', async function () {
+      wolkeFehlerZeigen('');
+      var meldung = q('wolkeMeldung');
+      meldung.hidden = true;
+
+      var email = q('wolkeEmail').value.trim();
+      var passwort = q('wolkePasswort').value;
+      if (!email || passwort.length < 6) {
+        wolkeFehlerZeigen('Bitte E-Mail eintragen und ein Passwort mit mindestens sechs Zeichen wählen.');
+        return;
+      }
+
+      try {
+        var ergebnis = await wolke.registrieren(email, passwort);
+        q('wolkePasswort').value = '';
+        if (ergebnis.angemeldet) {
+          wolkeAnsichtSetzen();
+          taktSetzen();
+          await abgleichen();
+          return;
+        }
+        meldung.hidden = false;
+        meldung.textContent = 'Konto angelegt. Schau in dein E-Mail-Postfach und klick den Bestätigungslink – '
+          + 'danach hier anmelden.';
+      } catch (fehler) {
+        wolkeFehlerZeigen('Konto anlegen fehlgeschlagen: ' + fehler.message);
+      }
+    });
+
     q('wolkeAbmelden').addEventListener('click', function () {
       wolke.abmelden();
       clearInterval(abgleichTakt);

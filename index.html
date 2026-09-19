@@ -216,8 +216,12 @@
       <form id="wolkeForm" class="formular" novalidate>
         <div class="feld"><label for="wolkeEmail">E-Mail</label><input type="email" id="wolkeEmail" autocomplete="username"></div>
         <div class="feld"><label for="wolkePasswort">Passwort</label><input type="password" id="wolkePasswort" autocomplete="current-password"></div>
-        <div class="feld-knoepfe"><button type="submit" class="knopf-primaer">Anmelden</button></div>
+        <div class="feld-knoepfe">
+          <button type="submit" class="knopf-primaer">Anmelden</button>
+          <button type="button" id="wolkeRegistrieren" class="knopf-sekundaer">Konto anlegen</button>
+        </div>
       </form>
+      <p class="karte-hinweis" id="wolkeMeldung" hidden></p>
 
       <div id="wolkeAngemeldet" hidden>
         <p class="karte-hinweis" id="wolkeStatus"></p>

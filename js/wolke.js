@@ -65,6 +65,26 @@
     return benutzer();
   }
 
+  /* Konto anlegen - damit die beiden Zugänge nicht von Hand im Supabase-Fenster
+     erstellt werden müssen. Verlangt das Projekt eine Bestätigung per E-Mail,
+     kommt keine Sitzung zurück; dann muss erst der Link in der Mail geklickt werden. */
+  async function registrieren(email, passwort) {
+    var antwort = await fetch(konfig.url + '/auth/v1/signup', {
+      method: 'POST',
+      headers: kopf(false),
+      body: JSON.stringify({ email: email, password: passwort })
+    });
+    if (!antwort.ok) throw new Error(await fehlerText(antwort));
+
+    var ergebnis = await antwort.json();
+    if (ergebnis.access_token) {
+      sitzung = ergebnis;
+      sitzungSchreiben(sitzung);
+      return { angemeldet: true };
+    }
+    return { angemeldet: false, bestaetigungNoetig: true };
+  }
+
   function abmelden() {
     sitzung = null;
     sitzungSchreiben(null);
@@ -128,6 +148,7 @@
     angemeldet: angemeldet,
     benutzer: benutzer,
     anmelden: anmelden,
+    registrieren: registrieren,
     abmelden: abmelden,
     holen: holen,
     sichern: sichern
