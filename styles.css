@@ -1,0 +1,272 @@
+/* ------------------------------------------------------------------
+   Haushaltsbuch - ein Stylesheet, keine externen Schriften oder CDNs.
+   Die Serienfarben sind auf Farbfehlsichtigkeit und Kontrast geprüft und
+   haben eigene Werte für hellen und dunklen Hintergrund.
+   ------------------------------------------------------------------ */
+
+:root {
+  color-scheme: light;
+  --flaeche: #fcfcfb;
+  --ebene: #f9f9f7;
+  --karte: #ffffff;
+  --text: #0b0b0b;
+  --text-zweit: #52514e;
+  --text-leise: #6d6b66;
+  --gitter: #e1e0d9;
+  --rand: rgba(11, 11, 11, 0.12);
+  --gut: #006300;
+  --schlecht: #c0392b;
+  --warnung-flaeche: #fff8f2;
+
+  --serie-1: #2a78d6;
+  --serie-2: #eb6834;
+  --serie-3: #1baf7a;
+  --serie-4: #eda100;
+  --serie-5: #e87ba4;
+  --serie-6: #008300;
+  --serie-7: #4a3aa7;
+  --serie-8: #e34948;
+  --serie-neutral: #898781;
+
+  --radius: 12px;
+  --schrift: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --flaeche: #1a1a19;
+    --ebene: #0d0d0d;
+    --karte: #1f1f1e;
+    --text: #ffffff;
+    --text-zweit: #c3c2b7;
+    --text-leise: #a3a199;
+    --gitter: #2c2c2a;
+    --rand: rgba(255, 255, 255, 0.14);
+    --gut: #0ca30c;
+    --schlecht: #ff8a80;
+    --warnung-flaeche: #2a1f1a;
+
+    --serie-1: #3987e5;
+    --serie-2: #d95926;
+    --serie-3: #199e70;
+    --serie-4: #c98500;
+    --serie-5: #d55181;
+    --serie-6: #008300;
+    --serie-7: #9085e9;
+    --serie-8: #e66767;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0 16px 48px;
+  font-family: var(--schrift);
+  background: var(--ebene);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+h1 { font-size: 1.35rem; margin: 0; }
+h2 { font-size: 1.05rem; margin: 0 0 4px; }
+
+/* ---------- Kopf und Monatswahl ---------- */
+.kopf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 20px 0 12px;
+}
+.kopf-unterzeile { margin: 2px 0 0; color: var(--text-zweit); font-size: 0.9rem; }
+.monatswahl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--karte);
+  border: 1px solid var(--rand);
+  border-radius: 999px;
+  padding: 4px 6px;
+}
+.monatswahl strong { min-width: 10.5ch; text-align: center; font-size: 0.95rem; }
+
+/* ---------- Tabs ---------- */
+.tableiste {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  max-width: 1040px;
+  margin: 0 auto 16px;
+  border-bottom: 1px solid var(--gitter);
+}
+.tableiste button {
+  flex: 0 0 auto;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 14px;
+  font: inherit;
+  color: var(--text-zweit);
+  cursor: pointer;
+}
+.tableiste button[aria-selected="true"] {
+  color: var(--text);
+  border-bottom-color: var(--serie-1);
+  font-weight: 600;
+}
+.tableiste button:hover { color: var(--text); }
+
+main { max-width: 1040px; margin: 0 auto; }
+main > section:focus-visible, .tableiste button:focus-visible,
+button:focus-visible, input:focus-visible, select:focus-visible, label:focus-visible {
+  outline: 2px solid var(--serie-1);
+  outline-offset: 2px;
+}
+
+/* ---------- Karten ---------- */
+.karte {
+  background: var(--karte);
+  border: 1px solid var(--rand);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.karte-warnung { background: var(--warnung-flaeche); }
+.karte-hinweis { margin: 0 0 12px; color: var(--text-zweit); font-size: 0.9rem; }
+.spalten { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.spalten > .karte { margin-bottom: 16px; }
+
+/* ---------- Kennzahlen ---------- */
+.kennzahlen {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.kennzahl {
+  background: var(--karte);
+  border: 1px solid var(--rand);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.kennzahl-titel { font-size: 0.8rem; color: var(--text-zweit); text-transform: uppercase; letter-spacing: 0.04em; }
+.kennzahl strong { font-size: 1.5rem; }
+.kennzahl-fuss { font-size: 0.78rem; color: var(--text-leise); }
+.positiv { color: var(--gut); }
+.negativ { color: var(--schlecht); }
+.gross-zahl { font-size: 1.8rem; font-weight: 600; margin: 0; }
+
+/* ---------- Balken nach Kategorie ---------- */
+.balken-liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.balken-zeile { cursor: default; }
+.balken-zeile:focus-visible { outline: 2px solid var(--serie-1); outline-offset: 4px; border-radius: 6px; }
+.balken-kopf { display: flex; justify-content: space-between; gap: 12px; font-size: 0.92rem; }
+.balken-name { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.balken-wert { white-space: nowrap; display: flex; gap: 8px; align-items: baseline; font-variant-numeric: tabular-nums; }
+.anteil { color: var(--text-leise); font-size: 0.82rem; }
+.balken-spur { margin-top: 5px; height: 12px; background: var(--gitter); border-radius: 6px; overflow: hidden; }
+.balken-fuellung { height: 100%; border-radius: 6px; }
+.farb-punkt { width: 10px; height: 10px; border-radius: 3px; flex: 0 0 auto; display: inline-block; }
+
+/* ---------- Gestapelter Balken + Legende ---------- */
+.stapel { display: flex; gap: 2px; height: 20px; border-radius: 6px; overflow: hidden; background: var(--gitter); }
+.stapel-teil { height: 100%; }
+.legende { list-style: none; display: flex; flex-wrap: wrap; gap: 14px; padding: 0; margin: 12px 0 0; font-size: 0.88rem; color: var(--text-zweit); }
+.legende li { display: flex; align-items: center; gap: 6px; }
+
+/* ---------- Verlauf ---------- */
+.verlauf-svg { width: 100%; height: auto; display: block; }
+.gitterlinie { stroke: var(--gitter); stroke-width: 1; }
+.achsen-text { fill: var(--text-leise); font-size: 11px; font-family: var(--schrift); }
+.verlauf-svg rect:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+
+.diagramm-tooltip {
+  position: fixed;
+  z-index: 40;
+  background: var(--text);
+  color: var(--karte);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  pointer-events: none;
+  max-width: 260px;
+}
+
+/* ---------- Formulare ---------- */
+.formular { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: end; }
+.feld { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.feld-breit { grid-column: span 2; }
+.feld label { font-size: 0.82rem; color: var(--text-zweit); }
+.optional { color: var(--text-leise); }
+input, select {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--rand);
+  border-radius: 8px;
+  background: var(--flaeche);
+  color: var(--text);
+  min-width: 0;
+}
+.feld-knoepfe { display: flex; gap: 8px; align-items: end; }
+.filterleiste { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 12px; }
+
+button { font: inherit; cursor: pointer; }
+.knopf-primaer, .knopf-sekundaer, .knopf-warnung {
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  display: inline-block;
+}
+.knopf-primaer { background: var(--serie-1); color: #fff; }
+.knopf-sekundaer { background: var(--flaeche); color: var(--text); border-color: var(--rand); cursor: pointer; }
+.knopf-warnung { background: var(--schlecht); color: #fff; }
+.knopf-klein { background: none; border: 1px solid var(--rand); border-radius: 8px; padding: 8px 12px; color: var(--text-zweit); }
+.knopf-rund { background: none; border: none; border-radius: 999px; width: 32px; height: 32px; font-size: 1.1rem; color: var(--text); }
+.knopf-rund:hover, .knopf-klein:hover { background: var(--gitter); }
+.knopfreihe { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.zeilen-knopf { background: none; border: none; color: var(--text-zweit); padding: 4px 6px; border-radius: 6px; }
+.zeilen-knopf:hover { background: var(--gitter); color: var(--text); }
+
+.fehler { color: var(--schlecht); margin: 10px 0 0; font-size: 0.9rem; }
+.leer-hinweis { color: var(--text-leise); font-size: 0.9rem; margin: 8px 0 0; }
+
+/* ---------- Tabellen ---------- */
+.tabelle-huelle { overflow-x: auto; }
+.tabelle { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.tabelle th, .tabelle td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--gitter); vertical-align: middle; }
+.tabelle th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-zweit); font-weight: 600; }
+.tabelle .rechts { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tabelle tr.geplant { color: var(--text-leise); font-style: italic; }
+.marke { font-size: 0.72rem; border: 1px solid var(--rand); border-radius: 999px; padding: 1px 7px; margin-left: 6px; font-style: normal; white-space: nowrap; }
+.kategorie-zelle { display: flex; align-items: center; gap: 7px; }
+.inaktiv { opacity: 0.55; }
+
+/* ---------- Einstellungen ---------- */
+.kategorie-liste { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.kategorie-liste li { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.kategorie-liste .kat-name { flex: 1 1 160px; min-width: 0; }
+.import-vorschau { margin-top: 12px; border: 1px dashed var(--rand); border-radius: var(--radius); padding: 12px; }
+
+.einfache-liste { list-style: none; margin: 0; padding: 0; }
+.einfache-liste li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--gitter); font-size: 0.92rem; }
+.einfache-liste li:last-child { border-bottom: none; }
+
+.fuss { max-width: 1040px; margin: 24px auto 0; color: var(--text-leise); font-size: 0.82rem; }
+.fuss p { margin: 2px 0; }
+
+/* ---------- Mobil ---------- */
+@media (max-width: 760px) {
+  .kennzahlen { grid-template-columns: repeat(2, 1fr); }
+  .spalten { grid-template-columns: 1fr; }
+  .feld-breit { grid-column: span 1; }
+  .kopf { padding-top: 14px; }
+  .kennzahl strong { font-size: 1.25rem; }
+}

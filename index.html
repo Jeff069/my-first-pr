@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haushaltsbuch</title>
+<meta name="description" content="Haushaltsbuch für zwei Personen - Einnahmen, Ausgaben und Abbuchungen im Blick. Läuft komplett im Browser.">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>💶</text></svg>">
+</head>
+<body>
+
+<header class="kopf">
+  <div class="kopf-titel">
+    <h1>Haushaltsbuch</h1>
+    <p class="kopf-unterzeile" id="kopfPersonen">Übersicht für zwei Personen</p>
+  </div>
+  <div class="monatswahl">
+    <button type="button" id="monatZurueck" class="knopf-rund" aria-label="Vorheriger Monat">‹</button>
+    <strong id="monatAnzeige" aria-live="polite">Monat</strong>
+    <button type="button" id="monatVor" class="knopf-rund" aria-label="Nächster Monat">›</button>
+    <button type="button" id="monatHeute" class="knopf-klein">Heute</button>
+  </div>
+</header>
+
+<nav class="tableiste" role="tablist" aria-label="Bereiche">
+  <button type="button" role="tab" id="tab-uebersicht" aria-controls="panel-uebersicht" aria-selected="true">Übersicht</button>
+  <button type="button" role="tab" id="tab-buchungen" aria-controls="panel-buchungen" aria-selected="false" tabindex="-1">Buchungen</button>
+  <button type="button" role="tab" id="tab-wiederkehrend" aria-controls="panel-wiederkehrend" aria-selected="false" tabindex="-1">Wiederkehrend</button>
+  <button type="button" role="tab" id="tab-einstellungen" aria-controls="panel-einstellungen" aria-selected="false" tabindex="-1">Einstellungen</button>
+</nav>
+
+<main>
+
+  <!-- ÜBERSICHT -->
+  <section id="panel-uebersicht" role="tabpanel" aria-labelledby="tab-uebersicht" tabindex="0">
+    <div class="kennzahlen" id="kennzahlen" aria-live="polite">
+      <div class="kennzahl"><span class="kennzahl-titel">Einnahmen</span><strong id="kzEinnahmen">–</strong></div>
+      <div class="kennzahl"><span class="kennzahl-titel">Ausgaben</span><strong id="kzAusgaben">–</strong></div>
+      <div class="kennzahl"><span class="kennzahl-titel">Saldo</span><strong id="kzSaldo">–</strong><span class="kennzahl-fuss" id="kzSaldoFuss"></span></div>
+      <div class="kennzahl"><span class="kennzahl-titel">Sparquote</span><strong id="kzSparquote">–</strong><span class="kennzahl-fuss">vom Einkommen übrig</span></div>
+    </div>
+
+    <section class="karte" id="geplantKarte">
+      <h2>Kommt diesen Monat noch</h2>
+      <p class="karte-hinweis" id="geplantSumme">–</p>
+      <ul class="einfache-liste" id="geplantListe"></ul>
+    </section>
+
+    <section class="karte">
+      <h2>Wohin das Geld geht</h2>
+      <p class="karte-hinweis">Ausgaben nach Kategorie im gewählten Monat.</p>
+      <div id="kategorieDiagramm"></div>
+    </section>
+
+    <div class="spalten">
+      <section class="karte">
+        <h2>Die letzten 6 Monate</h2>
+        <div id="verlaufDiagramm"></div>
+      </section>
+      <section class="karte">
+        <h2>Wer hat gezahlt</h2>
+        <div id="personDiagramm"></div>
+      </section>
+    </div>
+  </section>
+
+  <!-- BUCHUNGEN -->
+  <section id="panel-buchungen" role="tabpanel" aria-labelledby="tab-buchungen" tabindex="0" hidden>
+    <section class="karte">
+      <h2 id="buchungFormTitel">Neue Buchung</h2>
+      <form id="buchungForm" class="formular" novalidate>
+        <input type="hidden" id="buchungId">
+        <div class="feld"><label for="buchungDatum">Datum</label><input type="date" id="buchungDatum" required></div>
+        <div class="feld"><label for="buchungBetrag">Betrag</label><input type="text" inputmode="decimal" id="buchungBetrag" placeholder="z. B. 42,90" required></div>
+        <div class="feld"><label for="buchungArt">Art</label>
+          <select id="buchungArt"><option value="ausgabe">Ausgabe</option><option value="einnahme">Einnahme</option></select>
+        </div>
+        <div class="feld"><label for="buchungKategorie">Kategorie</label><select id="buchungKategorie"></select></div>
+        <div class="feld"><label for="buchungPerson">Wer</label><select id="buchungPerson"></select></div>
+        <div class="feld feld-breit"><label for="buchungNotiz">Notiz</label><input type="text" id="buchungNotiz" placeholder="z. B. Wocheneinkauf"></div>
+        <div class="feld-knoepfe">
+          <button type="submit" class="knopf-primaer">Speichern</button>
+          <button type="button" id="buchungAbbrechen" class="knopf-klein" hidden>Abbrechen</button>
+        </div>
+      </form>
+      <p class="fehler" id="buchungFehler" role="alert" hidden></p>
+    </section>
+
+    <section class="karte">
+      <h2>Buchungen im Monat</h2>
+      <div class="filterleiste">
+        <div class="feld"><label for="filterKategorie">Kategorie</label><select id="filterKategorie"></select></div>
+        <div class="feld"><label for="filterPerson">Wer</label><select id="filterPerson"></select></div>
+        <div class="feld"><label for="filterText">Suche in Notiz</label><input type="search" id="filterText" placeholder="z. B. REWE"></div>
+      </div>
+      <div class="tabelle-huelle">
+        <table class="tabelle" id="buchungTabelle">
+          <thead><tr><th>Datum</th><th>Notiz</th><th>Kategorie</th><th>Wer</th><th class="rechts">Betrag</th><th></th></tr></thead>
+          <tbody id="buchungListe"></tbody>
+        </table>
+      </div>
+      <p class="leer-hinweis" id="buchungLeer" hidden>Für diesen Monat ist noch nichts erfasst.</p>
+    </section>
+  </section>
+
+  <!-- WIEDERKEHREND -->
+  <section id="panel-wiederkehrend" role="tabpanel" aria-labelledby="tab-wiederkehrend" tabindex="0" hidden>
+    <section class="karte">
+      <h2>Monatliche Fixkostenlast</h2>
+      <p class="karte-hinweis">Quartals- und Jahresbeiträge sind anteilig umgelegt – eine Jahresversicherung über 600 € zählt hier als 50 € im Monat.</p>
+      <p class="gross-zahl" id="fixkostenSumme">–</p>
+    </section>
+
+    <section class="karte">
+      <h2 id="dauerFormTitel">Neuer Dauerauftrag</h2>
+      <form id="dauerForm" class="formular" novalidate>
+        <input type="hidden" id="dauerId">
+        <div class="feld feld-breit"><label for="dauerBezeichnung">Bezeichnung</label><input type="text" id="dauerBezeichnung" placeholder="z. B. Miete" required></div>
+        <div class="feld"><label for="dauerBetrag">Betrag</label><input type="text" inputmode="decimal" id="dauerBetrag" placeholder="z. B. 1.200,00" required></div>
+        <div class="feld"><label for="dauerArt">Art</label>
+          <select id="dauerArt"><option value="ausgabe">Ausgabe</option><option value="einnahme">Einnahme</option></select>
+        </div>
+        <div class="feld"><label for="dauerKategorie">Kategorie</label><select id="dauerKategorie"></select></div>
+        <div class="feld"><label for="dauerPerson">Wer</label><select id="dauerPerson"></select></div>
+        <div class="feld"><label for="dauerTag">Abbuchung am</label><input type="number" id="dauerTag" min="1" max="31" value="1" required></div>
+        <div class="feld"><label for="dauerIntervall">Rhythmus</label>
+          <select id="dauerIntervall">
+            <option value="monatlich">monatlich</option>
+            <option value="vierteljaehrlich">vierteljährlich</option>
+            <option value="jaehrlich">jährlich</option>
+          </select>
+        </div>
+        <div class="feld"><label for="dauerStart">Ab Monat</label><input type="month" id="dauerStart" required></div>
+        <div class="feld"><label for="dauerEnde">Bis Monat <span class="optional">(optional)</span></label><input type="month" id="dauerEnde"></div>
+        <div class="feld-knoepfe">
+          <button type="submit" class="knopf-primaer">Speichern</button>
+          <button type="button" id="dauerAbbrechen" class="knopf-klein" hidden>Abbrechen</button>
+        </div>
+      </form>
+      <p class="fehler" id="dauerFehler" role="alert" hidden></p>
+    </section>
+
+    <section class="karte">
+      <h2>Angelegte Daueraufträge</h2>
+      <div class="tabelle-huelle">
+        <table class="tabelle" id="dauerTabelle">
+          <thead><tr><th>Bezeichnung</th><th>Rhythmus</th><th>Tag</th><th>Kategorie</th><th class="rechts">Betrag</th><th></th></tr></thead>
+          <tbody id="dauerListe"></tbody>
+        </table>
+      </div>
+      <p class="leer-hinweis" id="dauerLeer" hidden>Noch keine Daueraufträge – Miete, Strom und Abos sind ein guter Anfang.</p>
+    </section>
+  </section>
+
+  <!-- EINSTELLUNGEN -->
+  <section id="panel-einstellungen" role="tabpanel" aria-labelledby="tab-einstellungen" tabindex="0" hidden>
+    <section class="karte">
+      <h2>Namen</h2>
+      <form id="personenForm" class="formular">
+        <div class="feld"><label for="personA">Person 1</label><input type="text" id="personA"></div>
+        <div class="feld"><label for="personB">Person 2</label><input type="text" id="personB"></div>
+        <div class="feld-knoepfe"><button type="submit" class="knopf-primaer">Speichern</button></div>
+      </form>
+    </section>
+
+    <section class="karte">
+      <h2>Kategorien</h2>
+      <ul class="kategorie-liste" id="kategorieListe"></ul>
+      <form id="kategorieForm" class="formular">
+        <div class="feld feld-breit"><label for="katName">Neue Kategorie</label><input type="text" id="katName" placeholder="z. B. Kinderbetreuung"></div>
+        <div class="feld"><label for="katTyp">Art</label>
+          <select id="katTyp"><option value="ausgabe">Ausgabe</option><option value="einnahme">Einnahme</option></select>
+        </div>
+        <div class="feld"><label for="katSlot">Farbe</label><select id="katSlot"></select></div>
+        <div class="feld-knoepfe"><button type="submit" class="knopf-primaer">Hinzufügen</button></div>
+      </form>
+    </section>
+
+    <section class="karte">
+      <h2>Backup</h2>
+      <p class="karte-hinweis">
+        Die Daten liegen ausschließlich in diesem Browser – nichts wird ins Netz übertragen.
+        Genau deshalb braucht es eine Sicherung: die Exportdatei ist auch der Weg, den Stand
+        auf ein zweites Gerät zu bringen.
+      </p>
+      <div class="knopfreihe">
+        <button type="button" id="exportKnopf" class="knopf-primaer">Als Datei sichern</button>
+        <label class="knopf-sekundaer" for="importDatei">Backup einlesen</label>
+        <input type="file" id="importDatei" accept="application/json,.json" hidden>
+      </div>
+      <div id="importVorschau" class="import-vorschau" hidden>
+        <p id="importText"></p>
+        <div class="knopfreihe">
+          <button type="button" id="importBestaetigen" class="knopf-primaer">Jetzt überschreiben</button>
+          <button type="button" id="importAbbrechen" class="knopf-klein">Abbrechen</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="karte karte-warnung">
+      <h2>Alle Daten löschen</h2>
+      <p class="karte-hinweis">Entfernt sämtliche Buchungen, Daueraufträge und Einstellungen aus diesem Browser. Das lässt sich nicht rückgängig machen.</p>
+      <button type="button" id="loeschenKnopf" class="knopf-warnung">Alles löschen</button>
+    </section>
+
+    <section class="karte">
+      <h2>Beispieldaten</h2>
+      <p class="karte-hinweis">Füllt das Haushaltsbuch mit einem erfundenen Monat, um die Auswertung auszuprobieren. Vorhandene Daten bleiben erhalten.</p>
+      <button type="button" id="demoKnopf" class="knopf-sekundaer">Beispielmonat anlegen</button>
+    </section>
+  </section>
+
+</main>
+
+<footer class="fuss">
+  <p id="speicherHinweis"></p>
+  <p>Alle Daten bleiben in diesem Browser.</p>
+</footer>
+
+<script src="js/format.js"></script>
+<script src="js/store.js"></script>
+<script src="js/model.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
