@@ -103,6 +103,17 @@
     select.value = gewaehlt || (mitAlle ? '' : 'gemeinsam');
   }
 
+  /* Formulare und Filter sind zugeklappt, bis man sie braucht - so sieht man
+     zuerst, was man hat, und nicht ein Formular. */
+  function klappe(knopfId, bereichId, offen) {
+    var knopf = q(knopfId);
+    var bereich = q(bereichId);
+    var jetztOffen = offen === undefined ? bereich.hidden : offen;
+    bereich.hidden = !jetztOffen;
+    knopf.setAttribute('aria-expanded', jetztOffen ? 'true' : 'false');
+    return jetztOffen;
+  }
+
   /* ---------------- Tabs ---------------- */
 
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
@@ -153,6 +164,29 @@
     alleszeigen();
   }
 
+  q('buchungFormOeffnen').addEventListener('click', function () {
+    var offen = klappe('buchungFormOeffnen', 'buchungFormBereich');
+    q('buchungFormOeffnen').lastChild.nodeValue = offen ? ' Formular zuklappen' : ' Neue Buchung eintragen';
+    if (offen) q('buchungBetrag').focus();
+  });
+
+  q('dauerFormOeffnen').addEventListener('click', function () {
+    var offen = klappe('dauerFormOeffnen', 'dauerFormBereich');
+    q('dauerFormOeffnen').lastChild.nodeValue = offen ? ' Formular zuklappen' : ' Regelmäßige Zahlung eintragen';
+    if (offen) q('dauerBezeichnung').focus();
+  });
+
+  q('filterOeffnen').addEventListener('click', function () {
+    var offen = klappe('filterOeffnen', 'filterBereich');
+    q('filterOeffnen').textContent = offen ? 'Filter zuklappen' : 'Filtern und suchen';
+  });
+
+  q('kategorieMehr').addEventListener('click', function () {
+    var bereich = q('kategorieDiagramm');
+    var alle = bereich.classList.toggle('alle');
+    q('kategorieMehr').textContent = alle ? 'Nur die größten fünf zeigen' : 'Alle Kategorien anzeigen';
+  });
+
   q('monatZurueck').addEventListener('click', function () { monatSetzen(model.monatPlus(aktuellerMonat, -1)); });
   q('monatVor').addEventListener('click', function () { monatSetzen(model.monatPlus(aktuellerMonat, 1)); });
   q('monatHeute').addEventListener('click', function () { monatSetzen(format.heuteIso().slice(0, 7)); });
@@ -190,7 +224,8 @@
     var geplantListe = q('geplantListe');
     leeren(geplantListe);
     if (u.geplanteBuchungen.length) {
-      q('geplantSumme').textContent = format.eur(u.geplanteAusgaben) + ' stehen noch aus · bereits gebucht: '
+      q('geplantSumme').textContent = format.eur(u.geplanteAusgaben);
+      q('geplantFuss').textContent = 'stehen noch aus · in diesem Monat bereits gebucht: '
         + format.eur(u.gebuchteAusgaben);
       u.geplanteBuchungen.forEach(function (b) {
         var li = document.createElement('li');
@@ -199,10 +234,13 @@
         geplantListe.appendChild(li);
       });
     } else {
-      q('geplantSumme').textContent = 'Für diesen Monat steht nichts mehr aus.';
+      q('geplantSumme').textContent = format.eur(0);
+      q('geplantFuss').textContent = 'Für den Rest des Monats steht nichts mehr aus.';
     }
 
-    charts.kategorieBalken(q('kategorieDiagramm'), model.nachKategorie(daten, aktuellerMonat, 'ausgabe'));
+    var kategorien = model.nachKategorie(daten, aktuellerMonat, 'ausgabe');
+    charts.kategorieBalken(q('kategorieDiagramm'), kategorien);
+    q('kategorieMehr').hidden = kategorien.length <= 5;
     charts.verlaufBalken(q('verlaufDiagramm'), model.monatsVerlauf(daten, aktuellerMonat, 6));
     charts.personBalken(q('personDiagramm'), model.nachPerson(daten, aktuellerMonat, 'ausgabe'));
   }
@@ -218,7 +256,6 @@
       ? format.heuteIso()
       : aktuellerMonat + '-01';
     q('buchungFormTitel').textContent = 'Neue Buchung';
-    q('buchungAbbrechen').hidden = true;
     q('buchungFehler').hidden = true;
   }
 
@@ -232,8 +269,9 @@
     q('buchungPerson').value = b.person;
     q('buchungNotiz').value = b.notiz;
     q('buchungFormTitel').textContent = 'Buchung bearbeiten';
-    q('buchungAbbrechen').hidden = false;
     q('tab-buchungen').click();
+    klappe('buchungFormOeffnen', 'buchungFormBereich', true);
+    q('buchungFormOeffnen').lastChild.nodeValue = ' Formular zuklappen';
     q('buchungBetrag').focus();
   }
 
@@ -258,6 +296,8 @@
 
   q('buchungAbbrechen').addEventListener('click', function () {
     buchungFormZuruecksetzen();
+    klappe('buchungFormOeffnen', 'buchungFormBereich', false);
+    q('buchungFormOeffnen').lastChild.nodeValue = ' Neue Buchung eintragen';
   });
 
   q('buchungForm').addEventListener('submit', function (e) {
@@ -300,6 +340,8 @@
     aktuellerMonat = eintrag.datum.slice(0, 7);
     sichern();
     buchungFormZuruecksetzen();
+    klappe('buchungFormOeffnen', 'buchungFormBereich', false);
+    q('buchungFormOeffnen').lastChild.nodeValue = ' Neue Buchung eintragen';
     alleszeigen();
   });
 
@@ -324,6 +366,7 @@
     }).sort(function (a, b) { return a.datum < b.datum ? -1 : a.datum > b.datum ? 1 : 0; });
 
     q('buchungLeer').hidden = liste.length > 0;
+    q('buchungTabelle').hidden = liste.length === 0;
 
     liste.forEach(function (b) {
       var kat = model.kategorieVon(daten, b.kategorieId);
@@ -458,8 +501,7 @@
     q('dauerIntervall').value = 'monatlich';
     q('dauerStart').value = aktuellerMonat;
     q('dauerEnde').value = '';
-    q('dauerFormTitel').textContent = 'Neuer Dauerauftrag';
-    q('dauerAbbrechen').hidden = true;
+    q('dauerFormTitel').textContent = 'Neue regelmäßige Zahlung';
     q('dauerFehler').hidden = true;
   }
 
@@ -475,8 +517,9 @@
     q('dauerIntervall').value = d.intervall;
     q('dauerStart').value = d.startMonat;
     q('dauerEnde').value = d.endMonat || '';
-    q('dauerFormTitel').textContent = 'Dauerauftrag bearbeiten';
-    q('dauerAbbrechen').hidden = false;
+    q('dauerFormTitel').textContent = 'Zahlung bearbeiten';
+    klappe('dauerFormOeffnen', 'dauerFormBereich', true);
+    q('dauerFormOeffnen').lastChild.nodeValue = ' Formular zuklappen';
     q('dauerBezeichnung').focus();
   }
 
@@ -484,7 +527,11 @@
     fuelleKategorien(q('dauerKategorie'), q('dauerArt').value);
   });
 
-  q('dauerAbbrechen').addEventListener('click', dauerFormZuruecksetzen);
+  q('dauerAbbrechen').addEventListener('click', function () {
+    dauerFormZuruecksetzen();
+    klappe('dauerFormOeffnen', 'dauerFormBereich', false);
+    q('dauerFormOeffnen').lastChild.nodeValue = ' Regelmäßige Zahlung eintragen';
+  });
 
   q('dauerForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -543,6 +590,8 @@
 
     sichern();
     dauerFormZuruecksetzen();
+    klappe('dauerFormOeffnen', 'dauerFormBereich', false);
+    q('dauerFormOeffnen').lastChild.nodeValue = ' Regelmäßige Zahlung eintragen';
     alleszeigen();
   });
 
@@ -550,9 +599,10 @@
     var tbody = q('dauerListe');
     leeren(tbody);
     q('dauerLeer').hidden = daten.dauerauftraege.length > 0;
-    q('fixkostenSumme').textContent = format.eur(model.fixkostenProMonat(daten, 'ausgabe')) + ' pro Monat';
+    q('dauerTabelle').hidden = daten.dauerauftraege.length === 0;
+    q('fixkostenSumme').textContent = format.eur(model.fixkostenProMonat(daten, 'ausgabe')) + ' im Monat';
 
-    var rhythmus = { monatlich: 'monatlich', vierteljaehrlich: 'vierteljährlich', jaehrlich: 'jährlich' };
+    var rhythmus = { monatlich: 'jeden Monat', vierteljaehrlich: 'alle 3 Monate', jaehrlich: 'einmal im Jahr' };
 
     daten.dauerauftraege.forEach(function (d) {
       var tr = document.createElement('tr');

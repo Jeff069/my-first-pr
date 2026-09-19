@@ -21,6 +21,26 @@
 
 <a class="sprungmarke" href="#inhalt">Zum Inhalt springen</a>
 
+<!-- Symbole einmal definiert, unten per <use> eingesetzt -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="sym-uebersicht" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/>
+  </symbol>
+  <symbol id="sym-buchungen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 6h16M4 12h16M4 18h10"/>
+  </symbol>
+  <symbol id="sym-monatlich" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>
+  </symbol>
+  <symbol id="sym-einstellungen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3.2"/>
+    <path d="M12 2.5v2.2M12 19.3v2.2M21.5 12h-2.2M4.7 12H2.5M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6M18.7 18.7l-1.6-1.6M6.9 6.9L5.3 5.3"/>
+  </symbol>
+  <symbol id="sym-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <path d="M12 5v14M5 12h14"/>
+  </symbol>
+</svg>
+
 <header class="kopf">
   <div class="kopf-titel">
     <h1>Haushaltsbuch</h1>
@@ -36,10 +56,18 @@
 </header>
 
 <nav class="tableiste" role="tablist" aria-label="Bereiche">
-  <button type="button" role="tab" id="tab-uebersicht" aria-controls="panel-uebersicht" aria-selected="true">Übersicht</button>
-  <button type="button" role="tab" id="tab-buchungen" aria-controls="panel-buchungen" aria-selected="false" tabindex="-1">Buchungen</button>
-  <button type="button" role="tab" id="tab-wiederkehrend" aria-controls="panel-wiederkehrend" aria-selected="false" tabindex="-1">Wiederkehrend</button>
-  <button type="button" role="tab" id="tab-einstellungen" aria-controls="panel-einstellungen" aria-selected="false" tabindex="-1">Einstellungen</button>
+  <button type="button" role="tab" id="tab-uebersicht" aria-controls="panel-uebersicht" aria-selected="true">
+    <svg class="tab-symbol" aria-hidden="true"><use href="#sym-uebersicht"/></svg><span>Übersicht</span>
+  </button>
+  <button type="button" role="tab" id="tab-buchungen" aria-controls="panel-buchungen" aria-selected="false" tabindex="-1">
+    <svg class="tab-symbol" aria-hidden="true"><use href="#sym-buchungen"/></svg><span>Buchungen</span>
+  </button>
+  <button type="button" role="tab" id="tab-wiederkehrend" aria-controls="panel-wiederkehrend" aria-selected="false" tabindex="-1">
+    <svg class="tab-symbol" aria-hidden="true"><use href="#sym-monatlich"/></svg><span>Monatliches</span>
+  </button>
+  <button type="button" role="tab" id="tab-einstellungen" aria-controls="panel-einstellungen" aria-selected="false" tabindex="-1">
+    <svg class="tab-symbol" aria-hidden="true"><use href="#sym-einstellungen"/></svg><span>Einstellungen</span>
+  </button>
   <span class="tab-indikator" id="tabIndikator" aria-hidden="true"></span>
 </nav>
 
@@ -47,7 +75,7 @@
 
   <!-- Erscheint, wenn jemand eine Buchung geschickt hat -->
   <section class="karte geteilt-karte" id="geteiltKarte" hidden aria-live="polite">
-    <h2>Geschickte Buchung</h2>
+    <h2>Jemand hat dir eine Buchung geschickt</h2>
     <p class="karte-hinweis" id="geteiltText"></p>
     <div class="knopfreihe">
       <button type="button" id="geteiltUebernehmen" class="knopf-primaer">Übernehmen</button>
@@ -55,50 +83,73 @@
     </div>
   </section>
 
-
-  <!-- ÜBERSICHT -->
+  <!-- ============================ ÜBERSICHT ============================ -->
   <section id="panel-uebersicht" role="tabpanel" aria-labelledby="tab-uebersicht" tabindex="0">
+    <p class="bereich-intro">Was in diesem Monat hereinkommt, was rausgeht – und wohin.</p>
+
     <div class="bilanz" aria-live="polite">
       <div class="bilanz-haupt">
-        <span class="etikett">Saldo im Monat</span>
+        <span class="etikett">Bleibt diesen Monat</span>
         <strong class="hero-zahl" id="kzSaldo">–</strong>
         <span class="bilanz-fuss" id="kzSaldoFuss"></span>
       </div>
       <dl class="bilanz-liste">
-        <div><dt class="etikett">Einnahmen</dt><dd id="kzEinnahmen">–</dd></div>
-        <div><dt class="etikett">Ausgaben</dt><dd id="kzAusgaben">–</dd></div>
-        <div><dt class="etikett">Sparquote</dt><dd id="kzSparquote">–</dd></div>
+        <div>
+          <dt class="etikett">Einnahmen<span class="dt-erklaerung">alles, was hereinkommt</span></dt>
+          <dd id="kzEinnahmen">–</dd>
+        </div>
+        <div>
+          <dt class="etikett">Ausgaben<span class="dt-erklaerung">alles, was rausgeht</span></dt>
+          <dd id="kzAusgaben">–</dd>
+        </div>
+        <div>
+          <dt class="etikett">Sparquote<span class="dt-erklaerung">Anteil vom Einkommen, der übrig bleibt</span></dt>
+          <dd id="kzSparquote">–</dd>
+        </div>
       </dl>
     </div>
 
     <section class="karte" id="geplantKarte">
       <h2>Kommt diesen Monat noch</h2>
-      <p class="karte-hinweis" id="geplantSumme">–</p>
+      <p class="karte-hinweis">Abbuchungen, die im Rest des Monats noch vom Konto gehen. So siehst du, was wirklich frei ist.</p>
+      <p class="betont" id="geplantSumme">–</p>
+      <span class="betont-fuss" id="geplantFuss"></span>
       <ul class="einfache-liste" id="geplantListe"></ul>
     </section>
 
     <section class="karte">
       <h2>Wohin das Geld geht</h2>
-      <p class="karte-hinweis">Ausgaben nach Kategorie im gewählten Monat.</p>
+      <p class="karte-hinweis">Die Ausgaben des Monats nach Kategorie, größter Posten zuerst.</p>
       <div id="kategorieDiagramm"></div>
+      <button type="button" id="kategorieMehr" class="knopf-klein knopf-breit" hidden>Alle Kategorien anzeigen</button>
     </section>
 
     <div class="spalten">
       <section class="karte">
         <h2>Die letzten 6 Monate</h2>
+        <p class="karte-hinweis">Einnahmen und Ausgaben nebeneinander – für den Blick auf die Entwicklung.</p>
         <div id="verlaufDiagramm"></div>
       </section>
       <section class="karte">
         <h2>Wer hat gezahlt</h2>
+        <p class="karte-hinweis">Wie sich die Ausgaben des Monats auf euch beide und auf Gemeinsames verteilen.</p>
         <div id="personDiagramm"></div>
       </section>
     </div>
   </section>
 
-  <!-- BUCHUNGEN -->
+  <!-- ============================ BUCHUNGEN ============================ -->
   <section id="panel-buchungen" role="tabpanel" aria-labelledby="tab-buchungen" tabindex="0" hidden>
-    <section class="karte">
+    <p class="bereich-intro">Jede einzelne Einnahme und Ausgabe – hier eintragen, ändern und nachschlagen.</p>
+
+    <button type="button" id="buchungFormOeffnen" class="knopf-gross" aria-expanded="false" aria-controls="buchungFormBereich">
+      <svg class="knopf-symbol" aria-hidden="true"><use href="#sym-plus"/></svg>
+      Neue Buchung eintragen
+    </button>
+
+    <section class="karte" id="buchungFormBereich" hidden>
       <h2 id="buchungFormTitel">Neue Buchung</h2>
+      <p class="karte-hinweis">Betrag immer positiv eintragen – ob es abgeht oder hereinkommt, entscheidet das Feld „Art".</p>
       <form id="buchungForm" class="formular" novalidate>
         <input type="hidden" id="buchungId">
         <div class="feld"><label for="buchungDatum">Datum</label><input type="date" id="buchungDatum" required></div>
@@ -107,11 +158,11 @@
           <select id="buchungArt"><option value="ausgabe">Ausgabe</option><option value="einnahme">Einnahme</option></select>
         </div>
         <div class="feld"><label for="buchungKategorie">Kategorie</label><select id="buchungKategorie"></select></div>
-        <div class="feld"><label for="buchungPerson">Wer</label><select id="buchungPerson"></select></div>
-        <div class="feld feld-breit"><label for="buchungNotiz">Notiz</label><input type="text" id="buchungNotiz" placeholder="z. B. Wocheneinkauf"></div>
+        <div class="feld"><label for="buchungPerson">Wer hat gezahlt</label><select id="buchungPerson"></select></div>
+        <div class="feld feld-breit"><label for="buchungNotiz">Notiz <span class="optional">(hilft beim Wiederfinden)</span></label><input type="text" id="buchungNotiz" placeholder="z. B. Wocheneinkauf"></div>
         <div class="feld-knoepfe">
           <button type="submit" class="knopf-primaer">Speichern</button>
-          <button type="button" id="buchungAbbrechen" class="knopf-klein" hidden>Abbrechen</button>
+          <button type="button" id="buchungAbbrechen" class="knopf-klein">Abbrechen</button>
         </div>
       </form>
       <p class="fehler" id="buchungFehler" role="alert" hidden></p>
@@ -119,98 +170,94 @@
 
     <section class="karte">
       <h2>Buchungen im Monat</h2>
-      <div class="filterleiste">
+      <p class="karte-hinweis">Tippe auf <em>Bearbeiten</em>, um etwas zu ändern, oder auf <em>Teilen</em>, um eine Buchung ans andere Telefon zu schicken.</p>
+
+      <button type="button" id="filterOeffnen" class="knopf-klein knopf-breit" aria-expanded="false" aria-controls="filterBereich">Filtern und suchen</button>
+      <div class="filterleiste" id="filterBereich" hidden>
         <div class="feld"><label for="filterKategorie">Kategorie</label><select id="filterKategorie"></select></div>
         <div class="feld"><label for="filterPerson">Wer</label><select id="filterPerson"></select></div>
         <div class="feld"><label for="filterText">Suche in Notiz</label><input type="search" id="filterText" placeholder="z. B. REWE"></div>
       </div>
+
       <div class="tabelle-huelle">
         <table class="tabelle" id="buchungTabelle">
           <thead><tr><th>Datum</th><th>Notiz</th><th>Kategorie</th><th>Wer</th><th class="rechts">Betrag</th><th></th></tr></thead>
           <tbody id="buchungListe"></tbody>
         </table>
       </div>
-      <p class="leer-hinweis" id="buchungLeer" hidden>Für diesen Monat ist noch nichts erfasst.</p>
+      <p class="leer-hinweis" id="buchungLeer" hidden>Für diesen Monat ist noch nichts erfasst. Oben auf „Neue Buchung eintragen" tippen.</p>
     </section>
   </section>
 
-  <!-- WIEDERKEHREND -->
+  <!-- ============================ MONATLICHES ============================ -->
   <section id="panel-wiederkehrend" role="tabpanel" aria-labelledby="tab-wiederkehrend" tabindex="0" hidden>
-    <section class="karte">
-      <h2>Monatliche Fixkostenlast</h2>
-      <p class="karte-hinweis">Quartals- und Jahresbeiträge sind anteilig umgelegt – eine Jahresversicherung über 600 € zählt hier als 50 € im Monat.</p>
-      <p class="gross-zahl" id="fixkostenSumme">–</p>
-    </section>
+    <p class="bereich-intro">Alles, was jeden Monat von allein kommt: Miete, Strom, Abos, Gehalt. Einmal eintragen – die App bucht es danach selbst.</p>
 
     <section class="karte">
-      <h2 id="dauerFormTitel">Neuer Dauerauftrag</h2>
+      <h2>Feste Kosten pro Monat</h2>
+      <p class="betont" id="fixkostenSumme">–</p>
+      <details class="hilfe">
+        <summary>Wie wird das gerechnet?</summary>
+        <p>Alles, was regelmäßig abgeht, zusammengezählt und auf einen Monat umgerechnet. Eine Versicherung über 600 € im Jahr zählt hier als 50 € im Monat – sonst sähe der Januar teuer und der Februar günstig aus, obwohl sich nichts geändert hat.</p>
+      </details>
+    </section>
+
+    <button type="button" id="dauerFormOeffnen" class="knopf-gross" aria-expanded="false" aria-controls="dauerFormBereich">
+      <svg class="knopf-symbol" aria-hidden="true"><use href="#sym-plus"/></svg>
+      Regelmäßige Zahlung eintragen
+    </button>
+
+    <section class="karte" id="dauerFormBereich" hidden>
+      <h2 id="dauerFormTitel">Neue regelmäßige Zahlung</h2>
+      <p class="karte-hinweis">Beispiel: Miete, 1.280 €, am 1., monatlich. Die App legt sie dann jeden Monat automatisch als Buchung an.</p>
       <form id="dauerForm" class="formular" novalidate>
         <input type="hidden" id="dauerId">
         <div class="feld feld-breit"><label for="dauerBezeichnung">Bezeichnung</label><input type="text" id="dauerBezeichnung" placeholder="z. B. Miete" required></div>
-        <div class="feld"><label for="dauerBetrag">Betrag</label><input type="text" inputmode="decimal" id="dauerBetrag" placeholder="z. B. 1.200,00" required></div>
+        <div class="feld"><label for="dauerBetrag">Betrag</label><input type="text" inputmode="decimal" id="dauerBetrag" placeholder="z. B. 1.280,00" required></div>
         <div class="feld"><label for="dauerArt">Art</label>
           <select id="dauerArt"><option value="ausgabe">Ausgabe</option><option value="einnahme">Einnahme</option></select>
         </div>
         <div class="feld"><label for="dauerKategorie">Kategorie</label><select id="dauerKategorie"></select></div>
-        <div class="feld"><label for="dauerPerson">Wer</label><select id="dauerPerson"></select></div>
-        <div class="feld"><label for="dauerTag">Abbuchung am</label><input type="number" id="dauerTag" min="1" max="31" value="1" required></div>
-        <div class="feld"><label for="dauerIntervall">Rhythmus</label>
+        <div class="feld"><label for="dauerPerson">Wer zahlt</label><select id="dauerPerson"></select></div>
+        <div class="feld"><label for="dauerTag">Tag im Monat</label><input type="number" id="dauerTag" min="1" max="31" value="1" required></div>
+        <div class="feld"><label for="dauerIntervall">Wie oft</label>
           <select id="dauerIntervall">
-            <option value="monatlich">monatlich</option>
-            <option value="vierteljaehrlich">vierteljährlich</option>
-            <option value="jaehrlich">jährlich</option>
+            <option value="monatlich">jeden Monat</option>
+            <option value="vierteljaehrlich">alle drei Monate</option>
+            <option value="jaehrlich">einmal im Jahr</option>
           </select>
         </div>
         <div class="feld"><label for="dauerStart">Ab Monat</label><input type="month" id="dauerStart" required></div>
-        <div class="feld"><label for="dauerEnde">Bis Monat <span class="optional">(optional)</span></label><input type="month" id="dauerEnde"></div>
+        <div class="feld"><label for="dauerEnde">Bis Monat <span class="optional">(leer = unbefristet)</span></label><input type="month" id="dauerEnde"></div>
         <div class="feld-knoepfe">
           <button type="submit" class="knopf-primaer">Speichern</button>
-          <button type="button" id="dauerAbbrechen" class="knopf-klein" hidden>Abbrechen</button>
+          <button type="button" id="dauerAbbrechen" class="knopf-klein">Abbrechen</button>
         </div>
       </form>
       <p class="fehler" id="dauerFehler" role="alert" hidden></p>
     </section>
 
     <section class="karte">
-      <h2>Angelegte Daueraufträge</h2>
+      <h2>Eingetragene Zahlungen</h2>
+      <p class="karte-hinweis"><em>Pausieren</em> stoppt künftige Buchungen, lässt die bisherigen aber stehen – gut für ein gekündigtes Abo.</p>
       <div class="tabelle-huelle">
         <table class="tabelle" id="dauerTabelle">
-          <thead><tr><th>Bezeichnung</th><th>Rhythmus</th><th>Tag</th><th>Kategorie</th><th class="rechts">Betrag</th><th></th></tr></thead>
+          <thead><tr><th>Bezeichnung</th><th>Wie oft</th><th>Tag</th><th>Kategorie</th><th class="rechts">Betrag</th><th></th></tr></thead>
           <tbody id="dauerListe"></tbody>
         </table>
       </div>
-      <p class="leer-hinweis" id="dauerLeer" hidden>Noch keine Daueraufträge – Miete, Strom und Abos sind ein guter Anfang.</p>
+      <p class="leer-hinweis" id="dauerLeer" hidden>Noch nichts eingetragen. Miete, Strom und Abos sind ein guter Anfang.</p>
     </section>
   </section>
 
-  <!-- EINSTELLUNGEN -->
+  <!-- ============================ EINSTELLUNGEN ============================ -->
   <section id="panel-einstellungen" role="tabpanel" aria-labelledby="tab-einstellungen" tabindex="0" hidden>
-    <section class="karte">
-      <h2>Namen</h2>
-      <form id="personenForm" class="formular">
-        <div class="feld"><label for="personA">Person 1</label><input type="text" id="personA"></div>
-        <div class="feld"><label for="personB">Person 2</label><input type="text" id="personB"></div>
-        <div class="feld-knoepfe"><button type="submit" class="knopf-primaer">Speichern</button></div>
-      </form>
-    </section>
-
-    <section class="karte">
-      <h2>Kategorien</h2>
-      <ul class="kategorie-liste" id="kategorieListe"></ul>
-      <form id="kategorieForm" class="formular">
-        <div class="feld feld-breit"><label for="katName">Neue Kategorie</label><input type="text" id="katName" placeholder="z. B. Kinderbetreuung"></div>
-        <div class="feld"><label for="katTyp">Art</label>
-          <select id="katTyp"><option value="ausgabe">Ausgabe</option><option value="einnahme">Einnahme</option></select>
-        </div>
-        <div class="feld"><label for="katSlot">Farbe</label><select id="katSlot"></select></div>
-        <div class="feld-knoepfe"><button type="submit" class="knopf-primaer">Hinzufügen</button></div>
-      </form>
-    </section>
+    <p class="bereich-intro">Namen, Kategorien, Sicherung – und der gemeinsame Stand für zwei Geräte.</p>
 
     <section class="karte" id="wolkeKarte" hidden>
       <h2>Gemeinsamer Stand</h2>
       <p class="karte-hinweis" id="wolkeHinweis">
-        Angemeldet seht ihr beide dieselben Buchungen – auf allen Geräten, ohne etwas hin- und herzuschicken.
+        Meldet ihr euch beide an, seht ihr dieselben Buchungen – auf allen Geräten, ohne etwas hin- und herzuschicken.
       </p>
 
       <form id="wolkeForm" class="formular" novalidate>
@@ -231,25 +278,53 @@
         </div>
       </div>
 
+      <details class="hilfe">
+        <summary>Wie funktioniert der Abgleich?</summary>
+        <p>Nach jeder Änderung schickt die App den Stand los und holt gleichzeitig, was der andere eingetragen hat. Beides wird zusammengeführt: Neues von beiden Seiten bleibt erhalten, bei zwei Fassungen derselben Buchung gilt die neuere, und Gelöschtes kommt nicht zurück. Ohne Empfang arbeitest du normal weiter – abgeglichen wird, sobald wieder Netz da ist.</p>
+      </details>
+
       <p class="fehler" id="wolkeFehler" role="alert" hidden></p>
     </section>
 
     <section class="karte">
-      <h2>Backup</h2>
+      <h2>Eure Namen</h2>
+      <p class="karte-hinweis">Sie stehen in der Auswahl „Wer hat gezahlt" und in der Auswertung.</p>
+      <form id="personenForm" class="formular">
+        <div class="feld"><label for="personA">Person 1</label><input type="text" id="personA"></div>
+        <div class="feld"><label for="personB">Person 2</label><input type="text" id="personB"></div>
+        <div class="feld-knoepfe"><button type="submit" class="knopf-primaer">Speichern</button></div>
+      </form>
+    </section>
+
+    <section class="karte">
+      <h2>Kategorien</h2>
+      <p class="karte-hinweis">Sie bestimmen, wie sich die Ausgaben in der Übersicht aufteilen. Namen und Farben kannst du frei ändern.</p>
+      <ul class="kategorie-liste" id="kategorieListe"></ul>
+      <form id="kategorieForm" class="formular">
+        <div class="feld feld-breit"><label for="katName">Neue Kategorie</label><input type="text" id="katName" placeholder="z. B. Kinderbetreuung"></div>
+        <div class="feld"><label for="katTyp">Art</label>
+          <select id="katTyp"><option value="ausgabe">Ausgabe</option><option value="einnahme">Einnahme</option></select>
+        </div>
+        <div class="feld"><label for="katSlot">Farbe</label><select id="katSlot"></select></div>
+        <div class="feld-knoepfe"><button type="submit" class="knopf-primaer">Hinzufügen</button></div>
+      </form>
+    </section>
+
+    <section class="karte">
+      <h2>Sicherung</h2>
       <p class="karte-hinweis">
-        Die Daten liegen ausschließlich in diesem Browser – nichts wird ins Netz übertragen.
-        Genau deshalb braucht es eine Sicherung: die Exportdatei ist auch der Weg, den Stand
-        auf ein zweites Gerät zu bringen.
+        Die Daten liegen in diesem Browser. Geht das Gerät verloren, sind sie weg – deshalb ab und zu sichern.
+        Dieselbe Datei bringt den Stand auch auf ein zweites Gerät.
       </p>
       <div class="knopfreihe">
         <button type="button" id="exportKnopf" class="knopf-primaer">Als Datei sichern</button>
-        <label class="knopf-sekundaer" for="importDatei">Backup einlesen</label>
+        <label class="knopf-sekundaer" for="importDatei">Sicherung einlesen</label>
         <input type="file" id="importDatei" accept="application/json,.json" hidden>
-        <button type="button" id="textKnopf" class="knopf-klein">Sicherung als Text</button>
+        <button type="button" id="textKnopf" class="knopf-klein">Als Text anzeigen</button>
       </div>
 
       <div class="text-bereich" id="textBereich" hidden>
-        <label for="backupText">Sicherung als Text – kopieren und sicher ablegen, oder ein Backup hier einfügen</label>
+        <label for="backupText">Zum Kopieren – oder eine fremde Sicherung hier einfügen und übernehmen</label>
         <textarea id="backupText" rows="7" spellcheck="false"></textarea>
         <div class="knopfreihe">
           <button type="button" id="kopierenKnopf" class="knopf-sekundaer">In die Zwischenablage</button>
@@ -257,6 +332,7 @@
           <span class="text-hinweis" id="textHinweis" aria-live="polite"></span>
         </div>
       </div>
+
       <div id="importVorschau" class="import-vorschau" hidden>
         <p id="importText"></p>
         <div class="knopfreihe">
@@ -266,16 +342,16 @@
       </div>
     </section>
 
-    <section class="karte karte-warnung">
-      <h2>Alle Daten löschen</h2>
-      <p class="karte-hinweis">Entfernt sämtliche Buchungen, Daueraufträge und Einstellungen aus diesem Browser. Das lässt sich nicht rückgängig machen.</p>
-      <button type="button" id="loeschenKnopf" class="knopf-warnung">Alles löschen</button>
+    <section class="karte">
+      <h2>Zum Ausprobieren</h2>
+      <p class="karte-hinweis">Legt einen erfundenen Monat an, damit du siehst, wie die Auswertung mit Zahlen aussieht. Deine eigenen Buchungen bleiben erhalten.</p>
+      <button type="button" id="demoKnopf" class="knopf-sekundaer">Beispielmonat anlegen</button>
     </section>
 
-    <section class="karte">
-      <h2>Beispieldaten</h2>
-      <p class="karte-hinweis">Füllt das Haushaltsbuch mit einem erfundenen Monat, um die Auswertung auszuprobieren. Vorhandene Daten bleiben erhalten.</p>
-      <button type="button" id="demoKnopf" class="knopf-sekundaer">Beispielmonat anlegen</button>
+    <section class="karte karte-warnung">
+      <h2>Alle Daten löschen</h2>
+      <p class="karte-hinweis">Entfernt sämtliche Buchungen, regelmäßigen Zahlungen und Einstellungen aus diesem Browser. Das lässt sich nicht rückgängig machen – vorher sichern.</p>
+      <button type="button" id="loeschenKnopf" class="knopf-warnung">Alles löschen</button>
     </section>
   </section>
 

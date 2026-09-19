@@ -126,6 +126,10 @@
 
 * { box-sizing: border-box; }
 
+/* Versteckt heißt versteckt: eigene display-Werte (grid, flex) würden das
+   hidden-Attribut sonst aushebeln - genau das ist hier mehrfach passiert. */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   padding: 0 20px 56px;
@@ -269,6 +273,9 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; letter-spacing: -0.01e
 }
 .tableiste button {
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   background: none;
   border: none;
   padding: 14px 16px;
@@ -276,6 +283,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; letter-spacing: -0.01e
   cursor: pointer;
   transition: color 0.2s var(--schwung);
 }
+.tab-symbol { width: 17px; height: 17px; flex: 0 0 auto; }
 .tableiste button:hover { color: var(--tinte); }
 .tableiste button[aria-selected="true"] { color: var(--gruen); font-weight: 600; }
 .tab-indikator {
@@ -314,7 +322,8 @@ main { max-width: 1060px; margin: 0 auto; }
   height: 1px;
   background: var(--linie);
 }
-.karte-hinweis { margin: 0 0 16px; color: var(--tinte-2); font-size: 0.9rem; max-width: 62ch; }
+.karte-hinweis { margin: 0 0 18px; color: var(--tinte-2); font-size: 0.93rem; line-height: 1.6; max-width: 64ch; }
+.karte-hinweis em { font-style: normal; color: var(--tinte); font-weight: 600; }
 .karte-warnung { border-color: color-mix(in srgb, var(--rot) 45%, var(--linie)); }
 .spalten { display: grid; grid-template-columns: 1.15fr 1fr; gap: 22px; align-items: start; }
 
@@ -358,15 +367,104 @@ main { max-width: 1060px; margin: 0 auto; }
 .bilanz-liste { margin: 0; display: flex; flex-direction: column; }
 .bilanz-liste > div {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 14px 28px;
+  padding: 15px 28px;
   border-bottom: 1px solid var(--linie);
+}
+.dt-erklaerung {
+  display: block;
+  margin-top: 3px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.74rem;
+  color: var(--tinte-3);
+  max-width: 28ch;
 }
 .bilanz-liste > div:last-child { border-bottom: none; }
 .bilanz-liste dt { margin: 0; }
 .bilanz-liste dd { margin: 0; font-family: var(--serif); font-size: 1.4rem; }
+
+/* ---------------- Einleitung, Erklärungen, große Knöpfe ---------------- */
+
+.bereich-intro {
+  max-width: 66ch;
+  margin: 0 0 22px;
+  color: var(--tinte-2);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Ausklappbare Erklärung - da, wo ein Begriff sonst Rätsel aufgibt. */
+.hilfe {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dotted var(--linie-stark);
+}
+.hilfe summary {
+  cursor: pointer;
+  font-size: 0.86rem;
+  color: var(--gruen);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.hilfe summary::-webkit-details-marker { display: none; }
+.hilfe summary::before {
+  content: "＋";
+  font-size: 0.9rem;
+  line-height: 1;
+}
+.hilfe[open] summary::before { content: "－"; }
+.hilfe p {
+  margin: 12px 0 0;
+  color: var(--tinte-2);
+  font-size: 0.92rem;
+  max-width: 64ch;
+  line-height: 1.65;
+}
+
+.betont {
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  margin: 4px 0 0;
+  line-height: 1.25;
+}
+.betont-fuss {
+  display: block;
+  margin: 2px 0 14px;
+  font-size: 0.88rem;
+  color: var(--tinte-2);
+}
+
+/* Die eine klare Handlung eines Bereichs - nicht zu übersehen. */
+.knopf-gross {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding: 17px 20px;
+  min-height: 56px;
+  border: none;
+  border-radius: var(--kante);
+  background: var(--gruen);
+  color: #fbf7ee;
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background-color 0.18s var(--schwung), transform 0.12s var(--schwung);
+}
+.knopf-gross:hover { background: var(--gruen-hell); }
+.knopf-gross:active { transform: translateY(1px); }
+.knopf-gross[aria-expanded="true"] { background: var(--tinte-2); }
+.knopf-symbol { width: 17px; height: 17px; flex: 0 0 auto; }
+.knopf-breit { width: 100%; margin-bottom: 16px; }
 
 /* ---------------- Balken nach Kategorie ---------------- */
 
@@ -399,6 +497,8 @@ main { max-width: 1060px; margin: 0 auto; }
 .balken-liste li:nth-child(6) .balken-fuellung { animation-delay: 0.22s; }
 .balken-liste li:nth-child(n+7) .balken-fuellung { animation-delay: 0.26s; }
 @keyframes balken-wachsen { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+#kategorieDiagramm:not(.alle) .balken-liste li:nth-child(n+6) { display: none; }
 
 .farb-punkt {
   width: 11px; height: 11px;
@@ -689,13 +789,16 @@ button { font-family: var(--sans); cursor: pointer; }
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .tableiste button {
-    padding: 13px 2px;
-    min-height: 58px;
-    font-size: 0.72rem;
+    flex-direction: column;
+    gap: 4px;
+    padding: 9px 2px 10px;
+    min-height: 60px;
+    font-size: 0.66rem;
     letter-spacing: 0.01em;
     text-transform: none;
     border-top: 2px solid transparent;
   }
+  .tab-symbol { width: 20px; height: 20px; }
   .tableiste button[aria-selected="true"] {
     border-top-color: var(--gruen);
     background: color-mix(in srgb, var(--gruen) 9%, transparent);
@@ -704,7 +807,9 @@ button { font-family: var(--sans); cursor: pointer; }
   main { margin-top: 18px; }
 
   /* --- Blätter --- */
-  .karte { padding: 18px 16px; margin-bottom: 16px; }
+  .karte { padding: 20px 17px; margin-bottom: 16px; }
+  .bereich-intro { font-size: 0.95rem; margin-bottom: 18px; }
+  .knopf-gross { margin-bottom: 18px; }
   .karte > h2 { font-size: 1.12rem; }
   .bilanz-liste > div, .bilanz-haupt { padding-left: 18px; padding-right: 18px; }
   .hero-zahl { font-size: 2.6rem; }
