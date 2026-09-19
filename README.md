@@ -45,15 +45,11 @@ Ein paar Details, die im Alltag zählen:
 ## Als App aufs Handy
 
 Die App ist installierbar: eigenes Symbol auf dem Startbildschirm, Start im Vollbild ohne
-Browserleiste, Start auch ohne Internetverbindung. Dafür braucht sie eine echte Adresse –
-über GitHub Pages ist das in zwei Minuten erledigt:
+Browserleiste, Start auch ohne Internetverbindung.
 
-1. Im Repository auf **Settings → Pages**
-2. Unter *Source* **Deploy from a branch** wählen
-3. Branch auf `claude/planmodus-3635uv` (oder später `main`) stellen, Ordner `/ (root)`, **Save**
-4. Nach ein paar Minuten liegt die App unter `https://<benutzername>.github.io/my-first-pr/`
+**Sie läuft bereits hier: https://jeff069.github.io/my-first-pr/**
 
-Dann auf dem Telefon öffnen:
+Auf dem Telefon öffnen und ablegen:
 
 - **Android (Chrome):** Menü ⋮ → *App installieren*
 - **iPhone (Safari):** Teilen-Symbol → *Zum Home-Bildschirm*
@@ -61,6 +57,16 @@ Dann auf dem Telefon öffnen:
 Danach startet das Haushaltsbuch wie eine normale App. Die Dateien liegen dann im Gerät
 (`sw.js`), es funktioniert also auch im Funkloch – der Kontostand im Supermarkt ist erreichbar,
 ohne Empfang.
+
+### Eine neue Fassung veröffentlichen
+
+GitHub Pages liefert den Branch `gh-pages` aus. Nach Änderungen auf `main` genügt:
+
+```bash
+git push origin main:gh-pages
+```
+
+GitHub baut die Seite daraufhin selbst neu; nach ein bis zwei Minuten ist sie aktuell.
 
 Wer etwas am Code ändert, zählt in `sw.js` die `VERSION` hoch; sonst zeigt das installierte
 Exemplar noch die alte Fassung. Die Symbole liegen in `icons/` und lassen sich mit
