@@ -73,6 +73,57 @@
   }
 }
 
+/* Gleiche Werte noch einmal für Ansichten, die den Modus ausdrücklich setzen
+   (etwa der Themenschalter einer eingebetteten Ansicht) - sonst bliebe dort das helle Papier. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --papier: #131612;
+  --blatt: #1b2320;
+  --blatt-tief: #202824;
+  --tinte: #f2ece0;
+  --tinte-2: #c3bfb2;
+  --tinte-3: #948f83;
+  --linie: #333d38;
+  --linie-stark: #46524b;
+
+  --gruen: #4fae8a;
+  --gruen-hell: #65c29e;
+  --kupfer: #e08a5c;
+  --rot: #ef8078;
+  --gold: #d0a53f;
+
+  --serie-1: #3987e5;
+  --serie-2: #d95926;
+  --serie-3: #199e70;
+  --serie-4: #c98500;
+  --serie-5: #d55181;
+  --serie-6: #008300;
+  --serie-7: #9085e9;
+  --serie-8: #e66767;
+  --serie-neutral: #8d8779;
+}
+
+/* Sicherung als Text */
+.text-bereich { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+.text-bereich textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  padding: 12px;
+  border: 1px solid var(--linie-stark);
+  border-radius: 3px;
+  background: var(--papier);
+  color: var(--tinte);
+  resize: vertical;
+  width: 100%;
+}
+.text-bereich textarea:focus {
+  outline: none;
+  border-color: var(--gruen);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gruen) 22%, transparent);
+}
+.text-hinweis { font-size: 0.85rem; color: var(--tinte-2); }
+
 * { box-sizing: border-box; }
 
 body {
@@ -562,7 +613,7 @@ button { font-family: var(--sans); cursor: pointer; }
   .feld-breit { grid-column: span 1; }
 }
 @media (max-width: 560px) {
-  body { padding: 0 14px 40px; }
+  body { padding: 0 16px 40px; }
   .kopf { padding-top: 20px; }
   .kopf h1 { font-size: 1.7rem; }
   .karte { padding: 18px 16px; }

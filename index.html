@@ -197,6 +197,17 @@
         <button type="button" id="exportKnopf" class="knopf-primaer">Als Datei sichern</button>
         <label class="knopf-sekundaer" for="importDatei">Backup einlesen</label>
         <input type="file" id="importDatei" accept="application/json,.json" hidden>
+        <button type="button" id="textKnopf" class="knopf-klein">Sicherung als Text</button>
+      </div>
+
+      <div class="text-bereich" id="textBereich" hidden>
+        <label for="backupText">Sicherung als Text – kopieren und sicher ablegen, oder ein Backup hier einfügen</label>
+        <textarea id="backupText" rows="7" spellcheck="false"></textarea>
+        <div class="knopfreihe">
+          <button type="button" id="kopierenKnopf" class="knopf-sekundaer">In die Zwischenablage</button>
+          <button type="button" id="textImportKnopf" class="knopf-sekundaer">Eingefügten Text übernehmen</button>
+          <span class="text-hinweis" id="textHinweis" aria-live="polite"></span>
+        </div>
       </div>
       <div id="importVorschau" class="import-vorschau" hidden>
         <p id="importText"></p>

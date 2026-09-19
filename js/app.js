@@ -632,11 +632,55 @@
     e.target.value = '';
   });
 
+  /* Zweiter Weg für die Sicherung: als Text. Nötig überall dort, wo der Browser
+     Downloads aus der Seite heraus unterbindet - etwa in eingebetteten Ansichten. */
+  q('textKnopf').addEventListener('click', function () {
+    var bereich = q('textBereich');
+    var zeigen = bereich.hidden;
+    bereich.hidden = !zeigen;
+    if (!zeigen) return;
+    q('backupText').value = store.exportJson(daten);
+    q('textHinweis').textContent = '';
+    q('backupText').focus();
+    q('backupText').select();
+  });
+
+  q('kopierenKnopf').addEventListener('click', function () {
+    var feld = q('backupText');
+    feld.select();
+    var melden = function (text) { q('textHinweis').textContent = text; };
+
+    if (global.navigator && global.navigator.clipboard) {
+      global.navigator.clipboard.writeText(feld.value).then(
+        function () { melden('Kopiert.'); },
+        function () { melden('Kopieren nicht erlaubt – bitte den markierten Text von Hand kopieren.'); }
+      );
+      return;
+    }
+    melden('Bitte den markierten Text von Hand kopieren.');
+  });
+
+  q('textImportKnopf').addEventListener('click', function () {
+    var ergebnis = store.importJson(q('backupText').value);
+    if (!ergebnis.ok) {
+      q('textHinweis').textContent = ergebnis.fehler;
+      return;
+    }
+    importStand = ergebnis.daten;
+    q('textHinweis').textContent = '';
+    q('importVorschau').hidden = false;
+    q('importBestaetigen').hidden = false;
+    q('importText').textContent = 'Gefunden: ' + importStand.buchungen.length + ' Buchungen, '
+      + importStand.dauerauftraege.length + ' Daueraufträge, ' + importStand.kategorien.length
+      + ' Kategorien. Der bisherige Stand in diesem Browser wird dabei ersetzt.';
+  });
+
   q('importBestaetigen').addEventListener('click', function () {
     if (!importStand) return;
     daten = importStand;
     importStand = null;
     q('importVorschau').hidden = true;
+    q('textBereich').hidden = true;
     sichern();
     alleszeigen();
   });
