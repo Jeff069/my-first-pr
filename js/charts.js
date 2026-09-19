@@ -156,10 +156,16 @@
       return;
     }
 
-    var B = 640, H = 240, obenAbstand = 16, untenAbstand = 34, linksAbstand = 8;
+    /* Die Zeichenfläche skaliert auf die Breite des Blattes. Bei einem festen
+       Koordinatensystem von 640 schrumpfte die Beschriftung auf dem Handy auf
+       etwa 6 Pixel - deshalb wird das System selbst schmaler. */
+    var schmal = el.clientWidth && el.clientWidth < 460;
+    var B = schmal ? 330 : 640;
+    var H = schmal ? 210 : 240;
+    var obenAbstand = 16, untenAbstand = 34, linksAbstand = 8;
     var zeichenHoehe = H - obenAbstand - untenAbstand;
     var gruppenBreite = (B - linksAbstand * 2) / reihe.length;
-    var balkenBreite = Math.min(26, (gruppenBreite - 10) / 2);
+    var balkenBreite = Math.min(26, (gruppenBreite - (schmal ? 6 : 10)) / 2);
 
     var svg = svgElement('svg', {
       viewBox: '0 0 ' + B + ' ' + H, class: 'verlauf-svg',

@@ -604,7 +604,13 @@ button { font-family: var(--sans); cursor: pointer; }
 [role="tabpanel"]:not([hidden]) > *:nth-child(3) { animation-delay: 0.14s; }
 [role="tabpanel"]:not([hidden]) > *:nth-child(n+4) { animation-delay: 0.20s; }
 
-/* ---------------- Mobil ---------------- */
+/* ==================================================================
+   Handy: eigene Anordnung, nicht nur ein schmaleres Blatt.
+   - Reiter wandern als feste Leiste an den unteren Rand (Daumenreichweite)
+   - Kopfzeile bleibt oben stehen, damit der Monat immer erreichbar ist
+   - Tabellen werden zu Karten: kein seitliches Scrollen mehr
+   - Eingabefelder mindestens 16px, sonst zoomt iOS beim Antippen
+   ================================================================== */
 
 @media (max-width: 820px) {
   .spalten { grid-template-columns: 1fr; }
@@ -612,13 +618,138 @@ button { font-family: var(--sans); cursor: pointer; }
   .bilanz-haupt { border-right: none; border-bottom: 1px solid var(--linie); }
   .feld-breit { grid-column: span 1; }
 }
-@media (max-width: 560px) {
-  body { padding: 0 16px 40px; }
-  .kopf { padding-top: 20px; }
-  .kopf h1 { font-size: 1.7rem; }
-  .karte { padding: 18px 16px; }
+
+@media (max-width: 700px) {
+  body {
+    padding: 0 16px;
+    /* Platz für die feste Leiste unten */
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* --- Kopfzeile bleibt stehen --- */
+  .kopf {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 20;
+    background: var(--papier);
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0 9px;
+    border-bottom: 1px solid var(--linie-stark);
+  }
+  .kopf h1 { font-size: 1.2rem; }
+  .kopf-unterzeile { display: none; }
+  .monatswahl { padding: 2px; flex: 0 1 auto; min-width: 0; }
+  .monatswahl strong { font-size: 0.92rem; min-width: 0; padding: 0; }
+  .knopf-rund { width: 42px; height: 42px; }
+  #monatHeute { padding: 9px 10px; font-size: 0.66rem; }
+
+  /* --- Reiter als feste Leiste unten --- */
+  .tableiste {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 30;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    overflow: visible;
+    background: var(--blatt);
+    border-top: 1px solid var(--linie-stark);
+    border-bottom: none;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .tableiste button {
+    padding: 13px 2px;
+    min-height: 58px;
+    font-size: 0.72rem;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    border-top: 2px solid transparent;
+  }
+  .tableiste button[aria-selected="true"] {
+    border-top-color: var(--gruen);
+    background: color-mix(in srgb, var(--gruen) 9%, transparent);
+  }
+  .tab-indikator { display: none; }
+  main { margin-top: 18px; }
+
+  /* --- Blätter --- */
+  .karte { padding: 18px 16px; margin-bottom: 16px; }
+  .karte > h2 { font-size: 1.12rem; }
   .bilanz-liste > div, .bilanz-haupt { padding-left: 18px; padding-right: 18px; }
-  .monatswahl { width: 100%; justify-content: space-between; }
+  .hero-zahl { font-size: 2.6rem; }
+
+  /* --- Eingaben: eine Spalte, große Ziele, kein Zoom beim Antippen --- */
+  .formular, .filterleiste { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .feld-breit, .feld-knoepfe { grid-column: span 2; }
+  input, select { font-size: 16px; min-height: 48px; }
+  .feld-knoepfe { flex-direction: column; align-items: stretch; }
+  .feld-knoepfe button { width: 100%; }
+  .knopfreihe > .knopf-primaer, .knopfreihe > .knopf-sekundaer { flex: 1 1 100%; text-align: center; justify-content: center; }
+
+  /* --- Tabellen werden zu Karten: Bezeichnung und Betrag oben,
+         Nebenangaben darunter, Aktionen in einer eigenen Zeile --- */
+  .tabelle-huelle { overflow-x: visible; }
+  .tabelle, .tabelle tbody, .tabelle tr { display: block; width: 100%; }
+  .tabelle td { display: block; width: auto; }
+  .tabelle thead { display: none; }
+  .tabelle tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+    border: 1px solid var(--linie);
+    border-radius: var(--kante);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .tabelle tbody tr:nth-child(even) { background: var(--blatt-tief); }
+  .tabelle td { border: none; padding: 0; }
+
+  /* Reihenfolge innerhalb der Karte, unabhängig von der Spaltenfolge */
+  .tabelle td:nth-child(2) { order: 1; flex: 1 1 55%; font-weight: 600; font-size: 1rem; }
+  .tabelle td.rechts { order: 2; margin-left: auto; font-size: 1.15rem; }
+  .tabelle td:nth-child(1), .tabelle td:nth-child(3), .tabelle td:nth-child(4) {
+    order: 3;
+    font-size: 0.82rem;
+    color: var(--tinte-2);
+  }
+  .tabelle td:last-child {
+    order: 4;
+    flex: 1 1 100%;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dotted var(--linie-stark);
+    display: flex;
+    gap: 6px;
+  }
+  .tabelle td:last-child .zeilen-knopf {
+    margin: 0;
+    flex: 1;
+    min-height: 40px;
+    border: 1px solid var(--linie);
+    border-radius: 3px;
+    text-align: center;
+  }
+  /* "am 15." statt eines nackten Datums ohne Spaltenkopf */
+  #dauerListe td:nth-child(3)::before { content: "am "; }
+  .marke { margin-left: 6px; }
+
+  /* --- Einstellungen --- */
+  .kategorie-liste li { gap: 10px; padding: 12px 0; }
+  .kategorie-liste .kat-name { flex: 1 1 100%; order: -1; }
+
+  .einfache-liste li { flex-wrap: wrap; }
+  .legende { gap: 8px 16px; }
+  .fuss { margin-top: 24px; }
+}
+
+@media (max-width: 380px) {
+  .tableiste button { font-size: 0.66rem; }
+  .hero-zahl { font-size: 2.2rem; }
+  .karte { padding: 16px 14px; }
 }
 
 /* ---------------- Weniger Bewegung: Wunsch des Systems achten ---------------- */

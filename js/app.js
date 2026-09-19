@@ -114,7 +114,13 @@
     if (fokussieren !== false) ziel.focus();
   }
 
-  global.addEventListener('resize', indikatorSetzen);
+  /* Nach Drehen oder Größenänderung passen Markierung und Diagramm sich an. */
+  var neuZeichnen = null;
+  global.addEventListener('resize', function () {
+    indikatorSetzen();
+    clearTimeout(neuZeichnen);
+    neuZeichnen = setTimeout(zeigeUebersicht, 200);
+  });
 
   tabs.forEach(function (tab, i) {
     tab.addEventListener('click', function () { tabWaehlen(tab, false); });
