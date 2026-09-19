@@ -498,6 +498,11 @@ main { max-width: 1060px; margin: 0 auto; }
 .balken-liste li:nth-child(n+7) .balken-fuellung { animation-delay: 0.26s; }
 @keyframes balken-wachsen { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
+/* Beim bloßen Neuzeichnen soll nichts hüpfen - nur bei Monats- oder Bereichswechsel. */
+.ohne-bewegung .balken-fuellung,
+.ohne-bewegung .stapel-teil,
+.ohne-bewegung .saeule { animation: none; }
+
 #kategorieDiagramm:not(.alle) .balken-liste li:nth-child(n+6) { display: none; }
 
 .farb-punkt {
@@ -560,6 +565,60 @@ main { max-width: 1060px; margin: 0 auto; }
   transition: opacity 0.16s var(--schwung), transform 0.16s var(--schwung);
 }
 .diagramm-tooltip.sichtbar { opacity: 1; transform: translateY(0); }
+
+/* ---------------- Kurzmeldungen ---------------- */
+
+.meldungen {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  align-items: center;
+  width: min(440px, calc(100vw - 32px));
+  pointer-events: none;
+}
+.meldung {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: var(--kante);
+  background: var(--tinte);
+  color: var(--papier);
+  font-size: 0.92rem;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.18);
+  animation: meldung-auf 0.26s var(--schwung);
+}
+.meldung.geht { animation: meldung-zu 0.24s var(--schwung) forwards; }
+.meldung-text { flex: 1; min-width: 0; }
+.meldung-aktion {
+  flex: 0 0 auto;
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--papier) 45%, transparent);
+  color: var(--papier);
+  border-radius: 3px;
+  padding: 7px 12px;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.meldung-aktion:hover { background: color-mix(in srgb, var(--papier) 16%, transparent); }
+@keyframes meldung-auf { from { opacity: 0; transform: translateY(14px); } }
+@keyframes meldung-zu { to { opacity: 0; transform: translateY(8px); } }
+
+/* Die gerade geänderte Zeile kurz hervorheben - damit man sieht, wo sie gelandet ist. */
+@keyframes zeile-blinzeln {
+  0%   { background: color-mix(in srgb, var(--gruen) 26%, transparent); }
+  100% { background: transparent; }
+}
+.tabelle tbody tr.frisch { animation: zeile-blinzeln 1.8s var(--schwung); }
 
 /* ---------------- Formulare ---------------- */
 
@@ -748,6 +807,9 @@ button { font-family: var(--sans); cursor: pointer; }
 }
 
 @media (max-width: 700px) {
+  /* Über der festen Leiste, nicht dahinter */
+  .meldungen { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+
   body {
     padding: 0 16px;
     /* Platz für die feste Leiste unten */

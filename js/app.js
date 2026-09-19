@@ -14,6 +14,10 @@
   var daten = store.laden();
   var aktuellerMonat = format.heuteIso().slice(0, 7);
   var bearbeiteBuchung = null;
+  /* Die Balken wachsen beim Monatswechsel und beim Öffnen der Übersicht -
+     aber nicht bei jedem Speichern, sonst zappelt die Seite. */
+  var diagrammeAnimieren = true;
+  var frischeZeile = null;
   var bearbeiteDauer = null;
   var importStand = null;
 
@@ -65,6 +69,10 @@
     daten.geloescht.push({ id: id, zeit: merge.jetzt() });
   }
 
+  function grabsteinEntfernen(id) {
+    daten.geloescht = (daten.geloescht || []).filter(function (e) { return e.id !== id; });
+  }
+
   function sichern() {
     daten.aktualisiert = merge.jetzt();
     var erfolg = store.speichern(daten);
@@ -103,6 +111,45 @@
     select.value = gewaehlt || (mitAlle ? '' : 'gemeinsam');
   }
 
+  /* Kurzmeldung am unteren Rand: sagt, was passiert ist, und bietet bei
+     Löschungen das Rückgängigmachen an - das ersetzt die Rückfrage vorher. */
+  var meldungen = [];
+
+  function meldungSchliessen(eintrag) {
+    if (!eintrag.el.parentNode) return;
+    clearTimeout(eintrag.uhr);
+    eintrag.el.classList.add('geht');
+    setTimeout(function () {
+      if (eintrag.el.parentNode) eintrag.el.parentNode.removeChild(eintrag.el);
+    }, wenigerBewegung ? 0 : 240);
+    meldungen = meldungen.filter(function (m) { return m !== eintrag; });
+  }
+
+  function meldung(text, aktion) {
+    var el = neu('div', null, 'meldung');
+    el.appendChild(neu('span', text, 'meldung-text'));
+
+    var eintrag = { el: el, uhr: null };
+
+    if (aktion) {
+      var knopf = neu('button', aktion.text, 'meldung-aktion');
+      knopf.type = 'button';
+      knopf.addEventListener('click', function () {
+        meldungSchliessen(eintrag);
+        aktion.tun();
+      });
+      el.appendChild(knopf);
+    }
+
+    q('meldungen').appendChild(el);
+    meldungen.push(eintrag);
+    /* Mit Rückgängig etwas länger stehen lassen - man muss es ja lesen können. */
+    eintrag.uhr = setTimeout(function () { meldungSchliessen(eintrag); }, aktion ? 7000 : 3500);
+
+    /* Nie mehr als zwei auf einmal - auf dem Handy verdecken drei schon die halbe Liste. */
+    while (meldungen.length > 2) meldungSchliessen(meldungen[0]);
+  }
+
   /* Formulare und Filter sind zugeklappt, bis man sie braucht - so sieht man
      zuerst, was man hat, und nicht ein Formular. */
   function klappe(knopfId, bereichId, offen) {
@@ -127,6 +174,7 @@
   }
 
   function tabWaehlen(ziel, fokussieren) {
+    if (ziel === q('tab-uebersicht')) diagrammeAnimieren = true;
     tabs.forEach(function (tab) {
       var aktiv = tab === ziel;
       tab.setAttribute('aria-selected', aktiv ? 'true' : 'false');
@@ -161,6 +209,7 @@
 
   function monatSetzen(monat) {
     aktuellerMonat = monat;
+    diagrammeAnimieren = true;
     alleszeigen();
   }
 
@@ -239,6 +288,10 @@
     }
 
     var kategorien = model.nachKategorie(daten, aktuellerMonat, 'ausgabe');
+    q('kategorieDiagramm').classList.toggle('ohne-bewegung', !diagrammeAnimieren);
+    q('personDiagramm').classList.toggle('ohne-bewegung', !diagrammeAnimieren);
+    q('verlaufDiagramm').classList.toggle('ohne-bewegung', !diagrammeAnimieren);
+    diagrammeAnimieren = false;
     charts.kategorieBalken(q('kategorieDiagramm'), kategorien);
     q('kategorieMehr').hidden = kategorien.length <= 5;
     charts.verlaufBalken(q('verlaufDiagramm'), model.monatsVerlauf(daten, aktuellerMonat, 6));
@@ -276,18 +329,32 @@
   }
 
   function buchungLoeschen(b) {
-    var text = b.quelle
-      ? 'Diese Buchung stammt aus einem Dauerauftrag. Sie wird gelöscht und für diesen Monat nicht erneut angelegt. Fortfahren?'
-      : 'Diese Buchung wirklich löschen?';
-    if (!global.confirm(text)) return;
-    if (b.quelle) {
-      daten.ausgeblendet = (daten.ausgeblendet || []).concat(b.quelle.dauerId + '|' + b.quelle.monat);
-    }
+    var warQuelle = b.quelle ? b.quelle.dauerId + '|' + b.quelle.monat : null;
+
     daten.buchungen = daten.buchungen.filter(function (x) { return x.id !== b.id; });
     grabstein(b.id);
+    /* Aus einem Dauerauftrag erzeugte Buchungen dürfen nicht nachwachsen. */
+    if (warQuelle) daten.ausgeblendet = (daten.ausgeblendet || []).concat(warQuelle);
     if (bearbeiteBuchung === b.id) buchungFormZuruecksetzen();
+
     sichern();
     alleszeigen();
+
+    meldung('„' + (b.notiz || model.kategorieVon(daten, b.kategorieId).name) + '" gelöscht', {
+      text: 'Rückgängig',
+      tun: function () {
+        daten.buchungen.push(Object.assign({}, b, { geaendert: merge.jetzt() }));
+        grabsteinEntfernen(b.id);
+        if (warQuelle) {
+          daten.ausgeblendet = (daten.ausgeblendet || []).filter(function (e) { return e !== warQuelle; });
+        }
+        aktuellerMonat = b.datum.slice(0, 7);
+        frischeZeile = b.id;
+        sichern();
+        alleszeigen();
+        meldung('Wiederhergestellt.');
+      }
+    });
   }
 
   q('buchungArt').addEventListener('change', function () {
@@ -337,12 +404,21 @@
       daten.buchungen.push(eintrag);
     }
 
+    var warBearbeitung = !!bearbeiteBuchung;
     aktuellerMonat = eintrag.datum.slice(0, 7);
+    frischeZeile = eintrag.id;
     sichern();
     buchungFormZuruecksetzen();
     klappe('buchungFormOeffnen', 'buchungFormBereich', false);
     q('buchungFormOeffnen').lastChild.nodeValue = ' Neue Buchung eintragen';
     alleszeigen();
+
+    /* Sagen, was die Buchung bewirkt hat - sonst ändert sich die Übersicht
+       unbemerkt im Hintergrund. */
+    var stand = model.monatsUebersicht(daten, aktuellerMonat);
+    meldung((warBearbeitung ? 'Geändert' : 'Gespeichert')
+      + ': ' + (eintrag.art === 'einnahme' ? '+ ' : '− ') + format.eur(eintrag.betrag)
+      + ' · bleibt diesen Monat ' + format.eur(stand.saldo));
   });
 
   ['filterKategorie', 'filterPerson', 'filterText'].forEach(function (id) {
@@ -366,12 +442,20 @@
     }).sort(function (a, b) { return a.datum < b.datum ? -1 : a.datum > b.datum ? 1 : 0; });
 
     q('buchungLeer').hidden = liste.length > 0;
+    var hervorheben = frischeZeile;
+    frischeZeile = null;
     q('buchungTabelle').hidden = liste.length === 0;
 
     liste.forEach(function (b) {
       var kat = model.kategorieVon(daten, b.kategorieId);
       var tr = document.createElement('tr');
       if (b.datum > heute) tr.className = 'geplant';
+      if (b.id === hervorheben) {
+        tr.classList.add('frisch');
+        setTimeout(function () {
+          if (tr.scrollIntoView) tr.scrollIntoView({ block: 'center', behavior: wenigerBewegung ? 'auto' : 'smooth' });
+        }, 60);
+      }
 
       tr.appendChild(neu('td', format.datum(b.datum)));
 
@@ -433,7 +517,7 @@
     }
     if (global.navigator && global.navigator.clipboard) {
       global.navigator.clipboard.writeText(text).then(function () {
-        global.alert('Der Text liegt in der Zwischenablage – jetzt in WhatsApp oder eine E-Mail einfügen.');
+        meldung('Kopiert – jetzt in WhatsApp oder eine E-Mail einfügen.');
       }, function () {
         global.prompt('Diesen Text verschicken:', text);
       });
@@ -479,6 +563,8 @@
 
     daten.buchungen.push(Object.assign({}, geteiltesAngebot.buchung, { geaendert: merge.jetzt() }));
     aktuellerMonat = geteiltesAngebot.buchung.datum.slice(0, 7);
+    frischeZeile = geteiltesAngebot.buchung.id;
+    meldung('Übernommen: ' + format.eur(geteiltesAngebot.buchung.betrag));
     geteiltesAngebot = null;
     q('geteiltKarte').hidden = true;
     sichern();
@@ -588,11 +674,15 @@
       daten.dauerauftraege.push(eintrag);
     }
 
+    var warBearbeitungDauer = !!bearbeiteDauer;
     sichern();
     dauerFormZuruecksetzen();
     klappe('dauerFormOeffnen', 'dauerFormBereich', false);
     q('dauerFormOeffnen').lastChild.nodeValue = ' Regelmäßige Zahlung eintragen';
     alleszeigen();
+
+    meldung((warBearbeitungDauer ? '„' + eintrag.bezeichnung + '" geändert' : '„' + eintrag.bezeichnung + '" eingetragen')
+      + ' · feste Kosten jetzt ' + format.eur(model.fixkostenProMonat(daten, 'ausgabe')) + ' im Monat');
   });
 
   function zeigeDaueraufraege() {
@@ -638,17 +728,30 @@
         d.geaendert = merge.jetzt();
         sichern();
         alleszeigen();
+        meldung(d.aktiv
+          ? '„' + d.bezeichnung + '" läuft wieder · feste Kosten ' + format.eur(model.fixkostenProMonat(daten, 'ausgabe')) + ' im Monat'
+          : '„' + d.bezeichnung + '" pausiert · feste Kosten ' + format.eur(model.fixkostenProMonat(daten, 'ausgabe')) + ' im Monat');
       });
 
       var loeschen = neu('button', 'Löschen', 'zeilen-knopf gefahr');
       loeschen.type = 'button';
       loeschen.addEventListener('click', function () {
-        if (!global.confirm('Dauerauftrag „' + d.bezeichnung + '" löschen? Bereits erzeugte Buchungen bleiben erhalten.')) return;
         daten.dauerauftraege = daten.dauerauftraege.filter(function (x) { return x.id !== d.id; });
         grabstein(d.id);
         if (bearbeiteDauer === d.id) dauerFormZuruecksetzen();
         sichern();
         alleszeigen();
+
+        meldung('„' + d.bezeichnung + '" gelöscht. Bereits erzeugte Buchungen bleiben stehen.', {
+          text: 'Rückgängig',
+          tun: function () {
+            daten.dauerauftraege.push(Object.assign({}, d, { geaendert: merge.jetzt() }));
+            grabsteinEntfernen(d.id);
+            sichern();
+            alleszeigen();
+            meldung('Wiederhergestellt.');
+          }
+        });
       });
 
       aktionen.appendChild(bearbeiten);
@@ -668,6 +771,7 @@
     daten.einstellungen.geaendert = merge.jetzt();
     sichern();
     alleszeigen();
+    meldung('Namen gespeichert.');
   });
 
   /* Namen statt Nummern - "Farbe 5" sagt niemandem etwas. Reihenfolge wie --serie-1..8. */
@@ -722,10 +826,12 @@
       var loeschen = neu('button', 'Löschen', 'zeilen-knopf gefahr');
       loeschen.type = 'button';
       loeschen.addEventListener('click', function () {
-        var text = benutzt
-          ? 'Die Kategorie „' + k.name + '" wird in ' + benutzt + ' Einträgen verwendet. Diese behalten ihren Betrag und erscheinen künftig unter „Ohne Kategorie". Löschen?'
-          : 'Kategorie „' + k.name + '" löschen?';
-        if (!global.confirm(text)) return;
+        /* Merken, wer die Kategorie trug - fürs Rückgängigmachen. */
+        var betroffeneBuchungen = daten.buchungen.filter(function (b) { return b.kategorieId === k.id; })
+          .map(function (b) { return b.id; });
+        var betroffeneDauer = daten.dauerauftraege.filter(function (d) { return d.kategorieId === k.id; })
+          .map(function (d) { return d.id; });
+
         daten.kategorien = daten.kategorien.filter(function (x) { return x.id !== k.id; });
         grabstein(k.id);
         daten.buchungen.forEach(function (b) {
@@ -736,6 +842,25 @@
         });
         sichern();
         alleszeigen();
+
+        meldung(benutzt
+          ? '„' + k.name + '" gelöscht. ' + benutzt + ' Einträge stehen jetzt unter „Ohne Kategorie".'
+          : '„' + k.name + '" gelöscht.', {
+          text: 'Rückgängig',
+          tun: function () {
+            daten.kategorien.push(Object.assign({}, k, { geaendert: merge.jetzt() }));
+            grabsteinEntfernen(k.id);
+            daten.buchungen.forEach(function (b) {
+              if (betroffeneBuchungen.indexOf(b.id) !== -1) { b.kategorieId = k.id; b.geaendert = merge.jetzt(); }
+            });
+            daten.dauerauftraege.forEach(function (d) {
+              if (betroffeneDauer.indexOf(d.id) !== -1) { d.kategorieId = k.id; d.geaendert = merge.jetzt(); }
+            });
+            sichern();
+            alleszeigen();
+            meldung('Wiederhergestellt.');
+          }
+        });
       });
       li.appendChild(loeschen);
 
@@ -757,6 +882,7 @@
     q('katName').value = '';
     sichern();
     alleszeigen();
+    meldung('Kategorie „' + name + '" angelegt.');
   });
 
   q('exportKnopf').addEventListener('click', function () {
@@ -846,7 +972,9 @@
     q('importVorschau').hidden = true;
     q('textBereich').hidden = true;
     sichern();
+    diagrammeAnimieren = true;
     alleszeigen();
+    meldung('Sicherung übernommen: ' + daten.buchungen.length + ' Buchungen.');
   });
 
   q('importAbbrechen').addEventListener('click', function () {
@@ -876,6 +1004,7 @@
       { tag: '18', art: 'ausgabe', betrag: 21000, kategorieId: 'kat_versicherung', notiz: 'Haftpflicht', person: 'a' },
       { tag: '24', art: 'ausgabe', betrag: 7600, kategorieId: 'kat_gesundheit', notiz: 'Apotheke', person: 'b' }
     ];
+    var vorher = daten.buchungen.length;
     beispiele.forEach(function (b) {
       daten.buchungen.push({
         id: store.neueId('b'),
@@ -890,7 +1019,9 @@
       });
     });
     sichern();
+    diagrammeAnimieren = true;
     alleszeigen();
+    meldung((daten.buchungen.length - vorher) + ' Beispielbuchungen angelegt.');
   });
 
   /* ---------------- Gemeinsamer Stand ---------------- */
