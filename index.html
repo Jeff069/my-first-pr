@@ -45,6 +45,17 @@
 
 <main id="inhalt">
 
+  <!-- Erscheint, wenn jemand eine Buchung geschickt hat -->
+  <section class="karte geteilt-karte" id="geteiltKarte" hidden aria-live="polite">
+    <h2>Geschickte Buchung</h2>
+    <p class="karte-hinweis" id="geteiltText"></p>
+    <div class="knopfreihe">
+      <button type="button" id="geteiltUebernehmen" class="knopf-primaer">Übernehmen</button>
+      <button type="button" id="geteiltVerwerfen" class="knopf-klein">Verwerfen</button>
+    </div>
+  </section>
+
+
   <!-- ÜBERSICHT -->
   <section id="panel-uebersicht" role="tabpanel" aria-labelledby="tab-uebersicht" tabindex="0">
     <div class="bilanz" aria-live="polite">
@@ -276,6 +287,7 @@
 <script src="js/store.js"></script>
 <script src="js/model.js"></script>
 <script src="js/merge.js"></script>
+<script src="js/teilen.js"></script>
 <script src="js/wolke.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/app.js"></script>

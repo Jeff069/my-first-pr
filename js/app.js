@@ -8,6 +8,7 @@
   var model = global.HB.model;
   var charts = global.HB.charts;
   var merge = global.HB.merge;
+  var teilen = global.HB.teilen;
   var wolke = global.HB.wolke;
 
   var daten = store.laden();
@@ -354,16 +355,97 @@
       var bearbeiten = neu('button', 'Bearbeiten', 'zeilen-knopf');
       bearbeiten.type = 'button';
       bearbeiten.addEventListener('click', function () { buchungBearbeiten(b); });
+      var verschicken = neu('button', 'Teilen', 'zeilen-knopf');
+      verschicken.type = 'button';
+      verschicken.addEventListener('click', function () { buchungTeilen(b); });
+
       var loeschen = neu('button', 'Löschen', 'zeilen-knopf gefahr');
       loeschen.type = 'button';
       loeschen.addEventListener('click', function () { buchungLoeschen(b); });
       aktionen.appendChild(bearbeiten);
+      aktionen.appendChild(verschicken);
       aktionen.appendChild(loeschen);
       tr.appendChild(aktionen);
 
       tbody.appendChild(tr);
     });
   }
+
+  /* ---------------- Buchung verschicken und übernehmen ---------------- */
+
+  function buchungTeilen(b) {
+    var kategorie = daten.kategorien.filter(function (k) { return k.id === b.kategorieId; })[0] || null;
+    var link = teilen.linkFuer(b, kategorie, global.location.href);
+    var beschreibung = (b.notiz || model.kategorieVon(daten, b.kategorieId).name)
+      + ' · ' + format.eur(b.betrag) + ' · ' + format.datum(b.datum);
+    var text = beschreibung + '\nÜbernehmen: ' + link;
+
+    /* Auf dem Handy die Teilen-Auswahl des Systems (WhatsApp, SMS, Mail),
+       sonst in die Zwischenablage. */
+    if (global.navigator && global.navigator.share) {
+      global.navigator.share({ title: 'Buchung fürs Haushaltsbuch', text: text }).catch(function () {
+        /* Abgebrochen ist kein Fehler. */
+      });
+      return;
+    }
+    if (global.navigator && global.navigator.clipboard) {
+      global.navigator.clipboard.writeText(text).then(function () {
+        global.alert('Der Text liegt in der Zwischenablage – jetzt in WhatsApp oder eine E-Mail einfügen.');
+      }, function () {
+        global.prompt('Diesen Text verschicken:', text);
+      });
+      return;
+    }
+    global.prompt('Diesen Text verschicken:', text);
+  }
+
+  var geteiltesAngebot = null;
+
+  function geteiltesPruefen() {
+    var angebot = teilen.ausAdresse(global.location.href);
+    /* Die Adresse sofort säubern, damit ein Neuladen nicht erneut fragt. */
+    if (angebot && global.history && global.history.replaceState) {
+      global.history.replaceState(null, '', global.location.href.split('#')[0]);
+    }
+    if (!angebot) return;
+
+    geteiltesAngebot = angebot;
+    var schonDa = daten.buchungen.some(function (b) { return b.id === angebot.buchung.id; });
+    var kategorieName = angebot.kategorie ? angebot.kategorie.name
+      : model.kategorieVon(daten, angebot.buchung.kategorieId).name;
+
+    q('geteiltText').textContent = (angebot.buchung.notiz || kategorieName)
+      + ' · ' + format.eur(angebot.buchung.betrag)
+      + ' · ' + format.datum(angebot.buchung.datum)
+      + ' · ' + kategorieName
+      + ' · ' + personName(angebot.buchung.person)
+      + (schonDa ? ' — diese Buchung ist bereits erfasst.' : '');
+    q('geteiltUebernehmen').hidden = schonDa;
+    q('geteiltKarte').hidden = false;
+  }
+
+  q('geteiltUebernehmen').addEventListener('click', function () {
+    if (!geteiltesAngebot) return;
+
+    /* Fehlt die Kategorie hier, wird sie mit angelegt - sonst stünde die
+       Buchung ohne Einordnung da. */
+    if (geteiltesAngebot.kategorie
+        && !daten.kategorien.some(function (k) { return k.id === geteiltesAngebot.kategorie.id; })) {
+      daten.kategorien.push(Object.assign({}, geteiltesAngebot.kategorie, { geaendert: merge.jetzt() }));
+    }
+
+    daten.buchungen.push(Object.assign({}, geteiltesAngebot.buchung, { geaendert: merge.jetzt() }));
+    aktuellerMonat = geteiltesAngebot.buchung.datum.slice(0, 7);
+    geteiltesAngebot = null;
+    q('geteiltKarte').hidden = true;
+    sichern();
+    alleszeigen();
+  });
+
+  q('geteiltVerwerfen').addEventListener('click', function () {
+    geteiltesAngebot = null;
+    q('geteiltKarte').hidden = true;
+  });
 
   /* ---------------- Daueraufträge ---------------- */
 
@@ -917,6 +999,7 @@
   wolkeAnsichtSetzen();
   taktSetzen();
   abgleichen('still');
+  geteiltesPruefen();
 
   /* Service Worker: macht die App installierbar und offline lauffähig.
      Nur auf einer echten Adresse und nicht in einer eingebetteten Ansicht -

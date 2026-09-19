@@ -8,7 +8,7 @@
    die Anmeldung mit E-Mail und Passwort. */
 window.HB = window.HB || {};
 window.HB.konfig = {
-  url: '',
+  url: 'https://olxhpugdfwmkqrxpbfop.supabase.co',
   schluessel: '',
   /* Name des gemeinsamen Haushalts - beide Geräte müssen denselben verwenden. */
   haushalt: 'haushalt'

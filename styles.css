@@ -318,6 +318,14 @@ main { max-width: 1060px; margin: 0 auto; }
 .karte-warnung { border-color: color-mix(in srgb, var(--rot) 45%, var(--linie)); }
 .spalten { display: grid; grid-template-columns: 1.15fr 1fr; gap: 22px; align-items: start; }
 
+.geteilt-karte {
+  border-color: var(--gruen);
+  border-left-width: 4px;
+  background: linear-gradient(180deg, var(--blatt) 0%, var(--blatt-tief) 100%);
+}
+.geteilt-karte h2 { color: var(--gruen); }
+.geteilt-betrag { font-family: var(--serif); font-size: 1.3rem; color: var(--tinte); }
+
 /* ---------------- Bilanzkopf: eine große Zahl, drei kleine ---------------- */
 
 .bilanz {
