@@ -710,7 +710,12 @@ button { font-family: var(--sans); cursor: pointer; }
   .tabelle td:last-child .zeilen-knopf { margin: 0; flex: 1; min-height: 40px; background: var(--karte); }
   #dauerListe td:nth-child(3)::before { content: "am "; }
 
-  .kategorie-liste .kat-name { flex: 1 1 100%; order: -1; }
+  /* Emoji und Name in die erste Zeile, alles Weitere darunter -
+     vorher brauchte jede Kategorie drei Zeilen. */
+  .kategorie-liste li { gap: 8px 9px; }
+  .kategorie-liste .kat-emoji { order: -2; width: 56px; }
+  .kategorie-liste .kat-name { order: -1; flex: 1 1 55%; }
+  .kategorie-liste .zeilen-knopf { margin-left: auto; }
 }
 
 @media (max-width: 380px) {

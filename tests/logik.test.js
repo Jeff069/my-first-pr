@@ -205,3 +205,30 @@ test('Unvollständige Datensätze werden repariert statt verworfen', () => {
   assert.equal(repariert.buchungen[0].person, 'gemeinsam');
   assert.equal(repariert.kategorien.length, 10, 'Standardkategorien werden ergänzt');
 });
+
+test('Kategorien ohne Emoji bekommen das passende nachgetragen', () => {
+  /* So sehen Kategorien aus, die vor der Emoji-Einführung angelegt wurden. */
+  const alt = store.migrieren({
+    kategorien: [
+      { id: 'kat_wohnen', name: 'Wohnen & Miete', typ: 'ausgabe', slot: 1 },
+      { id: 'kat_lebensmittel', name: 'Lebensmittel', typ: 'ausgabe', slot: 2 },
+      { id: 'kat_gehalt', name: 'Gehalt', typ: 'einnahme', slot: 6 },
+      { id: 'kat_eigene', name: 'Selbst angelegt', typ: 'ausgabe', slot: 4 }
+    ]
+  });
+
+  const nach = {};
+  alt.kategorien.forEach((k) => { nach[k.id] = k.emoji; });
+
+  assert.equal(nach.kat_wohnen, '🏠');
+  assert.equal(nach.kat_lebensmittel, '🛒');
+  assert.equal(nach.kat_gehalt, '💰');
+  assert.equal(nach.kat_eigene, '🏷️', 'eigene Kategorien behalten das Ersatzschild');
+});
+
+test('Ein selbst gesetztes Emoji wird nicht überschrieben', () => {
+  const eigen = store.migrieren({
+    kategorien: [{ id: 'kat_wohnen', name: 'Wohnen', typ: 'ausgabe', slot: 1, emoji: '🏡' }]
+  });
+  assert.equal(eigen.kategorien[0].emoji, '🏡');
+});

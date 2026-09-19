@@ -45,6 +45,14 @@
     ];
   }
 
+  /* Kategorien, die vor der Emoji-Einführung angelegt wurden, tragen keines.
+     Statt sie alle auf das Ersatzschild zu setzen, holen wir das passende
+     Emoji über die Kennung aus den Standardkategorien nach. */
+  function standardEmoji(id) {
+    var treffer = standardKategorien().filter(function (k) { return k.id === id; })[0];
+    return treffer ? treffer.emoji : null;
+  }
+
   function leereDaten() {
     return {
       version: VERSION,
@@ -77,7 +85,9 @@
               typ: k.typ === 'einnahme' ? 'einnahme' : 'ausgabe',
               slot: Math.min(SLOTS, Math.max(1, parseInt(k.slot, 10) || 8)),
               /* Ein Zeichen zum Wiedererkennen - in der Liste schneller erfasst als ein Name. */
-              emoji: typeof k.emoji === 'string' && k.emoji ? k.emoji.slice(0, 8) : '🏷️',
+              emoji: typeof k.emoji === 'string' && k.emoji
+                ? k.emoji.slice(0, 8)
+                : (standardEmoji(k.id) || '🏷️'),
               geaendert: k.geaendert || '1970-01-01T00:00:00.000Z'
             };
           })
@@ -191,6 +201,7 @@
     neueId: neueId,
     leereDaten: leereDaten,
     standardKategorien: standardKategorien,
+    standardEmoji: standardEmoji,
     migrieren: migrieren,
     laden: laden,
     speichern: speichern,
