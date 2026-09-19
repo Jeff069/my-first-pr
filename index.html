@@ -21,29 +21,9 @@
 
 <a class="sprungmarke" href="#inhalt">Zum Inhalt springen</a>
 
-<!-- Symbole einmal definiert, unten per <use> eingesetzt -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <symbol id="sym-uebersicht" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/>
-  </symbol>
-  <symbol id="sym-buchungen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M4 6h16M4 12h16M4 18h10"/>
-  </symbol>
-  <symbol id="sym-monatlich" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>
-  </symbol>
-  <symbol id="sym-einstellungen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="3.2"/>
-    <path d="M12 2.5v2.2M12 19.3v2.2M21.5 12h-2.2M4.7 12H2.5M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6M18.7 18.7l-1.6-1.6M6.9 6.9L5.3 5.3"/>
-  </symbol>
-  <symbol id="sym-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-    <path d="M12 5v14M5 12h14"/>
-  </symbol>
-</svg>
-
 <header class="kopf">
   <div class="kopf-titel">
-    <h1>Haushaltsbuch</h1>
+    <h1><span class="emoji" aria-hidden="true">💶</span>Haushaltsbuch</h1>
     <p class="kopf-unterzeile" id="kopfPersonen">Übersicht für zwei Personen</p>
     <p class="abgleich-status" id="abgleichStatus" hidden aria-live="polite"></p>
   </div>
@@ -57,16 +37,16 @@
 
 <nav class="tableiste" role="tablist" aria-label="Bereiche">
   <button type="button" role="tab" id="tab-uebersicht" aria-controls="panel-uebersicht" aria-selected="true">
-    <svg class="tab-symbol" aria-hidden="true"><use href="#sym-uebersicht"/></svg><span>Übersicht</span>
+    <span class="emoji" aria-hidden="true">📊</span><span>Übersicht</span>
   </button>
   <button type="button" role="tab" id="tab-buchungen" aria-controls="panel-buchungen" aria-selected="false" tabindex="-1">
-    <svg class="tab-symbol" aria-hidden="true"><use href="#sym-buchungen"/></svg><span>Buchungen</span>
+    <span class="emoji" aria-hidden="true">🧾</span><span>Buchungen</span>
   </button>
   <button type="button" role="tab" id="tab-wiederkehrend" aria-controls="panel-wiederkehrend" aria-selected="false" tabindex="-1">
-    <svg class="tab-symbol" aria-hidden="true"><use href="#sym-monatlich"/></svg><span>Monatliches</span>
+    <span class="emoji" aria-hidden="true">🔁</span><span>Monatliches</span>
   </button>
   <button type="button" role="tab" id="tab-einstellungen" aria-controls="panel-einstellungen" aria-selected="false" tabindex="-1">
-    <svg class="tab-symbol" aria-hidden="true"><use href="#sym-einstellungen"/></svg><span>Einstellungen</span>
+    <span class="emoji" aria-hidden="true">⚙️</span><span>Einstellungen</span>
   </button>
   <span class="tab-indikator" id="tabIndikator" aria-hidden="true"></span>
 </nav>
@@ -75,7 +55,7 @@
 
   <!-- Erscheint, wenn jemand eine Buchung geschickt hat -->
   <section class="karte geteilt-karte" id="geteiltKarte" hidden aria-live="polite">
-    <h2>Jemand hat dir eine Buchung geschickt</h2>
+    <h2><span class="emoji" aria-hidden="true">📨</span>Jemand hat dir eine Buchung geschickt</h2>
     <p class="karte-hinweis" id="geteiltText"></p>
     <div class="knopfreihe">
       <button type="button" id="geteiltUebernehmen" class="knopf-primaer">Übernehmen</button>
@@ -89,28 +69,28 @@
 
     <div class="bilanz" aria-live="polite">
       <div class="bilanz-haupt">
-        <span class="etikett">Bleibt diesen Monat</span>
+        <span class="etikett"><span class="emoji" aria-hidden="true">💶</span>Bleibt diesen Monat</span>
         <strong class="hero-zahl" id="kzSaldo">–</strong>
         <span class="bilanz-fuss" id="kzSaldoFuss"></span>
       </div>
       <dl class="bilanz-liste">
         <div>
-          <dt class="etikett">Einnahmen<span class="dt-erklaerung">alles, was hereinkommt</span></dt>
+          <dt class="etikett"><span class="emoji" aria-hidden="true">📥</span>Einnahmen<span class="dt-erklaerung">alles, was hereinkommt</span></dt>
           <dd id="kzEinnahmen">–</dd>
         </div>
         <div>
-          <dt class="etikett">Ausgaben<span class="dt-erklaerung">alles, was rausgeht</span></dt>
+          <dt class="etikett"><span class="emoji" aria-hidden="true">📤</span>Ausgaben<span class="dt-erklaerung">alles, was rausgeht</span></dt>
           <dd id="kzAusgaben">–</dd>
         </div>
         <div>
-          <dt class="etikett">Sparquote<span class="dt-erklaerung">Anteil vom Einkommen, der übrig bleibt</span></dt>
+          <dt class="etikett"><span class="emoji" aria-hidden="true">🐖</span>Sparquote<span class="dt-erklaerung">Anteil vom Einkommen, der übrig bleibt</span></dt>
           <dd id="kzSparquote">–</dd>
         </div>
       </dl>
     </div>
 
     <section class="karte" id="geplantKarte">
-      <h2>Kommt diesen Monat noch</h2>
+      <h2><span class="emoji" aria-hidden="true">⏳</span>Kommt diesen Monat noch</h2>
       <p class="karte-hinweis">Abbuchungen, die im Rest des Monats noch vom Konto gehen. So siehst du, was wirklich frei ist.</p>
       <p class="betont" id="geplantSumme">–</p>
       <span class="betont-fuss" id="geplantFuss"></span>
@@ -118,7 +98,7 @@
     </section>
 
     <section class="karte">
-      <h2>Wohin das Geld geht</h2>
+      <h2><span class="emoji" aria-hidden="true">🧭</span>Wohin das Geld geht</h2>
       <p class="karte-hinweis">Die Ausgaben des Monats nach Kategorie, größter Posten zuerst.</p>
       <div id="kategorieDiagramm"></div>
       <button type="button" id="kategorieMehr" class="knopf-klein knopf-breit" hidden>Alle Kategorien anzeigen</button>
@@ -126,12 +106,12 @@
 
     <div class="spalten">
       <section class="karte">
-        <h2>Die letzten 6 Monate</h2>
+        <h2><span class="emoji" aria-hidden="true">📈</span>Die letzten 6 Monate</h2>
         <p class="karte-hinweis">Einnahmen und Ausgaben nebeneinander – für den Blick auf die Entwicklung.</p>
         <div id="verlaufDiagramm"></div>
       </section>
       <section class="karte">
-        <h2>Wer hat gezahlt</h2>
+        <h2><span class="emoji" aria-hidden="true">👫</span>Wer hat gezahlt</h2>
         <p class="karte-hinweis">Wie sich die Ausgaben des Monats auf euch beide und auf Gemeinsames verteilen.</p>
         <div id="personDiagramm"></div>
       </section>
@@ -143,12 +123,12 @@
     <p class="bereich-intro">Jede einzelne Einnahme und Ausgabe – hier eintragen, ändern und nachschlagen.</p>
 
     <button type="button" id="buchungFormOeffnen" class="knopf-gross" aria-expanded="false" aria-controls="buchungFormBereich">
-      <svg class="knopf-symbol" aria-hidden="true"><use href="#sym-plus"/></svg>
+      <span class="emoji" aria-hidden="true">➕</span>
       Neue Buchung eintragen
     </button>
 
     <section class="karte" id="buchungFormBereich" hidden>
-      <h2 id="buchungFormTitel">Neue Buchung</h2>
+      <h2><span class="emoji" aria-hidden="true">✏️</span><span id="buchungFormTitel">Neue Buchung</span></h2>
       <p class="karte-hinweis">Betrag immer positiv eintragen – ob es abgeht oder hereinkommt, entscheidet das Feld „Art".</p>
       <form id="buchungForm" class="formular" novalidate>
         <input type="hidden" id="buchungId">
@@ -169,7 +149,7 @@
     </section>
 
     <section class="karte">
-      <h2>Buchungen im Monat</h2>
+      <h2><span class="emoji" aria-hidden="true">🧾</span>Buchungen im Monat</h2>
       <p class="karte-hinweis">Tippe auf <em>Bearbeiten</em>, um etwas zu ändern, oder auf <em>Teilen</em>, um eine Buchung ans andere Telefon zu schicken.</p>
 
       <button type="button" id="filterOeffnen" class="knopf-klein knopf-breit" aria-expanded="false" aria-controls="filterBereich">Filtern und suchen</button>
@@ -194,7 +174,7 @@
     <p class="bereich-intro">Alles, was jeden Monat von allein kommt: Miete, Strom, Abos, Gehalt. Einmal eintragen – die App bucht es danach selbst.</p>
 
     <section class="karte">
-      <h2>Feste Kosten pro Monat</h2>
+      <h2><span class="emoji" aria-hidden="true">🏷️</span>Feste Kosten pro Monat</h2>
       <p class="betont" id="fixkostenSumme">–</p>
       <details class="hilfe">
         <summary>Wie wird das gerechnet?</summary>
@@ -203,12 +183,12 @@
     </section>
 
     <button type="button" id="dauerFormOeffnen" class="knopf-gross" aria-expanded="false" aria-controls="dauerFormBereich">
-      <svg class="knopf-symbol" aria-hidden="true"><use href="#sym-plus"/></svg>
+      <span class="emoji" aria-hidden="true">➕</span>
       Regelmäßige Zahlung eintragen
     </button>
 
     <section class="karte" id="dauerFormBereich" hidden>
-      <h2 id="dauerFormTitel">Neue regelmäßige Zahlung</h2>
+      <h2><span class="emoji" aria-hidden="true">✏️</span><span id="dauerFormTitel">Neue regelmäßige Zahlung</span></h2>
       <p class="karte-hinweis">Beispiel: Miete, 1.280 €, am 1., monatlich. Die App legt sie dann jeden Monat automatisch als Buchung an.</p>
       <form id="dauerForm" class="formular" novalidate>
         <input type="hidden" id="dauerId">
@@ -238,7 +218,7 @@
     </section>
 
     <section class="karte">
-      <h2>Eingetragene Zahlungen</h2>
+      <h2><span class="emoji" aria-hidden="true">🔁</span>Eingetragene Zahlungen</h2>
       <p class="karte-hinweis"><em>Pausieren</em> stoppt künftige Buchungen, lässt die bisherigen aber stehen – gut für ein gekündigtes Abo.</p>
       <div class="tabelle-huelle">
         <table class="tabelle" id="dauerTabelle">
@@ -255,7 +235,7 @@
     <p class="bereich-intro">Namen, Kategorien, Sicherung – und der gemeinsame Stand für zwei Geräte.</p>
 
     <section class="karte" id="wolkeKarte" hidden>
-      <h2>Gemeinsamer Stand</h2>
+      <h2><span class="emoji" aria-hidden="true">🔗</span>Gemeinsamer Stand</h2>
       <p class="karte-hinweis" id="wolkeHinweis">
         Meldet ihr euch beide an, seht ihr dieselben Buchungen – auf allen Geräten, ohne etwas hin- und herzuschicken.
       </p>
@@ -287,7 +267,7 @@
     </section>
 
     <section class="karte">
-      <h2>Eure Namen</h2>
+      <h2><span class="emoji" aria-hidden="true">🙋</span>Eure Namen</h2>
       <p class="karte-hinweis">Sie stehen in der Auswahl „Wer hat gezahlt" und in der Auswertung.</p>
       <form id="personenForm" class="formular">
         <div class="feld"><label for="personA">Person 1</label><input type="text" id="personA"></div>
@@ -297,10 +277,11 @@
     </section>
 
     <section class="karte">
-      <h2>Kategorien</h2>
+      <h2><span class="emoji" aria-hidden="true">🎨</span>Kategorien</h2>
       <p class="karte-hinweis">Sie bestimmen, wie sich die Ausgaben in der Übersicht aufteilen. Namen und Farben kannst du frei ändern.</p>
       <ul class="kategorie-liste" id="kategorieListe"></ul>
       <form id="kategorieForm" class="formular">
+        <div class="feld"><label for="katEmoji">Emoji</label><input type="text" id="katEmoji" class="kat-emoji" value="🏷️" maxlength="8" aria-label="Emoji der neuen Kategorie"></div>
         <div class="feld feld-breit"><label for="katName">Neue Kategorie</label><input type="text" id="katName" placeholder="z. B. Kinderbetreuung"></div>
         <div class="feld"><label for="katTyp">Art</label>
           <select id="katTyp"><option value="ausgabe">Ausgabe</option><option value="einnahme">Einnahme</option></select>
@@ -311,7 +292,7 @@
     </section>
 
     <section class="karte">
-      <h2>Sicherung</h2>
+      <h2><span class="emoji" aria-hidden="true">💾</span>Sicherung</h2>
       <p class="karte-hinweis">
         Die Daten liegen in diesem Browser. Geht das Gerät verloren, sind sie weg – deshalb ab und zu sichern.
         Dieselbe Datei bringt den Stand auch auf ein zweites Gerät.
@@ -343,13 +324,13 @@
     </section>
 
     <section class="karte">
-      <h2>Zum Ausprobieren</h2>
+      <h2><span class="emoji" aria-hidden="true">🧪</span>Zum Ausprobieren</h2>
       <p class="karte-hinweis">Legt einen erfundenen Monat an, damit du siehst, wie die Auswertung mit Zahlen aussieht. Deine eigenen Buchungen bleiben erhalten.</p>
       <button type="button" id="demoKnopf" class="knopf-sekundaer">Beispielmonat anlegen</button>
     </section>
 
     <section class="karte karte-warnung">
-      <h2>Alle Daten löschen</h2>
+      <h2><span class="emoji" aria-hidden="true">⚠️</span>Alle Daten löschen</h2>
       <p class="karte-hinweis">Entfernt sämtliche Buchungen, regelmäßigen Zahlungen und Einstellungen aus diesem Browser. Das lässt sich nicht rückgängig machen – vorher sichern.</p>
       <button type="button" id="loeschenKnopf" class="knopf-warnung">Alles löschen</button>
     </section>

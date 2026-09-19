@@ -100,14 +100,18 @@
   function fuelleKategorien(select, typ, gewaehlt) {
     leeren(select);
     daten.kategorien.filter(function (k) { return !typ || k.typ === typ; })
-      .forEach(function (k) { select.appendChild(option(k.id, k.name)); });
+      .forEach(function (k) { select.appendChild(option(k.id, (k.emoji || '🏷️') + '  ' + k.name)); });
     if (gewaehlt) select.value = gewaehlt;
   }
+
+  var PERSON_EMOJI = { a: '👤', b: '👤', gemeinsam: '👥' };
 
   function fuellePersonen(select, mitAlle, gewaehlt) {
     leeren(select);
     if (mitAlle) select.appendChild(option('', 'Alle'));
-    ['a', 'b', 'gemeinsam'].forEach(function (p) { select.appendChild(option(p, personName(p))); });
+    ['a', 'b', 'gemeinsam'].forEach(function (p) {
+      select.appendChild(option(p, PERSON_EMOJI[p] + '  ' + personName(p)));
+    });
     select.value = gewaehlt || (mitAlle ? '' : 'gemeinsam');
   }
 
@@ -260,7 +264,8 @@
 
     var saldo = q('kzSaldo');
     zaehleHoch(saldo, u.saldo, format.eur);
-    saldo.className = 'hero-zahl' + (u.saldo < 0 ? ' negativ' : u.saldo > 0 ? ' positiv' : '');
+    saldo.className = 'hero-zahl';
+    saldo.parentNode.classList.toggle('negativ', u.saldo < 0);
     q('kzSaldoFuss').textContent = u.saldo < 0
       ? 'In diesem Monat ist mehr abgeflossen als hereingekommen.'
       : 'So viel bleibt in diesem Monat übrig.';
@@ -340,7 +345,7 @@
     sichern();
     alleszeigen();
 
-    meldung('„' + (b.notiz || model.kategorieVon(daten, b.kategorieId).name) + '" gelöscht', {
+    meldung('🗑️ „' + (b.notiz || model.kategorieVon(daten, b.kategorieId).name) + '" gelöscht', {
       text: 'Rückgängig',
       tun: function () {
         daten.buchungen.push(Object.assign({}, b, { geaendert: merge.jetzt() }));
@@ -352,7 +357,7 @@
         frischeZeile = b.id;
         sichern();
         alleszeigen();
-        meldung('Wiederhergestellt.');
+        meldung('↩️ Wiederhergestellt.');
       }
     });
   }
@@ -416,7 +421,7 @@
     /* Sagen, was die Buchung bewirkt hat - sonst ändert sich die Übersicht
        unbemerkt im Hintergrund. */
     var stand = model.monatsUebersicht(daten, aktuellerMonat);
-    meldung((warBearbeitung ? 'Geändert' : 'Gespeichert')
+    meldung((warBearbeitung ? '✏️ Geändert' : '✅ Gespeichert')
       + ': ' + (eintrag.art === 'einnahme' ? '+ ' : '− ') + format.eur(eintrag.betrag)
       + ' · bleibt diesen Monat ' + format.eur(stand.saldo));
   });
@@ -466,6 +471,7 @@
 
       var katZelle = document.createElement('td');
       var huelle = neu('span', null, 'kategorie-zelle');
+      huelle.appendChild(neu('span', kat.emoji || '🏷️', 'emoji'));
       var punkt = neu('span', null, 'farb-punkt');
       punkt.style.background = charts.farbe(kat.slot || 0);
       huelle.appendChild(punkt);
@@ -517,7 +523,7 @@
     }
     if (global.navigator && global.navigator.clipboard) {
       global.navigator.clipboard.writeText(text).then(function () {
-        meldung('Kopiert – jetzt in WhatsApp oder eine E-Mail einfügen.');
+        meldung('📋 Kopiert – jetzt in WhatsApp oder eine E-Mail einfügen.');
       }, function () {
         global.prompt('Diesen Text verschicken:', text);
       });
@@ -564,7 +570,7 @@
     daten.buchungen.push(Object.assign({}, geteiltesAngebot.buchung, { geaendert: merge.jetzt() }));
     aktuellerMonat = geteiltesAngebot.buchung.datum.slice(0, 7);
     frischeZeile = geteiltesAngebot.buchung.id;
-    meldung('Übernommen: ' + format.eur(geteiltesAngebot.buchung.betrag));
+    meldung('📥 Übernommen: ' + format.eur(geteiltesAngebot.buchung.betrag));
     geteiltesAngebot = null;
     q('geteiltKarte').hidden = true;
     sichern();
@@ -708,6 +714,7 @@
       var dauerKat = model.kategorieVon(daten, d.kategorieId);
       var katZelle = document.createElement('td');
       var katHuelle = neu('span', null, 'kategorie-zelle');
+      katHuelle.appendChild(neu('span', dauerKat.emoji || '🏷️', 'emoji'));
       var katPunkt = neu('span', null, 'farb-punkt');
       katPunkt.style.background = charts.farbe(dauerKat.slot || 0);
       katHuelle.appendChild(katPunkt);
@@ -742,14 +749,14 @@
         sichern();
         alleszeigen();
 
-        meldung('„' + d.bezeichnung + '" gelöscht. Bereits erzeugte Buchungen bleiben stehen.', {
+        meldung('🗑️ „' + d.bezeichnung + '" gelöscht. Bereits erzeugte Buchungen bleiben stehen.', {
           text: 'Rückgängig',
           tun: function () {
             daten.dauerauftraege.push(Object.assign({}, d, { geaendert: merge.jetzt() }));
             grabsteinEntfernen(d.id);
             sichern();
             alleszeigen();
-            meldung('Wiederhergestellt.');
+            meldung('↩️ Wiederhergestellt.');
           }
         });
       });
@@ -771,7 +778,7 @@
     daten.einstellungen.geaendert = merge.jetzt();
     sichern();
     alleszeigen();
-    meldung('Namen gespeichert.');
+    meldung('🙋 Namen gespeichert.');
   });
 
   /* Namen statt Nummern - "Farbe 5" sagt niemandem etwas. Reihenfolge wie --serie-1..8. */
@@ -792,6 +799,21 @@
 
     daten.kategorien.forEach(function (k) {
       var li = document.createElement('li');
+
+      var emojiFeld = document.createElement('input');
+      emojiFeld.type = 'text';
+      emojiFeld.value = k.emoji || '🏷️';
+      emojiFeld.maxLength = 8;
+      emojiFeld.className = 'kat-emoji';
+      emojiFeld.setAttribute('aria-label', 'Emoji für ' + k.name);
+      emojiFeld.addEventListener('change', function () {
+        k.emoji = emojiFeld.value.trim() || '🏷️';
+        emojiFeld.value = k.emoji;
+        k.geaendert = merge.jetzt();
+        sichern();
+        alleszeigen();
+      });
+      li.appendChild(emojiFeld);
 
       var punkt = neu('span', null, 'farb-punkt');
       punkt.style.background = charts.farbe(k.slot);
@@ -858,7 +880,7 @@
             });
             sichern();
             alleszeigen();
-            meldung('Wiederhergestellt.');
+            meldung('↩️ Wiederhergestellt.');
           }
         });
       });
@@ -877,12 +899,14 @@
       name: name,
       typ: q('katTyp').value,
       slot: parseInt(q('katSlot').value, 10) || 8,
+      emoji: q('katEmoji').value.trim() || '🏷️',
       geaendert: merge.jetzt()
     });
     q('katName').value = '';
+    q('katEmoji').value = '🏷️';
     sichern();
     alleszeigen();
-    meldung('Kategorie „' + name + '" angelegt.');
+    meldung('🎨 Kategorie „' + name + '" angelegt.');
   });
 
   q('exportKnopf').addEventListener('click', function () {
@@ -974,7 +998,7 @@
     sichern();
     diagrammeAnimieren = true;
     alleszeigen();
-    meldung('Sicherung übernommen: ' + daten.buchungen.length + ' Buchungen.');
+    meldung('💾 Sicherung übernommen: ' + daten.buchungen.length + ' Buchungen.');
   });
 
   q('importAbbrechen').addEventListener('click', function () {
@@ -1021,7 +1045,7 @@
     sichern();
     diagrammeAnimieren = true;
     alleszeigen();
-    meldung((daten.buchungen.length - vorher) + ' Beispielbuchungen angelegt.');
+    meldung('🧪 ' + (daten.buchungen.length - vorher) + ' Beispielbuchungen angelegt.');
   });
 
   /* ---------------- Gemeinsamer Stand ---------------- */
@@ -1180,7 +1204,9 @@
     var filterKat = q('filterKategorie').value;
     leeren(q('filterKategorie'));
     q('filterKategorie').appendChild(option('', 'Alle'));
-    daten.kategorien.forEach(function (k) { q('filterKategorie').appendChild(option(k.id, k.name)); });
+    daten.kategorien.forEach(function (k) {
+      q('filterKategorie').appendChild(option(k.id, (k.emoji || '🏷️') + '  ' + k.name));
+    });
     q('filterKategorie').value = filterKat;
 
     fuellePersonen(q('buchungPerson'), false, q('buchungPerson').value);

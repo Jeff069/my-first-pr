@@ -71,7 +71,7 @@
 
   function kategorieVon(daten, id) {
     var treffer = (daten.kategorien || []).filter(function (k) { return k.id === id; })[0];
-    return treffer || { id: null, name: 'Ohne Kategorie', slot: 0 };
+    return treffer || { id: null, name: 'Ohne Kategorie', slot: 0, emoji: '🏷️' };
   }
 
   /* Absteigend sortiert: die größten Posten zuerst - das ist die Frage dahinter. */
@@ -85,7 +85,7 @@
       var schluessel = b.kategorieId || '__ohne__';
       if (!nachId[schluessel]) {
         var kat = kategorieVon(daten, b.kategorieId);
-        nachId[schluessel] = { kategorieId: b.kategorieId || null, name: kat.name, slot: kat.slot || 0, betrag: 0, anzahl: 0 };
+        nachId[schluessel] = { kategorieId: b.kategorieId || null, name: kat.name, slot: kat.slot || 0, emoji: kat.emoji || '🏷️', betrag: 0, anzahl: 0 };
       }
       nachId[schluessel].betrag += b.betrag;
       nachId[schluessel].anzahl += 1;

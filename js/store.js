@@ -32,16 +32,16 @@
   function standardKategorien() {
     var anfang = '1970-01-01T00:00:00.000Z';
     return [
-      { id: 'kat_wohnen', name: 'Wohnen & Miete', typ: 'ausgabe', slot: 1, geaendert: anfang },
-      { id: 'kat_lebensmittel', name: 'Lebensmittel', typ: 'ausgabe', slot: 2, geaendert: anfang },
-      { id: 'kat_mobilitaet', name: 'Auto & Mobilität', typ: 'ausgabe', slot: 3, geaendert: anfang },
-      { id: 'kat_versicherung', name: 'Versicherungen', typ: 'ausgabe', slot: 4, geaendert: anfang },
-      { id: 'kat_abos', name: 'Abos & Verträge', typ: 'ausgabe', slot: 5, geaendert: anfang },
-      { id: 'kat_freizeit', name: 'Freizeit', typ: 'ausgabe', slot: 6, geaendert: anfang },
-      { id: 'kat_gesundheit', name: 'Gesundheit', typ: 'ausgabe', slot: 7, geaendert: anfang },
-      { id: 'kat_sonstiges', name: 'Sonstiges', typ: 'ausgabe', slot: 8, geaendert: anfang },
-      { id: 'kat_gehalt', name: 'Gehalt', typ: 'einnahme', slot: 6, geaendert: anfang },
-      { id: 'kat_sonstige_einnahme', name: 'Sonstige Einnahmen', typ: 'einnahme', slot: 3, geaendert: anfang }
+      { id: 'kat_wohnen', name: 'Wohnen & Miete', typ: 'ausgabe', slot: 1, emoji: '🏠', geaendert: anfang },
+      { id: 'kat_lebensmittel', name: 'Lebensmittel', typ: 'ausgabe', slot: 2, emoji: '🛒', geaendert: anfang },
+      { id: 'kat_mobilitaet', name: 'Auto & Mobilität', typ: 'ausgabe', slot: 3, emoji: '🚗', geaendert: anfang },
+      { id: 'kat_versicherung', name: 'Versicherungen', typ: 'ausgabe', slot: 4, emoji: '🛡️', geaendert: anfang },
+      { id: 'kat_abos', name: 'Abos & Verträge', typ: 'ausgabe', slot: 5, emoji: '📺', geaendert: anfang },
+      { id: 'kat_freizeit', name: 'Freizeit', typ: 'ausgabe', slot: 6, emoji: '🎉', geaendert: anfang },
+      { id: 'kat_gesundheit', name: 'Gesundheit', typ: 'ausgabe', slot: 7, emoji: '💊', geaendert: anfang },
+      { id: 'kat_sonstiges', name: 'Sonstiges', typ: 'ausgabe', slot: 8, emoji: '📦', geaendert: anfang },
+      { id: 'kat_gehalt', name: 'Gehalt', typ: 'einnahme', slot: 6, emoji: '💰', geaendert: anfang },
+      { id: 'kat_sonstige_einnahme', name: 'Sonstige Einnahmen', typ: 'einnahme', slot: 3, emoji: '✨', geaendert: anfang }
     ];
   }
 
@@ -76,6 +76,8 @@
               name: k.name || 'Ohne Namen',
               typ: k.typ === 'einnahme' ? 'einnahme' : 'ausgabe',
               slot: Math.min(SLOTS, Math.max(1, parseInt(k.slot, 10) || 8)),
+              /* Ein Zeichen zum Wiedererkennen - in der Liste schneller erfasst als ein Name. */
+              emoji: typeof k.emoji === 'string' && k.emoji ? k.emoji.slice(0, 8) : '🏷️',
               geaendert: k.geaendert || '1970-01-01T00:00:00.000Z'
             };
           })

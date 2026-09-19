@@ -84,9 +84,8 @@
 
       var kopf = element('div', 'balken-kopf');
       var name = element('span', 'balken-name');
-      var punkt = element('span', 'farb-punkt');
-      punkt.style.background = farbe(eintrag.slot);
-      name.appendChild(punkt);
+      /* Kein Farbpunkt: Der Balken darunter trägt die Farbe bereits. */
+      name.appendChild(element('span', 'emoji', eintrag.emoji || '🏷️'));
       name.appendChild(document.createTextNode(eintrag.name));
       kopf.appendChild(name);
 
