@@ -179,6 +179,8 @@
 
   function tabWaehlen(ziel, fokussieren) {
     if (ziel === q('tab-uebersicht')) diagrammeAnimieren = true;
+    /* Die Kennzahlen im Kopf gehören zur Übersicht; sonst bleibt nur Titel und Monat. */
+    q('bilanz').hidden = ziel !== q('tab-uebersicht');
     tabs.forEach(function (tab) {
       var aktiv = tab === ziel;
       tab.setAttribute('aria-selected', aktiv ? 'true' : 'false');
@@ -1232,6 +1234,7 @@
   dauerFormZuruecksetzen();
   alleszeigen();
   indikatorSetzen();
+  q('bilanz').hidden = q('tab-uebersicht').getAttribute('aria-selected') !== 'true';
   wolkeAnsichtSetzen();
   taktSetzen();
   abgleichen('still');

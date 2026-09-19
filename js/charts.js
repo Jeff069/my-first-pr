@@ -77,34 +77,32 @@
       return;
     }
     var groesster = eintraege[0].betrag || 1;
-    var liste = element('ul', 'balken-liste');
+    var liste = element('ul', 'posten-liste');
 
     eintraege.forEach(function (eintrag) {
-      var zeile = element('li', 'balken-zeile');
+      var zeile = element('li', 'posten');
 
-      var kopf = element('div', 'balken-kopf');
-      var name = element('span', 'balken-name');
-      /* Kein Farbpunkt: Der Balken darunter trägt die Farbe bereits. */
-      name.appendChild(element('span', 'emoji', eintrag.emoji || '🏷️'));
-      name.appendChild(document.createTextNode(eintrag.name));
-      kopf.appendChild(name);
+      /* Farbiges Feld mit Emoji: erkennt man schneller als jeden Namen. */
+      var chip = element('span', 'chip', eintrag.emoji || '🏷️');
+      chip.style.background = 'color-mix(in srgb, ' + farbe(eintrag.slot) + ' 15%, var(--karte))';
+      zeile.appendChild(chip);
 
-      var wert = element('span', 'balken-wert');
-      wert.appendChild(element('strong', null, format.eur(eintrag.betrag)));
-      wert.appendChild(element('span', 'anteil', format.prozent(eintrag.anteil)));
-      kopf.appendChild(wert);
+      var mitte = element('div', 'posten-mitte');
+      mitte.appendChild(element('div', 'posten-name', eintrag.name));
+      mitte.appendChild(element('div', 'posten-unter',
+        format.prozent(eintrag.anteil) + ' · ' + eintrag.anzahl + (eintrag.anzahl === 1 ? ' Buchung' : ' Buchungen')));
 
       var spur = element('div', 'balken-spur');
       var fuellung = element('div', 'balken-fuellung');
-      fuellung.style.width = Math.max(2, (eintrag.betrag / groesster) * 100) + '%';
+      fuellung.style.width = Math.max(3, (eintrag.betrag / groesster) * 100) + '%';
       fuellung.style.background = farbe(eintrag.slot);
       spur.appendChild(fuellung);
+      mitte.appendChild(spur);
+      zeile.appendChild(mitte);
 
-      tooltipAn(zeile, eintrag.name + ': ' + format.eur(eintrag.betrag) +
-        ' (' + format.prozent(eintrag.anteil) + ', ' + eintrag.anzahl + ' Buchungen)');
+      zeile.appendChild(element('div', 'posten-betrag', format.eur(eintrag.betrag)));
 
-      zeile.appendChild(kopf);
-      zeile.appendChild(spur);
+      tooltipAn(zeile, eintrag.name + ': ' + format.eur(eintrag.betrag) + ' (' + format.prozent(eintrag.anteil) + ')');
       liste.appendChild(zeile);
     });
 

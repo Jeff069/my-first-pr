@@ -11,8 +11,8 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/symbol-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta name="theme-color" content="#f2ece0" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#131612" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#3b2f6b" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#2a2250" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Haushaltsbuch">
@@ -21,17 +21,41 @@
 
 <a class="sprungmarke" href="#inhalt">Zum Inhalt springen</a>
 
-<header class="kopf">
-  <div class="kopf-titel">
-    <h1><span class="emoji" aria-hidden="true">💶</span>Haushaltsbuch</h1>
-    <p class="kopf-unterzeile" id="kopfPersonen">Übersicht für zwei Personen</p>
-    <p class="abgleich-status" id="abgleichStatus" hidden aria-live="polite"></p>
+<header class="kopf" id="kopf">
+  <div class="kopf-zeile">
+    <div class="kopf-titel">
+      <h1><span class="emoji" aria-hidden="true">💶</span>Haushaltsbuch</h1>
+      <p class="kopf-unterzeile" id="kopfPersonen">Übersicht für zwei Personen</p>
+      <p class="abgleich-status" id="abgleichStatus" hidden aria-live="polite"></p>
+    </div>
+    <div class="monatswahl">
+      <button type="button" id="monatZurueck" class="knopf-rund" aria-label="Vorheriger Monat">‹</button>
+      <strong id="monatAnzeige" aria-live="polite">Monat</strong>
+      <button type="button" id="monatVor" class="knopf-rund" aria-label="Nächster Monat">›</button>
+      <button type="button" id="monatHeute" class="knopf-klein">Heute</button>
+    </div>
   </div>
-  <div class="monatswahl">
-    <button type="button" id="monatZurueck" class="knopf-rund" aria-label="Vorheriger Monat">‹</button>
-    <strong id="monatAnzeige" aria-live="polite">Monat</strong>
-    <button type="button" id="monatVor" class="knopf-rund" aria-label="Nächster Monat">›</button>
-    <button type="button" id="monatHeute" class="knopf-klein">Heute</button>
+
+  <div class="bilanz" id="bilanz" aria-live="polite">
+    <div class="bilanz-haupt">
+      <span class="etikett">Bleibt diesen Monat</span>
+      <strong class="hero-zahl" id="kzSaldo">–</strong>
+      <span class="bilanz-fuss" id="kzSaldoFuss"></span>
+    </div>
+    <dl class="bilanz-liste">
+      <div>
+        <dt class="etikett"><span class="emoji" aria-hidden="true">📥</span>Rein<span class="dt-erklaerung">alles, was hereinkommt</span></dt>
+        <dd id="kzEinnahmen">–</dd>
+      </div>
+      <div>
+        <dt class="etikett"><span class="emoji" aria-hidden="true">📤</span>Raus<span class="dt-erklaerung">alles, was rausgeht</span></dt>
+        <dd id="kzAusgaben">–</dd>
+      </div>
+      <div>
+        <dt class="etikett"><span class="emoji" aria-hidden="true">💶</span>Quote<span class="dt-erklaerung">Anteil vom Einkommen, der übrig bleibt</span></dt>
+        <dd id="kzSparquote">–</dd>
+      </div>
+    </dl>
   </div>
 </header>
 
@@ -67,27 +91,6 @@
   <section id="panel-uebersicht" role="tabpanel" aria-labelledby="tab-uebersicht" tabindex="0">
     <p class="bereich-intro">Was in diesem Monat hereinkommt, was rausgeht – und wohin.</p>
 
-    <div class="bilanz" aria-live="polite">
-      <div class="bilanz-haupt">
-        <span class="etikett"><span class="emoji" aria-hidden="true">💶</span>Bleibt diesen Monat</span>
-        <strong class="hero-zahl" id="kzSaldo">–</strong>
-        <span class="bilanz-fuss" id="kzSaldoFuss"></span>
-      </div>
-      <dl class="bilanz-liste">
-        <div>
-          <dt class="etikett"><span class="emoji" aria-hidden="true">📥</span>Einnahmen<span class="dt-erklaerung">alles, was hereinkommt</span></dt>
-          <dd id="kzEinnahmen">–</dd>
-        </div>
-        <div>
-          <dt class="etikett"><span class="emoji" aria-hidden="true">📤</span>Ausgaben<span class="dt-erklaerung">alles, was rausgeht</span></dt>
-          <dd id="kzAusgaben">–</dd>
-        </div>
-        <div>
-          <dt class="etikett"><span class="emoji" aria-hidden="true">💶</span>Sparquote<span class="dt-erklaerung">Anteil vom Einkommen, der übrig bleibt</span></dt>
-          <dd id="kzSparquote">–</dd>
-        </div>
-      </dl>
-    </div>
 
     <section class="karte" id="geplantKarte">
       <h2><span class="emoji" aria-hidden="true">⏳</span>Kommt diesen Monat noch</h2>
