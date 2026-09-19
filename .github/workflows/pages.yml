@@ -1,6 +1,9 @@
 # Veröffentlicht das Haushaltsbuch über GitHub Pages.
-# Der Schritt "configure-pages" mit enablement schaltet Pages beim ersten Lauf
-# selbst frei - es muss dafür nichts in den Einstellungen geklickt werden.
+#
+# Zwei Schritte, bewusst getrennt: Die Umgebung "github-pages" gibt es erst,
+# wenn Pages aktiv ist. Stünde sie schon am ersten Job, bräche der Lauf ab,
+# bevor irgendetwas laufen kann. Der erste Job schaltet Pages frei und packt
+# die Dateien, der zweite veröffentlicht sie.
 
 name: Seite veröffentlichen
 
@@ -8,7 +11,6 @@ on:
   push:
     branches:
       - main
-      - claude/planmodus-3635uv
   workflow_dispatch:
 
 permissions:
@@ -16,17 +18,13 @@ permissions:
   pages: write
   id-token: write
 
-# Immer nur eine Veröffentlichung gleichzeitig, laufende nicht abbrechen.
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  veroeffentlichen:
+  vorbereiten:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.veroeffentlichung.outputs.page_url }}
     steps:
       - name: Stand auschecken
         uses: actions/checkout@v4
@@ -44,6 +42,13 @@ jobs:
         with:
           path: .
 
+  veroeffentlichen:
+    needs: vorbereiten
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.veroeffentlichung.outputs.page_url }}
+    steps:
       - name: Veröffentlichen
         id: veroeffentlichung
         uses: actions/deploy-pages@v4
