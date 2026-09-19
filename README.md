@@ -42,6 +42,25 @@ Ein paar Details, die im Alltag zählen:
 - Beträge liegen intern als ganze Cent vor, damit sich keine Rundungsfehler ansammeln.
 - Dunkelmodus, Bedienung per Tastatur und ein Layout, das auf dem Handy funktioniert.
 
+## Gestaltung und Barrierefreiheit
+
+Die Oberfläche ist einem geführten Kassenbuch nachempfunden: Cremepapier statt Weiß,
+Serifen-Überschriften, feine Linien statt Schatten, Beträge in Tabellenziffern, damit Spalten
+untereinander stehen. Schriften kommen aus dem System – kein CDN, keine Nachladezeit, offline
+identisch.
+
+- **Kontrast geprüft:** alle Textfarben erreichen mindestens 4,5:1 gegen ihren Untergrund, in
+  hellem wie dunklem Modus.
+- **Diagrammfarben geprüft:** die acht Kategoriefarben sind auf Farbfehlsichtigkeit getestet
+  (Deuteranopie, Protanopie, Tritanopie) und haben eigene Werte für hell und dunkel. Jeder Balken
+  trägt zusätzlich Name und Betrag – die Farbe allein muss nie die Aussage tragen.
+- **Bewegung mit Maß:** Balken wachsen, Zahlen laufen auf ihren Wert zu, die Reitermarkierung
+  gleitet mit, Blätter blenden versetzt ein. Wer im System „weniger Bewegung" eingestellt hat,
+  bekommt alles sofort und ohne Animation.
+- **Bedienbar ohne Maus:** Reiter per Pfeiltasten, sichtbarer Fokusring auf allen Elementen,
+  Sprungmarke zum Inhalt, Beschriftungen an jedem Feld, Ergebnisbereiche als `aria-live`.
+  Klickflächen mindestens 44 px hoch.
+
 ## Wo die Daten liegen
 
 Ausschließlich im `localStorage` deines Browsers. Nichts wird übertragen, es gibt keinen Server und

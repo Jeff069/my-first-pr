@@ -16,6 +16,34 @@
 
   function q(id) { return document.getElementById(id); }
 
+  var wenigerBewegung = global.matchMedia
+    ? global.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false;
+
+  /* Zahlen laufen beim Monatswechsel auf ihren neuen Wert zu - beim ersten Aufbau von null aus.
+     Bei "weniger Bewegung" springt der Wert sofort. */
+  var letzterStand = {};
+  function zaehleHoch(el, ziel, darstellen) {
+    var von = letzterStand[el.id] == null ? 0 : letzterStand[el.id];
+    letzterStand[el.id] = ziel;
+
+    if (wenigerBewegung || von === ziel) {
+      el.textContent = darstellen(ziel);
+      return;
+    }
+
+    var beginn = null;
+    var dauer = 460;
+    function schritt(jetzt) {
+      if (beginn === null) beginn = jetzt;
+      var t = Math.min(1, (jetzt - beginn) / dauer);
+      var weich = 1 - Math.pow(1 - t, 3);
+      el.textContent = darstellen(Math.round(von + (ziel - von) * weich));
+      if (t < 1) requestAnimationFrame(schritt);
+    }
+    requestAnimationFrame(schritt);
+  }
+
   function leeren(el) {
     while (el.firstChild) el.removeChild(el.firstChild);
   }
@@ -67,18 +95,29 @@
 
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
 
-  function tabWaehlen(ziel) {
+  function indikatorSetzen() {
+    var aktiv = tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0];
+    if (!aktiv) return;
+    var strich = q('tabIndikator');
+    strich.style.width = aktiv.offsetWidth + 'px';
+    strich.style.transform = 'translateX(' + aktiv.offsetLeft + 'px)';
+  }
+
+  function tabWaehlen(ziel, fokussieren) {
     tabs.forEach(function (tab) {
       var aktiv = tab === ziel;
       tab.setAttribute('aria-selected', aktiv ? 'true' : 'false');
       tab.tabIndex = aktiv ? 0 : -1;
       q(tab.getAttribute('aria-controls')).hidden = !aktiv;
     });
-    ziel.focus();
+    indikatorSetzen();
+    if (fokussieren !== false) ziel.focus();
   }
 
+  global.addEventListener('resize', indikatorSetzen);
+
   tabs.forEach(function (tab, i) {
-    tab.addEventListener('click', function () { tabWaehlen(tab); });
+    tab.addEventListener('click', function () { tabWaehlen(tab, false); });
     tab.addEventListener('keydown', function (e) {
       var ziel = null;
       if (e.key === 'ArrowRight') ziel = tabs[(i + 1) % tabs.length];
@@ -114,15 +153,20 @@
   function zeigeUebersicht() {
     var u = model.monatsUebersicht(daten, aktuellerMonat);
 
-    q('kzEinnahmen').textContent = format.eur(u.einnahmen);
-    q('kzAusgaben').textContent = format.eur(u.ausgaben);
+    zaehleHoch(q('kzEinnahmen'), u.einnahmen, format.eur);
+    zaehleHoch(q('kzAusgaben'), u.ausgaben, format.eur);
 
     var saldo = q('kzSaldo');
-    saldo.textContent = format.eur(u.saldo);
-    saldo.className = u.saldo < 0 ? 'negativ' : u.saldo > 0 ? 'positiv' : '';
-    q('kzSaldoFuss').textContent = u.saldo < 0 ? 'mehr ausgegeben als eingenommen' : 'bleibt übrig';
+    zaehleHoch(saldo, u.saldo, format.eur);
+    saldo.className = 'hero-zahl' + (u.saldo < 0 ? ' negativ' : u.saldo > 0 ? ' positiv' : '');
+    q('kzSaldoFuss').textContent = u.saldo < 0
+      ? 'In diesem Monat ist mehr abgeflossen als hereingekommen.'
+      : 'So viel bleibt in diesem Monat übrig.';
 
-    q('kzSparquote').textContent = format.prozent(u.sparquote);
+    /* Zehntel mitzählen, damit die Quote nicht in ganzen Prozent springt. */
+    zaehleHoch(q('kzSparquote'), Math.round(u.sparquote * 10), function (zehntel) {
+      return format.prozent(zehntel / 10);
+    });
 
     var geplantListe = q('geplantListe');
     leeren(geplantListe);
@@ -290,7 +334,7 @@
       var bearbeiten = neu('button', 'Bearbeiten', 'zeilen-knopf');
       bearbeiten.type = 'button';
       bearbeiten.addEventListener('click', function () { buchungBearbeiten(b); });
-      var loeschen = neu('button', 'Löschen', 'zeilen-knopf');
+      var loeschen = neu('button', 'Löschen', 'zeilen-knopf gefahr');
       loeschen.type = 'button';
       loeschen.addEventListener('click', function () { buchungLoeschen(b); });
       aktionen.appendChild(bearbeiten);
@@ -418,7 +462,15 @@
 
       tr.appendChild(neu('td', rhythmus[d.intervall] || d.intervall));
       tr.appendChild(neu('td', d.tagImMonat + '.'));
-      tr.appendChild(neu('td', model.kategorieVon(daten, d.kategorieId).name));
+      var dauerKat = model.kategorieVon(daten, d.kategorieId);
+      var katZelle = document.createElement('td');
+      var katHuelle = neu('span', null, 'kategorie-zelle');
+      var katPunkt = neu('span', null, 'farb-punkt');
+      katPunkt.style.background = charts.farbe(dauerKat.slot || 0);
+      katHuelle.appendChild(katPunkt);
+      katHuelle.appendChild(neu('span', dauerKat.name));
+      katZelle.appendChild(katHuelle);
+      tr.appendChild(katZelle);
       tr.appendChild(neu('td', (d.art === 'einnahme' ? '+' : '−') + ' ' + format.eur(d.betrag), 'rechts'));
 
       var aktionen = neu('td', null, 'rechts');
@@ -434,7 +486,7 @@
         alleszeigen();
       });
 
-      var loeschen = neu('button', 'Löschen', 'zeilen-knopf');
+      var loeschen = neu('button', 'Löschen', 'zeilen-knopf gefahr');
       loeschen.type = 'button';
       loeschen.addEventListener('click', function () {
         if (!global.confirm('Dauerauftrag „' + d.bezeichnung + '" löschen? Bereits erzeugte Buchungen bleiben erhalten.')) return;
@@ -462,10 +514,13 @@
     alleszeigen();
   });
 
+  /* Namen statt Nummern - "Farbe 5" sagt niemandem etwas. Reihenfolge wie --serie-1..8. */
+  var FARBNAMEN = ['Blau', 'Orange', 'Türkis', 'Gelb', 'Rosé', 'Grün', 'Violett', 'Rot'];
+
   function farbAuswahl(gewaehlt, beiAenderung) {
     var select = document.createElement('select');
     select.setAttribute('aria-label', 'Farbe');
-    for (var i = 1; i <= store.SLOTS; i++) select.appendChild(option(String(i), 'Farbe ' + i));
+    for (var i = 1; i <= store.SLOTS; i++) select.appendChild(option(String(i), FARBNAMEN[i - 1] || ('Farbe ' + i)));
     select.value = String(gewaehlt || 8);
     if (beiAenderung) select.addEventListener('change', function () { beiAenderung(parseInt(select.value, 10)); });
     return select;
@@ -506,7 +561,7 @@
       var benutzt = daten.buchungen.filter(function (b) { return b.kategorieId === k.id; }).length
         + daten.dauerauftraege.filter(function (d) { return d.kategorieId === k.id; }).length;
 
-      var loeschen = neu('button', 'Löschen', 'zeilen-knopf');
+      var loeschen = neu('button', 'Löschen', 'zeilen-knopf gefahr');
       loeschen.type = 'button';
       loeschen.addEventListener('click', function () {
         var text = benutzt
@@ -664,10 +719,11 @@
   /* ---------------- Start ---------------- */
 
   leeren(q('katSlot'));
-  for (var i = 1; i <= store.SLOTS; i++) q('katSlot').appendChild(option(String(i), 'Farbe ' + i));
+  for (var i = 1; i <= store.SLOTS; i++) q('katSlot').appendChild(option(String(i), FARBNAMEN[i - 1] || ('Farbe ' + i)));
   q('katSlot').value = '1';
 
   buchungFormZuruecksetzen();
   dauerFormZuruecksetzen();
   alleszeigen();
+  indikatorSetzen();
 })(window);

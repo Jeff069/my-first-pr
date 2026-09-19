@@ -47,9 +47,13 @@
     tooltip.style.left = x + 'px';
     tooltip.style.top = y + 'px';
     tooltip.hidden = false;
+    /* Ein Bildaufbau Verzögerung, sonst greift der Übergang beim ersten Mal nicht. */
+    requestAnimationFrame(function () { tooltip.classList.add('sichtbar'); });
   }
   function tooltipVerbergen() {
-    if (tooltip) tooltip.hidden = true;
+    if (!tooltip) return;
+    tooltip.classList.remove('sichtbar');
+    tooltip.hidden = true;
   }
   function tooltipAn(el, text) {
     el.addEventListener('mouseenter', function (e) { tooltipZeigen(text, e.clientX + 12, e.clientY + 12); });
@@ -185,7 +189,8 @@
         if (!hoehe) return;
         var rect = svgElement('rect', {
           x: mitte + serie.versatz, y: basis - hoehe, width: balkenBreite, height: hoehe,
-          rx: 4, fill: farbe(serie.slot), tabindex: '0'
+          rx: 3, fill: farbe(serie.slot), tabindex: '0', class: 'saeule',
+          style: 'animation-delay: ' + (i * 60 + 40) + 'ms'
         });
         tooltipAn(rect, format.monatLabel(punkt.monat) + ' · ' + serie.name + ': ' + format.eur(serie.wert));
         svg.appendChild(rect);

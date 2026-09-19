@@ -10,6 +10,8 @@
 </head>
 <body>
 
+<a class="sprungmarke" href="#inhalt">Zum Inhalt springen</a>
+
 <header class="kopf">
   <div class="kopf-titel">
     <h1>Haushaltsbuch</h1>
@@ -28,17 +30,24 @@
   <button type="button" role="tab" id="tab-buchungen" aria-controls="panel-buchungen" aria-selected="false" tabindex="-1">Buchungen</button>
   <button type="button" role="tab" id="tab-wiederkehrend" aria-controls="panel-wiederkehrend" aria-selected="false" tabindex="-1">Wiederkehrend</button>
   <button type="button" role="tab" id="tab-einstellungen" aria-controls="panel-einstellungen" aria-selected="false" tabindex="-1">Einstellungen</button>
+  <span class="tab-indikator" id="tabIndikator" aria-hidden="true"></span>
 </nav>
 
-<main>
+<main id="inhalt">
 
   <!-- ÜBERSICHT -->
   <section id="panel-uebersicht" role="tabpanel" aria-labelledby="tab-uebersicht" tabindex="0">
-    <div class="kennzahlen" id="kennzahlen" aria-live="polite">
-      <div class="kennzahl"><span class="kennzahl-titel">Einnahmen</span><strong id="kzEinnahmen">–</strong></div>
-      <div class="kennzahl"><span class="kennzahl-titel">Ausgaben</span><strong id="kzAusgaben">–</strong></div>
-      <div class="kennzahl"><span class="kennzahl-titel">Saldo</span><strong id="kzSaldo">–</strong><span class="kennzahl-fuss" id="kzSaldoFuss"></span></div>
-      <div class="kennzahl"><span class="kennzahl-titel">Sparquote</span><strong id="kzSparquote">–</strong><span class="kennzahl-fuss">vom Einkommen übrig</span></div>
+    <div class="bilanz" aria-live="polite">
+      <div class="bilanz-haupt">
+        <span class="etikett">Saldo im Monat</span>
+        <strong class="hero-zahl" id="kzSaldo">–</strong>
+        <span class="bilanz-fuss" id="kzSaldoFuss"></span>
+      </div>
+      <dl class="bilanz-liste">
+        <div><dt class="etikett">Einnahmen</dt><dd id="kzEinnahmen">–</dd></div>
+        <div><dt class="etikett">Ausgaben</dt><dd id="kzAusgaben">–</dd></div>
+        <div><dt class="etikett">Sparquote</dt><dd id="kzSparquote">–</dd></div>
+      </dl>
     </div>
 
     <section class="karte" id="geplantKarte">
