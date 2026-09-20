@@ -68,9 +68,12 @@ git push origin main:gh-pages
 
 GitHub baut die Seite daraufhin selbst neu; nach ein bis zwei Minuten ist sie aktuell.
 
-Wer etwas am Code ändert, zählt in `sw.js` die `VERSION` hoch; sonst zeigt das installierte
-Exemplar noch die alte Fassung. Die Symbole liegen in `icons/` und lassen sich mit
-`node tools/symbole.mjs` neu erzeugen.
+Vor jeder Veröffentlichung `node tools/sw-version.mjs` ausführen: Das stempelt eine Prüfsumme
+über die ausgelieferten Dateien in `sw.js`. Ohne diesen Schritt zeigt das installierte Exemplar
+weiter die alte Fassung, weil der Service Worker sich nur erneuert, wenn sich `sw.js` ändert.
+Die App lädt sich nach einer erkannten Neuerung einmal selbst neu.
+
+Die Symbole liegen in `icons/` und lassen sich mit `node tools/symbole.mjs` neu erzeugen.
 
 ## Gestaltung und Barrierefreiheit
 

@@ -1246,8 +1246,23 @@
   if (global.navigator && 'serviceWorker' in global.navigator
       && global.location.protocol.indexOf('http') === 0
       && global.top === global.self) {
+    /* Gab es schon einen Service Worker, bedeutet ein Wechsel: neue Fassung da.
+       Dann einmal neu laden, damit sie sofort sichtbar wird - sonst zeigte die
+       App die alte Gestaltung, bis man sie zweimal startet. */
+    var hatteBereitsEinen = !!global.navigator.serviceWorker.controller;
+    var schonNeuGeladen = false;
+
+    global.navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (!hatteBereitsEinen || schonNeuGeladen) return;
+      schonNeuGeladen = true;
+      global.location.reload();
+    });
+
     global.addEventListener('load', function () {
-      global.navigator.serviceWorker.register('sw.js').catch(function () {
+      global.navigator.serviceWorker.register('sw.js').then(function (anmeldung) {
+        /* Beim Öffnen nachsehen, ob es eine neue Fassung gibt. */
+        anmeldung.update().catch(function () { /* ohne Netz nicht möglich */ });
+      }).catch(function () {
         /* Ohne Service Worker läuft die App genauso, nur nicht offline. */
       });
     });

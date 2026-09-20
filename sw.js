@@ -1,8 +1,10 @@
 /* Service Worker: legt die App im Gerät ab, damit sie ohne Netz startet.
-   Bei Änderungen an den Dateien die VERSION hochzählen - dann wird der alte
-   Bestand verworfen und neu geladen. */
 
-var VERSION = 'haushaltsbuch-v1';
+   Die VERSION wird nicht von Hand gepflegt, sondern von tools/sw-version.mjs
+   aus dem Inhalt der Dateien gestempelt. Ändert sich eine Datei, ändert sich
+   die Version, der alte Bestand wird verworfen und alles neu geladen. */
+
+var VERSION = 'haushaltsbuch-dfa3a2889cd0';
 
 var BESTAND = [
   './',
