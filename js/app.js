@@ -79,14 +79,14 @@
     var hinweis = q('speicherHinweis');
     hinweis.textContent = erfolg
       ? ''
-      : 'Achtung: Dieser Browser speichert nichts dauerhaft (privates Fenster?). Bitte vor dem Schließen ein Backup exportieren.';
+      : 'Dieser Browser merkt sich nichts dauerhaft (privates Fenster?). Vor dem Schließen unter Einstellungen „Als Datei sichern“ tippen.';
     hinweis.className = erfolg ? '' : 'fehler';
     abgleichAnstossen();
   }
 
   function personName(schluessel) {
-    if (schluessel === 'a') return daten.einstellungen.personA || 'Ich';
-    if (schluessel === 'b') return daten.einstellungen.personB || 'Partnerin';
+    if (schluessel === 'a') return daten.einstellungen.personA || store.VORGABE_NAMEN.a;
+    if (schluessel === 'b') return daten.einstellungen.personB || store.VORGABE_NAMEN.b;
     return 'Gemeinsam';
   }
 
@@ -328,6 +328,9 @@
   function zeigeUebersicht() {
     var u = model.monatsUebersicht(daten, aktuellerMonat);
     var g = model.ausgleich(daten, aktuellerMonat);
+
+    q('namenHinweis').hidden = !(daten.einstellungen.personA === store.VORGABE_NAMEN.a
+      && daten.einstellungen.personB === store.VORGABE_NAMEN.b);
 
     zaehleHoch(q('kzEinnahmen'), u.einnahmen, format.eur);
     zaehleHoch(q('kzAusgaben'), u.ausgaben, format.eur);
@@ -930,10 +933,16 @@
 
   /* ---------------- Einstellungen ---------------- */
 
+  q('namenLink').addEventListener('click', function () {
+    tabWaehlen(q('tab-einstellungen'), false);
+    q('personA').focus();
+    q('personA').scrollIntoView({ block: 'center' });
+  });
+
   q('personenForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    daten.einstellungen.personA = q('personA').value.trim() || 'Ich';
-    daten.einstellungen.personB = q('personB').value.trim() || 'Partnerin';
+    daten.einstellungen.personA = q('personA').value.trim() || store.VORGABE_NAMEN.a;
+    daten.einstellungen.personB = q('personB').value.trim() || store.VORGABE_NAMEN.b;
     daten.einstellungen.geaendert = merge.jetzt();
     sichern();
     alleszeigen();
@@ -1099,7 +1108,7 @@
       q('importBestaetigen').hidden = false;
       q('importText').textContent = 'Gefunden: ' + importStand.buchungen.length + ' Buchungen, '
         + importStand.dauerauftraege.length + ' Daueraufträge, ' + importStand.kategorien.length
-        + ' Kategorien. Der bisherige Stand in diesem Browser wird dabei ersetzt.';
+        + ' Kategorien. Damit wird der jetzige Stand in diesem Browser ersetzt.';
     };
     leser.readAsText(datei);
     e.target.value = '';
@@ -1145,7 +1154,7 @@
     q('importBestaetigen').hidden = false;
     q('importText').textContent = 'Gefunden: ' + importStand.buchungen.length + ' Buchungen, '
       + importStand.dauerauftraege.length + ' Daueraufträge, ' + importStand.kategorien.length
-      + ' Kategorien. Der bisherige Stand in diesem Browser wird dabei ersetzt.';
+      + ' Kategorien. Damit wird der jetzige Stand in diesem Browser ersetzt.';
   });
 
   q('importBestaetigen').addEventListener('click', function () {

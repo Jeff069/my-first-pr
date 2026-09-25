@@ -62,10 +62,13 @@
     return person;
   }
 
+  /* Solange diese Namen stehen, weiß die App, dass noch niemand sich eingetragen hat. */
+  var VORGABE_NAMEN = { a: 'Ich', b: 'Partnerin' };
+
   function leereDaten() {
     return {
       version: VERSION,
-      einstellungen: { personA: 'Ich', personB: 'Partnerin', startsaldo: 0, geaendert: '1970-01-01T00:00:00.000Z' },
+      einstellungen: { personA: VORGABE_NAMEN.a, personB: VORGABE_NAMEN.b, startsaldo: 0, geaendert: '1970-01-01T00:00:00.000Z' },
       kategorien: standardKategorien(),
       buchungen: [],
       dauerauftraege: [],
@@ -210,6 +213,7 @@
     SCHLUESSEL: SCHLUESSEL,
     VERSION: VERSION,
     SLOTS: SLOTS,
+    VORGABE_NAMEN: VORGABE_NAMEN,
     neueId: neueId,
     leereDaten: leereDaten,
     standardKategorien: standardKategorien,

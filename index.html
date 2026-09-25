@@ -91,6 +91,8 @@
 
   <!-- ============================ ÜBERSICHT ============================ -->
   <section id="panel-uebersicht" role="tabpanel" aria-labelledby="tab-uebersicht" tabindex="0">
+    <!-- Nur solange die Vorgabenamen stehen: auf dem zweiten Handy hieße sonst alles „Ich“ -->
+    <p class="namen-hinweis" id="namenHinweis" hidden>👋 <button type="button" id="namenLink" class="textlink">Eure Namen eintragen</button></p>
     <!-- Nur sichtbar, wenn in diesem Monat noch etwas abgeht -->
     <section class="karte" id="geplantKarte" hidden>
       <h2><span class="emoji" aria-hidden="true">⏳</span><span id="geplantTitel">Geht noch ab</span></h2>
@@ -282,10 +284,10 @@
 
     <section class="karte">
       <h2><span class="emoji" aria-hidden="true">🙋</span>Eure Namen</h2>
-      <p class="karte-hinweis">Sie stehen in der Auswahl „Wer hat gezahlt" und in der Auswertung.</p>
+      <p class="karte-hinweis">Tragt hier eure Vornamen ein – dann steht bei jeder Buchung, wer gezahlt hat, auch auf dem anderen Handy.</p>
       <form id="personenForm" class="formular">
-        <div class="feld"><label for="personA">Person 1</label><input type="text" id="personA"></div>
-        <div class="feld"><label for="personB">Person 2</label><input type="text" id="personB"></div>
+        <div class="feld"><label for="personA">Name 1</label><input type="text" id="personA"></div>
+        <div class="feld"><label for="personB">Name 2</label><input type="text" id="personB"></div>
         <div class="feld-knoepfe"><button type="submit" class="knopf-primaer">Speichern</button></div>
       </form>
     </section>
@@ -319,11 +321,11 @@
       </div>
 
       <div class="text-bereich" id="textBereich" hidden>
-        <label for="backupText">Zum Kopieren – oder eine fremde Sicherung hier einfügen und übernehmen</label>
+        <label for="backupText">Zum Kopieren und Verschicken, z. B. per WhatsApp – oder eine erhaltene Sicherung hier einfügen.</label>
         <textarea id="backupText" rows="7" spellcheck="false"></textarea>
         <div class="knopfreihe">
-          <button type="button" id="kopierenKnopf" class="knopf-sekundaer">In die Zwischenablage</button>
-          <button type="button" id="textImportKnopf" class="knopf-sekundaer">Eingefügten Text übernehmen</button>
+          <button type="button" id="kopierenKnopf" class="knopf-sekundaer">Kopieren</button>
+          <button type="button" id="textImportKnopf" class="knopf-sekundaer">Eingefügte Sicherung einlesen</button>
           <span class="text-hinweis" id="textHinweis" aria-live="polite"></span>
         </div>
       </div>
@@ -331,7 +333,7 @@
       <div id="importVorschau" class="import-vorschau" hidden>
         <p id="importText"></p>
         <div class="knopfreihe">
-          <button type="button" id="importBestaetigen" class="knopf-primaer">Jetzt überschreiben</button>
+          <button type="button" id="importBestaetigen" class="knopf-primaer">Ja, ersetzen</button>
           <button type="button" id="importAbbrechen" class="knopf-klein">Abbrechen</button>
         </div>
       </div>
