@@ -242,21 +242,40 @@
 
   /* ---------------- Monatswahl ---------------- */
 
+  /* Heute, solange der angezeigte Monat der laufende ist - sonst der Monatserste,
+     damit ein Nachtrag beim Blättern nicht im falschen Monat landet. */
+  function datumVorgabe() {
+    return aktuellerMonat === format.heuteIso().slice(0, 7)
+      ? format.heuteIso()
+      : aktuellerMonat + '-01';
+  }
+
+  /* Die Formulare folgen dem Monat - außer man bearbeitet gerade etwas. */
+  function formularDatenAnMonat() {
+    if (!bearbeiteBuchung) q('buchungDatum').value = datumVorgabe();
+    if (!bearbeiteDauer) q('dauerStart').value = aktuellerMonat;
+  }
+
   function monatSetzen(monat) {
     aktuellerMonat = monat;
     diagrammeAnimieren = true;
+    formularDatenAnMonat();
     alleszeigen();
   }
 
   q('buchungFormOeffnen').addEventListener('click', function () {
     var offen = klappe('buchungFormOeffnen', 'buchungFormBereich');
     q('buchungFormOeffnen').lastChild.nodeValue = offen ? ' Formular zuklappen' : ' Neue Buchung eintragen';
+    /* Zuklappen beendet auch das Bearbeiten - sonst überschreibt die nächste
+       „neue“ Buchung still den zuletzt geöffneten Eintrag. */
+    if (!offen) buchungFormZuruecksetzen();
     if (offen) q('buchungBetrag').focus();
   });
 
   q('dauerFormOeffnen').addEventListener('click', function () {
     var offen = klappe('dauerFormOeffnen', 'dauerFormBereich');
     q('dauerFormOeffnen').lastChild.nodeValue = offen ? ' Formular zuklappen' : ' Regelmäßige Zahlung eintragen';
+    if (!offen) dauerFormZuruecksetzen();
     if (offen) q('dauerBezeichnung').focus();
   });
 
@@ -395,9 +414,10 @@
     q('buchungId').value = '';
     q('buchungBetrag').value = '';
     q('buchungNotiz').value = '';
-    q('buchungDatum').value = aktuellerMonat === format.heuteIso().slice(0, 7)
-      ? format.heuteIso()
-      : aktuellerMonat + '-01';
+    q('buchungDatum').value = datumVorgabe();
+    q('buchungArt').value = 'ausgabe';
+    fuelleKategorien(q('buchungKategorie'), 'ausgabe');
+    q('buchungPerson').value = 'gemeinsam';
     q('buchungFuer').value = 'beide';
     buchungFuerSchalten();
     q('buchungFormTitel').textContent = 'Neue Buchung';
@@ -443,6 +463,7 @@
           daten.ausgeblendet = (daten.ausgeblendet || []).filter(function (e) { return e !== warQuelle; });
         }
         aktuellerMonat = b.datum.slice(0, 7);
+        formularDatenAnMonat();
         frischeZeile = b.id;
         sichern();
         alleszeigen();
@@ -494,8 +515,10 @@
     };
 
     if (bearbeiteBuchung) {
+      /* Die Herkunft bleibt: sonst legt faelligesNachtragen die korrigierte
+         Miete gleich noch einmal an. */
       daten.buchungen = daten.buchungen.map(function (b) {
-        return b.id === bearbeiteBuchung ? Object.assign({}, b, eintrag) : b;
+        return b.id === bearbeiteBuchung ? Object.assign({}, b, eintrag, { quelle: b.quelle }) : b;
       });
     } else {
       daten.buchungen.push(eintrag);
@@ -673,6 +696,7 @@
 
     daten.buchungen.push(Object.assign({}, geteiltesAngebot.buchung, { geaendert: merge.jetzt() }));
     aktuellerMonat = geteiltesAngebot.buchung.datum.slice(0, 7);
+    formularDatenAnMonat();
     frischeZeile = geteiltesAngebot.buchung.id;
     meldung('📥 Übernommen: ' + format.eur(geteiltesAngebot.buchung.betrag));
     geteiltesAngebot = null;
@@ -693,6 +717,9 @@
     q('dauerId').value = '';
     q('dauerBezeichnung').value = '';
     q('dauerBetrag').value = '';
+    q('dauerArt').value = 'ausgabe';
+    fuelleKategorien(q('dauerKategorie'), 'ausgabe');
+    q('dauerPerson').value = 'gemeinsam';
     q('dauerTag').value = '1';
     q('dauerIntervall').value = 'monatlich';
     q('dauerStart').value = aktuellerMonat;

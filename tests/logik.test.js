@@ -131,6 +131,18 @@ test('Daueraufträge erzeugen den fehlenden Monat - und nur einmal', () => {
   assert.equal(model.faelligeBuchungen(daten, '2026-09').length, 0, 'keine Verdopplung beim zweiten Lauf');
 });
 
+test('Eine vorhandene Buchung mit quelle {dauerId, monat} sperrt die Erzeugung, auch wenn Betrag und Datum abweichen', () => {
+  const dauer = {
+    id: 'd1', bezeichnung: 'Miete', art: 'ausgabe', betrag: 120000, kategorieId: 'kat_wohnen',
+    person: 'gemeinsam', tagImMonat: 1, intervall: 'monatlich', startMonat: '2026-01', endMonat: null, aktiv: true
+  };
+  /* So sieht die erzeugte Miete aus, nachdem jemand Betrag und Tag von Hand korrigiert hat. */
+  const korrigiert = buchung('2026-09-03', 'ausgabe', 130000, { id: 'b_d1_2026-09', notiz: 'Miete', person: 'gemeinsam', quelle: { dauerId: 'd1', monat: '2026-09' } });
+  const daten = datenMit([korrigiert], [dauer]);
+  assert.equal(model.faelligeBuchungen(daten, '2026-09').length, 0, 'die Herkunft zählt, nicht Betrag oder Datum');
+  assert.equal(model.faelligeBuchungen(daten, '2026-10').length, 1, 'der Folgemonat wird weiterhin erzeugt');
+});
+
 test('Bewusst geloeschte Dauerauftrags-Buchungen kehren nicht zurueck', () => {
   const dauer = {
     id: 'd1', bezeichnung: 'Miete', art: 'ausgabe', betrag: 120000, kategorieId: 'kat_wohnen',
