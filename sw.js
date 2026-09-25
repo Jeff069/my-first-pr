@@ -1,23 +1,29 @@
 /* Service Worker: legt die App im Gerät ab, damit sie ohne Netz startet.
 
-   Die VERSION wird nicht von Hand gepflegt, sondern von tools/sw-version.mjs
-   aus dem Inhalt der Dateien gestempelt. Ändert sich eine Datei, ändert sich
-   die Version, der alte Bestand wird verworfen und alles neu geladen. */
+   VERSION und BESTAND werden nicht von Hand gepflegt, sondern von
+   tools/sw-version.mjs gestempelt: die Version aus dem Inhalt der Dateien,
+   der Bestand aus deren Liste. Ändert sich eine Datei, ändert sich die
+   Version, der alte Bestand wird verworfen und alles neu geladen. */
 
-var VERSION = 'haushaltsbuch-dfa3a2889cd0';
+var VERSION = 'haushaltsbuch-354757528dff';
 
 var BESTAND = [
   './',
   './index.html',
   './styles.css',
   './manifest.webmanifest',
+  './js/konfig.js',
   './js/format.js',
   './js/store.js',
   './js/model.js',
+  './js/merge.js',
+  './js/teilen.js',
+  './js/wolke.js',
   './js/charts.js',
   './js/app.js',
   './icons/symbol-192.png',
   './icons/symbol-512.png',
+  './icons/symbol-maskierbar-512.png',
   './icons/apple-touch-icon.png'
 ];
 
@@ -70,7 +76,9 @@ self.addEventListener('fetch', function (e) {
         }
         return antwort;
       }).catch(function () {
-        return treffer;
+        /* respondWith darf nie undefined bekommen, sonst bricht der Aufruf
+           mit einem Fehler ab statt still ins Leere zu laufen. */
+        return treffer || new Response('', { status: 503, statusText: 'offline' });
       });
       return treffer || ausDemNetz;
     })
