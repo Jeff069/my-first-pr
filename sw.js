@@ -5,7 +5,7 @@
    der Bestand aus deren Liste. Ändert sich eine Datei, ändert sich die
    Version, der alte Bestand wird verworfen und alles neu geladen. */
 
-var VERSION = 'haushaltsbuch-37b9eeb4ee11';
+var VERSION = 'haushaltsbuch-97810000d217';
 
 var BESTAND = [
   './',

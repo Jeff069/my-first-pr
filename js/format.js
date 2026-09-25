@@ -8,8 +8,9 @@
   var datumFormat = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   /* Beträge liegen überall als ganzzahlige Cent vor und werden erst hier zu Euro. */
+  /* Intl liefert einen Bindestrich; Listen und Meldungen setzen das echte Minus - hier auch. */
   function eur(cent) {
-    return eurFormat.format((Number(cent) || 0) / 100);
+    return eurFormat.format((Number(cent) || 0) / 100).replace(/^-/, '−');
   }
 
   /* Für Achsen: "2.000 €" statt "2.000,00 €" - dort zählen runde Werte, nicht Cent. */

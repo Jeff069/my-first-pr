@@ -736,6 +736,8 @@ button { font-family: var(--sans); cursor: pointer; }
 @media (max-width: 700px) {
   body { padding: 0 16px; }
   main { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+  /* Die Fußzeile steht außerhalb von main und braucht denselben Abstand zur festen Leiste. */
+  .fuss { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
   .meldungen { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 
   .kopf {

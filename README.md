@@ -28,15 +28,15 @@ Zahlen ausprobieren.
 
 | Bereich | Was er kann |
 |---|---|
-| **Übersicht** | Einnahmen, Ausgaben, Saldo und Sparquote des Monats · Liste „Kommt diesen Monat noch" · Ausgaben nach Kategorie · Vergleich der letzten sechs Monate · Aufteilung nach Person |
-| **Buchungen** | Erfassen, bearbeiten, löschen – mit Datum, Betrag, Kategorie, Notiz und der Angabe, wer gezahlt hat; Filter nach Kategorie, Person und Notiztext |
-| **Wiederkehrend** | Daueraufträge mit Abbuchungstag und Rhythmus (monatlich, vierteljährlich, jährlich); sie erzeugen die Buchungen des Monats automatisch. Dazu die monatliche Fixkostenlast, bei der Jahresbeiträge anteilig umgelegt sind |
-| **Einstellungen** | Namen der beiden Personen, eigene Kategorien mit Farbe, Backup exportieren und einlesen |
+| **Übersicht** | Eine Hauptzahl „Bleibt uns am Monatsende“ mit dem Anteil vom Einkommen · Rein, Raus und Ausgleich (wer wem etwas zurückgibt) · „Geht noch ab“, nur wenn etwas aussteht · Ausgaben nach Kategorie · die letzten sechs Monate · Aufteilung nach Person |
+| **Buchungen** | Erfassen (Betrag zuerst), antippen zum Bearbeiten, Teilen oder Löschen – mit Datum, Betrag, Kategorie, Notiz, wer gezahlt hat und für wen; Filter nach Kategorie, Person und Notiztext |
+| **Monatliches** | Regelmäßige Zahlungen mit Abbuchungstag und Rhythmus (monatlich, vierteljährlich, jährlich); sie erzeugen die Buchungen des Monats automatisch, eine Änderung wirkt sofort auf den laufenden Monat. Dazu die festen Kosten pro Monat, bei denen Jahresbeiträge anteilig umgelegt sind |
+| **Einstellungen** | Namen der beiden Personen, eigene Kategorien mit Emoji und Farbe, Sicherung als Datei oder Text, Beispielmonat zum Ausprobieren |
 
 Ein paar Details, die im Alltag zählen:
 
 - **Abbuchungstag 31** rutscht in kurzen Monaten auf den letzten Tag, statt in den Folgemonat zu fallen.
-- **Keine doppelte Miete:** ein Dauerauftrag erzeugt pro Monat genau eine Buchung, egal wie oft die
+- **Keine doppelte Miete:** eine regelmäßige Zahlung erzeugt pro Monat genau eine Buchung, egal wie oft die
   Seite neu geladen wird. Eine bewusst gelöschte Buchung kommt nicht zurück.
 - **Jahresbeiträge werden umgelegt** – 600 € Versicherung im Jahr zählen als 50 € im Monat.
 - Beträge liegen intern als ganze Cent vor, damit sich keine Rundungsfehler ansammeln.
@@ -157,7 +157,7 @@ index.html          Seitenstruktur mit den vier Bereichen
 styles.css          Gestaltung, heller und dunkler Modus
 js/format.js        Beträge, Datums- und Monatsformate (deutsch)
 js/store.js         Speichern, Laden, Export/Import – die einzige Stelle mit localStorage
-js/model.js         Rechenkern: Summen, Auswertungen, Daueraufträge (ohne DOM)
+js/model.js         Rechenkern: Summen, Auswertungen, regelmäßige Zahlungen, Ausgleich (ohne DOM)
 js/merge.js         Zusammenführen zweier Stände beim Abgleich (ohne DOM)
 js/wolke.js         Anmeldung und Austausch mit Supabase
 js/konfig.js        Zugangsdaten für den gemeinsamen Stand (leer = nur lokal)
@@ -180,8 +180,9 @@ node --test
 ```
 
 Läuft ohne npm und ohne Abhängigkeiten – Node ab Version 18 genügt. Geprüft werden unter anderem
-die Monatssummen, die Sparquote ohne Einnahmen, der Abbuchungstag 31 im Februar, die Idempotenz der
-Daueraufträge und der Export/Import-Durchlauf.
+die Monatssummen, der Ausgleich zwischen beiden, der Abbuchungstag 31 im Februar, die Idempotenz der
+regelmäßigen Zahlungen, der Abgleich zweier Stände, der Offline-Vorrat des Service Workers und der
+Export/Import-Durchlauf.
 
 ## Veröffentlichen
 

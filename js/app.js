@@ -659,7 +659,7 @@
     }).sort(function (a, b) { return a.datum < b.datum ? -1 : a.datum > b.datum ? 1 : 0; });
 
     q('buchungLeer').hidden = liste.length > 0;
-    q('buchungLeerText').textContent = gefiltert
+    q('buchungLeerText').textContent = gefiltert && alle.length
       ? 'Kein Treffer – ' + alle.length + ' Buchungen ausgeblendet.'
       : 'In diesem Monat ist noch nichts eingetragen. Tippe oben auf ➕.';
     q('filterZuruecksetzen').hidden = !gefiltert;
@@ -888,6 +888,8 @@
       return;
     }
 
+    var alt = daten.dauerauftraege.filter(function (d) { return d.id === bearbeiteDauer; })[0];
+
     var eintrag = {
       id: bearbeiteDauer || store.neueId('d'),
       bezeichnung: q('dauerBezeichnung').value.trim(),
@@ -900,11 +902,10 @@
       intervall: q('dauerIntervall').value,
       startMonat: q('dauerStart').value,
       endMonat: q('dauerEnde').value || null,
-      aktiv: true,
+      /* Bearbeiten weckt eine pausierte Zahlung nicht auf - dafür gibt es den eigenen Knopf. */
+      aktiv: alt ? alt.aktiv !== false : true,
       geaendert: merge.jetzt()
     };
-
-    var alt = daten.dauerauftraege.filter(function (d) { return d.id === bearbeiteDauer; })[0];
 
     if (bearbeiteDauer) {
       daten.dauerauftraege = daten.dauerauftraege.map(function (d) {
@@ -1364,8 +1365,7 @@
     sichern();
     monatSetzen(monat);
 
-    meldung('🧪 Beispielmonat angelegt: ' + (daten.buchungen.length - vorher) + ' Buchungen, '
-      + neueDauer.length + ' regelmäßige Zahlungen', {
+    meldung('🧪 Beispielmonat angelegt.', {
       text: 'Rückgängig',
       tun: function () {
         /* Auch die aus den Beispiel-Zahlungen erzeugten Buchungen gehen mit -
