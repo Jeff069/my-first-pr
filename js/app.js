@@ -218,12 +218,19 @@
     });
     indikatorSetzen();
     if (fokussieren !== false) ziel.focus();
+    /* Wurde die Übersicht gezeichnet, während ihr Reiter versteckt war (Speichern
+       im Reiter Buchungen), maß der Verlauf Breite 0; jetzt ist die echte Breite da. */
+    if (ziel === q('tab-uebersicht') && daten) zeigeUebersicht();
   }
 
-  /* Nach Drehen oder Größenänderung passen Markierung und Diagramm sich an. */
+  /* Nach Drehen oder Größenänderung passen Markierung und Diagramm sich an.
+     Die Handy-Tastatur ändert nur die Höhe - dann bleibt das Diagramm stehen. */
   var neuZeichnen = null;
+  var letzteBreite = global.innerWidth;
   global.addEventListener('resize', function () {
     indikatorSetzen();
+    if (global.innerWidth === letzteBreite) return;
+    letzteBreite = global.innerWidth;
     clearTimeout(neuZeichnen);
     neuZeichnen = setTimeout(zeigeUebersicht, 200);
   });

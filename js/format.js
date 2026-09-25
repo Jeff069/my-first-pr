@@ -3,12 +3,18 @@
   'use strict';
 
   var eurFormat = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
+  var eurGanzFormat = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
   var monatFormat = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' });
   var datumFormat = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   /* Beträge liegen überall als ganzzahlige Cent vor und werden erst hier zu Euro. */
   function eur(cent) {
     return eurFormat.format((Number(cent) || 0) / 100);
+  }
+
+  /* Für Achsen: "2.000 €" statt "2.000,00 €" - dort zählen runde Werte, nicht Cent. */
+  function eurGanz(cent) {
+    return eurGanzFormat.format((Number(cent) || 0) / 100);
   }
 
   function prozent(wert) {
@@ -72,6 +78,7 @@
 
   var api = {
     eur: eur,
+    eurGanz: eurGanz,
     prozent: prozent,
     parseBetrag: parseBetrag,
     datum: datum,

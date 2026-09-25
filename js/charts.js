@@ -5,7 +5,9 @@
   'use strict';
 
   var SVG_NS = 'http://www.w3.org/2000/svg';
-  var format = global.HB.format;
+  var format = (typeof require !== 'undefined' && typeof module !== 'undefined')
+    ? require('./format.js')
+    : global.HB.format;
 
   function farbe(slot) {
     return 'var(--serie-' + (slot > 0 ? slot : 'neutral') + ')';
@@ -37,6 +39,7 @@
 
   /* Ein Tooltip-Element für alle Diagramme, am Zeiger ausgerichtet. */
   var tooltip = null;
+  var tooltipBild = 0;
   function tooltipZeigen(text, x, y) {
     if (!tooltip) {
       tooltip = element('div', 'diagramm-tooltip');
@@ -48,10 +51,13 @@
     tooltip.style.top = y + 'px';
     tooltip.hidden = false;
     /* Ein Bildaufbau Verzögerung, sonst greift der Übergang beim ersten Mal nicht. */
-    requestAnimationFrame(function () { tooltip.classList.add('sichtbar'); });
+    cancelAnimationFrame(tooltipBild);
+    tooltipBild = requestAnimationFrame(function () { tooltip.classList.add('sichtbar'); });
   }
   function tooltipVerbergen() {
     if (!tooltip) return;
+    /* Sonst holt ein noch ausstehender Bildaufbau das eben versteckte Tooltip zurück. */
+    cancelAnimationFrame(tooltipBild);
     tooltip.classList.remove('sichtbar');
     tooltip.hidden = true;
   }
@@ -87,20 +93,19 @@
       chip.style.background = 'color-mix(in srgb, ' + farbe(eintrag.slot) + ' 15%, var(--karte))';
       zeile.appendChild(chip);
 
-      var mitte = element('div', 'posten-mitte');
-      mitte.appendChild(element('div', 'posten-name', eintrag.name));
-      mitte.appendChild(element('div', 'posten-unter',
+      /* Name, Unterzeile, Betrag und Balken sind Rasterzellen der Zeile (styles.css .posten):
+         so bekommt der Balken die volle Breite neben dem Chip, der Betrag steht oben rechts. */
+      zeile.appendChild(element('div', 'posten-name', eintrag.name));
+      zeile.appendChild(element('div', 'posten-unter',
         format.prozent(eintrag.anteil) + ' · ' + eintrag.anzahl + (eintrag.anzahl === 1 ? ' Buchung' : ' Buchungen')));
+      zeile.appendChild(element('div', 'posten-betrag', format.eur(eintrag.betrag)));
 
       var spur = element('div', 'balken-spur');
       var fuellung = element('div', 'balken-fuellung');
       fuellung.style.width = Math.max(3, (eintrag.betrag / groesster) * 100) + '%';
       fuellung.style.background = farbe(eintrag.slot);
       spur.appendChild(fuellung);
-      mitte.appendChild(spur);
-      zeile.appendChild(mitte);
-
-      zeile.appendChild(element('div', 'posten-betrag', format.eur(eintrag.betrag)));
+      zeile.appendChild(spur);
 
       tooltipAn(zeile, eintrag.name + ': ' + format.eur(eintrag.betrag) + ' (' + format.prozent(eintrag.anteil) + ')');
       liste.appendChild(zeile);
@@ -143,6 +148,19 @@
     el.appendChild(legende);
   }
 
+  /* Achsenschritt in Cent: die Hälfte des Maximums, abgerundet auf 1, 2 oder 5 mal
+     eine Zehnerpotenz - so stehen an der Achse runde Euro statt krummer Cent. */
+  function schoenerSchritt(maximum) {
+    var roh = maximum / 2;
+    if (!(roh > 0)) return 1;
+    var potenz = Math.pow(10, Math.floor(Math.log10(roh)));
+    var schritt = potenz;
+    [1, 2, 5].forEach(function (faktor) {
+      if (faktor * potenz <= roh) schritt = faktor * potenz;
+    });
+    return schritt;
+  }
+
   /* Monatsvergleich: zwei Reihen (Einnahmen, Ausgaben) als gruppierte Säulen.
      Eine einzige Werteachse - zwei Skalen wären an dieser Stelle irreführend. */
   function verlaufBalken(el, reihe) {
@@ -155,8 +173,11 @@
 
     /* Die Zeichenfläche skaliert auf die Breite des Blattes. Bei einem festen
        Koordinatensystem von 640 schrumpfte die Beschriftung auf dem Handy auf
-       etwa 6 Pixel - deshalb wird das System selbst schmaler. */
-    var schmal = el.clientWidth && el.clientWidth < 460;
+       etwa 6 Pixel - deshalb wird das System selbst schmaler. Ist der Reiter
+       gerade versteckt (Breite 0), zählt die Fensterbreite, sonst entsteht auf
+       dem Handy der Desktop-Maßstab. */
+    var breite = el.clientWidth || document.documentElement.clientWidth;
+    var schmal = breite < 460;
     var B = schmal ? 330 : 640;
     var H = schmal ? 210 : 240;
     var obenAbstand = 16, untenAbstand = 34, linksAbstand = 8;
@@ -169,16 +190,17 @@
       role: 'img', 'aria-label': 'Einnahmen und Ausgaben der letzten ' + reihe.length + ' Monate'
     });
 
-    /* Zurückhaltende Hilfslinien bei Hälfte und Maximum */
-    [0.5, 1].forEach(function (anteil) {
-      var y = obenAbstand + zeichenHoehe - zeichenHoehe * anteil;
+    /* Zurückhaltende Hilfslinien bei runden Beträgen, ohne Cent beschriftet */
+    var schritt = schoenerSchritt(maximum);
+    for (var wert = schritt; wert <= maximum; wert += schritt) {
+      var y = obenAbstand + zeichenHoehe - zeichenHoehe * (wert / maximum);
       svg.appendChild(svgElement('line', {
         x1: linksAbstand, x2: B - linksAbstand, y1: y, y2: y, class: 'gitterlinie'
       }));
       var beschriftung = svgElement('text', { x: linksAbstand, y: y - 4, class: 'achsen-text' });
-      beschriftung.textContent = format.eur(Math.round(maximum * anteil));
+      beschriftung.textContent = format.eurGanz(wert);
       svg.appendChild(beschriftung);
-    });
+    }
 
     reihe.forEach(function (punkt, i) {
       var mitte = linksAbstand + gruppenBreite * i + gruppenBreite / 2;
@@ -220,11 +242,17 @@
     el.appendChild(legende);
   }
 
-  global.HB = global.HB || {};
-  global.HB.charts = {
+  var api = {
     kategorieBalken: kategorieBalken,
     personBalken: personBalken,
     verlaufBalken: verlaufBalken,
+    schoenerSchritt: schoenerSchritt,
     farbe: farbe
   };
-})(window);
+
+  global.HB = global.HB || {};
+  global.HB.charts = api;
+  /* Unter Node gibt es kein document; die Zeichenfunktionen bleiben dort ungenutzt,
+     schoenerSchritt ist rein und wird in tests/logik.test.js geprüft. */
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+})(typeof window !== 'undefined' ? window : globalThis);

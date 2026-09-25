@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const format = require('../js/format.js');
 const store = require('../js/store.js');
 const model = require('../js/model.js');
+const charts = require('../js/charts.js');
 
 function buchung(datum, art, betrag, extra) {
   return Object.assign({ id: datum + art + betrag, datum, art, betrag, kategorieId: 'kat_lebensmittel', notiz: '', person: 'a', quelle: null }, extra || {});
@@ -267,4 +268,17 @@ test('Ein selbst gesetztes Emoji wird nicht überschrieben', () => {
     kategorien: [{ id: 'kat_wohnen', name: 'Wohnen', typ: 'ausgabe', slot: 1, emoji: '🏡' }]
   });
   assert.equal(eigen.kategorien[0].emoji, '🏡');
+});
+
+test('Achsenschritt ist rund: 1, 2 oder 5 mal eine Zehnerpotenz, höchstens das halbe Maximum', () => {
+  assert.equal(charts.schoenerSchritt(499000), 200000, '4.990 € -> Linien bei 2.000 und 4.000 €');
+  assert.equal(charts.schoenerSchritt(136450), 50000, '1.364,50 € -> Linien bei 500 und 1.000 €');
+  assert.equal(charts.schoenerSchritt(12000), 5000, '120 € -> Linien bei 50 und 100 €');
+  assert.equal(charts.schoenerSchritt(200000), 100000, 'genau die Hälfte darf getroffen werden');
+  assert.equal(charts.schoenerSchritt(0), 1, 'ohne Maximum keine Endlosschleife');
+});
+
+test('Achsenbeschriftung ohne Cent', () => {
+  assert.equal(format.eurGanz(200000).replace(/[\u00a0\u202f]/g, ' '), '2.000 €');
+  assert.equal(format.eurGanz(4000000).replace(/[\u00a0\u202f]/g, ' '), '40.000 €');
 });

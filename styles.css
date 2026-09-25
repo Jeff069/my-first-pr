@@ -400,9 +400,15 @@ main { max-width: 1040px; margin: 0 auto; padding-bottom: 40px; }
 
 .posten-liste { list-style: none; margin: 0; padding: 0; }
 .posten {
-  display: flex;
-  align-items: center;
-  gap: 13px;
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  grid-template-areas:
+    "chip name betrag"
+    "chip unter unter"
+    "chip balken balken";
+  column-gap: 13px;
+  row-gap: 2px;
+  align-items: start;
   padding: 12px 0;
   border-top: 1px solid var(--rand);
 }
@@ -415,14 +421,15 @@ main { max-width: 1040px; margin: 0 auto; padding-bottom: 40px; }
   font-size: 1.25rem;
   font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
   flex: 0 0 auto;
+  grid-area: chip;
 }
-.posten-mitte { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.posten-name { font-weight: 650; font-size: 0.98rem; }
-.posten-unter { font-size: 0.83rem; color: var(--tinte-3); margin-top: 1px; }
-.posten-betrag { font-weight: 750; font-size: 1.02rem; white-space: nowrap; }
+.posten-name { grid-area: name; min-width: 0; overflow-wrap: anywhere; font-weight: 650; font-size: 0.95rem; }
+.posten-unter { grid-area: unter; min-width: 0; overflow-wrap: anywhere; font-size: 0.83rem; color: var(--tinte-3); }
+.posten-betrag { grid-area: betrag; align-self: start; font-weight: 750; font-size: 1rem; white-space: nowrap; }
 
 .balken-spur {
-  margin-top: 7px;
+  grid-area: balken;
+  margin-top: 5px;
   height: 5px;
   background: var(--karte-tief);
   border-radius: 999px;
