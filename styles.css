@@ -803,11 +803,21 @@ button { font-family: var(--sans); cursor: pointer; }
   /* Zeile 1: Titel links, Betrag rechts - der Betrag bricht nie in die zweite Zeile;
      Zeile 2: Datum, Kategorie, Wer. Der Umbruch dazwischen ist ein leeres Flex-Kind. */
   .tabelle td:nth-child(2) { order: 1; flex: 1 1 0; min-width: 0; font-weight: 700; font-size: 1rem; }
+  /* Ein langer Titel wird mit … gekürzt statt umzubrechen: die Zeile bleibt zweizeilig,
+     der volle Text steht im aria-label und nach dem Tippen im Formular. */
+  #buchungListe td:nth-child(2) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tabelle td.rechts { order: 2; flex: 0 0 auto; margin-left: auto; font-size: 1.08rem; }
   .tabelle tr::after { content: ""; flex-basis: 100%; height: 0; order: 3; }
   .tabelle td:nth-child(1), .tabelle td:nth-child(3), .tabelle td:nth-child(4) {
     order: 4; font-size: 0.83rem; color: var(--tinte-2);
   }
+  /* Die Unterzeile bleibt einzeilig: „Gemeinsam“ entfällt als Normalfall, ein langer
+     Kategoriename wird mit … gekürzt, statt Datum und Wer in eine dritte Zeile zu drängen. */
+  #buchungListe td.wer-gemeinsam { display: none; }
+  #buchungListe td:nth-child(1), #buchungListe td:nth-child(4) { flex: 0 0 auto; white-space: nowrap; }
+  #buchungListe td:nth-child(3) { flex: 1 1 0; min-width: 0; }
+  #buchungListe .kategorie-zelle > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .marke-symbol { padding: 1px 6px; }
   /* Monatliches: die Bezeichnung ist der Titel, „jeden Monat“ steht darunter;
      die Knöpfe gibt es nur noch hier. Drei Knöpfe passen nur enger gesetzt in 283 px;
      wo sie trotzdem nicht passen (320 px), bricht der letzte in eine zweite Reihe um,

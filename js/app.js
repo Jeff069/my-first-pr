@@ -409,6 +409,15 @@
     return iso.slice(8, 10) + '.' + iso.slice(5, 7) + '.';
   }
 
+  /* Eine Marke als Zeichen: Screenreader und Tooltip bekommen das Wort dazu. */
+  function symbolMarke(zeichen, bedeutung) {
+    var marke = neu('span', zeichen, 'marke marke-symbol');
+    marke.setAttribute('role', 'img');
+    marke.setAttribute('aria-label', bedeutung);
+    marke.title = bedeutung;
+    return marke;
+  }
+
   function personMitEmoji(p) {
     return PERSON_EMOJI[p] + ' ' + personName(p);
   }
@@ -681,11 +690,13 @@
       });
 
       /* Aufs Handy passt die Zeile nur ohne Jahr - der Monat steht ohnehin im Kopf.
-         Die Marken stehen beim Datum, damit der Titel neben dem Betrag einzeilig bleibt. */
+         Die Marken stehen beim Datum, damit der Titel neben dem Betrag einzeilig bleibt -
+         als Zeichen statt als Wort, sonst wird die Unterzeile dreizeilig: 🔁 wie der
+         Reiter Monatliches, ⏳ wie der Chip „gehen noch ab“ in der Übersicht. */
       var datumZelle = neu('td', kurzDatum(b.datum));
       datumZelle.appendChild(neu('span', b.datum.slice(0, 4), 'jahr'));
-      if (b.quelle) datumZelle.appendChild(neu('span', 'automatisch', 'marke'));
-      if (b.datum > heute) datumZelle.appendChild(neu('span', 'geplant', 'marke'));
+      if (b.quelle) datumZelle.appendChild(symbolMarke('🔁', 'automatisch'));
+      if (b.datum > heute) datumZelle.appendChild(symbolMarke('⏳', 'geplant'));
       tr.appendChild(datumZelle);
 
       tr.appendChild(neu('td', titel));
@@ -701,7 +712,8 @@
       katZelle.appendChild(huelle);
       tr.appendChild(katZelle);
 
-      tr.appendChild(neu('td', personName(b.person)));
+      /* Gemeinsam ist der Normalfall - auf dem Handy steht nur die Ausnahme (Ich, Partnerin). */
+      tr.appendChild(neu('td', personName(b.person), b.person === 'gemeinsam' ? 'wer-gemeinsam' : null));
 
       tr.appendChild(neu('td', (b.art === 'einnahme' ? '+' : '−') + ' ' + format.eur(b.betrag),
         b.art === 'einnahme' ? 'rechts positiv' : 'rechts'));
