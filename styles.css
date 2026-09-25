@@ -805,11 +805,16 @@ button { font-family: var(--sans); cursor: pointer; }
     order: 4; font-size: 0.83rem; color: var(--tinte-2);
   }
   /* Monatliches: die Bezeichnung ist der Titel, „jeden Monat“ steht darunter;
-     die Knöpfe gibt es nur noch hier. */
+     die Knöpfe gibt es nur noch hier. Drei Knöpfe passen nur enger gesetzt in 283 px;
+     wo sie trotzdem nicht passen (320 px), bricht der letzte in eine zweite Reihe um,
+     statt über Zeile und Karte hinauszuragen und die Seite waagerecht scrollen zu lassen. */
   #dauerListe td:nth-child(1) { order: 1; flex: 1 1 0; min-width: 0; font-weight: 700; font-size: 1rem; color: var(--tinte); }
   #dauerListe td:nth-child(2) { order: 4; flex: 0 1 auto; font-size: 0.83rem; color: var(--tinte-2); font-weight: 400; }
-  #dauerListe td:last-child { order: 5; flex: 1 1 100%; margin-top: 8px; display: flex; gap: 7px; }
-  #dauerListe td:last-child .zeilen-knopf { margin: 0; flex: 1; min-height: 40px; background: var(--karte); }
+  #dauerListe td:last-child { order: 5; flex: 1 1 100%; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 7px; }
+  #dauerListe td:last-child .zeilen-knopf {
+    margin: 0; flex: 1 1 auto; min-width: 0; min-height: 40px;
+    padding: 7px 8px; font-size: 0.8rem; background: var(--karte);
+  }
   #dauerListe td:nth-child(3)::before { content: "am "; }
   .feld-nebenknoepfe button { width: auto; flex: 1 1 0; }
 
