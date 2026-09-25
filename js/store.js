@@ -4,6 +4,9 @@
   'use strict';
 
   var SCHLUESSEL = 'hb.daten.v1';
+  /* Gerätelokale Bequemlichkeiten (zuletzt genutzte Kategorie): bewusst getrennt von
+     den Daten, damit Abgleich und Sicherung sie nie mit aufs andere Handy tragen. */
+  var GERAET_SCHLUESSEL = 'hb.geraet.v1';
   var VERSION = 1;
 
   /* Fällt auf den Speicher im Arbeitsspeicher zurück, wenn localStorage fehlt
@@ -19,6 +22,7 @@
     }
   })();
   var ersatzSpeicher = null;
+  var ersatzGeraet = {};
 
   function neueId(praefix) {
     return praefix + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
@@ -68,7 +72,8 @@
   function leereDaten() {
     return {
       version: VERSION,
-      einstellungen: { personA: VORGABE_NAMEN.a, personB: VORGABE_NAMEN.b, startsaldo: 0, geaendert: '1970-01-01T00:00:00.000Z' },
+      /* letzteEinnahmePerson: wessen Gehalt zuletzt eingetragen wurde - Vorgabe beim nächsten Mal. */
+      einstellungen: { personA: VORGABE_NAMEN.a, personB: VORGABE_NAMEN.b, startsaldo: 0, letzteEinnahmePerson: 'a', geaendert: '1970-01-01T00:00:00.000Z' },
       kategorien: standardKategorien(),
       buchungen: [],
       dauerauftraege: [],
@@ -154,6 +159,7 @@
     });
 
     daten.einstellungen.startsaldo = Math.round(Number(daten.einstellungen.startsaldo) || 0);
+    daten.einstellungen.letzteEinnahmePerson = daten.einstellungen.letzteEinnahmePerson === 'b' ? 'b' : 'a';
     return daten;
   }
 
@@ -181,6 +187,25 @@
     } catch (e) {
       return false;
     }
+  }
+
+  /* Nie ein Fehler, nie ein Fehlen: ohne Speicher ein leeres Objekt bzw. der Stand dieser Sitzung. */
+  function geraetLesen() {
+    if (!speicherVerfuegbar) return Object.assign({}, ersatzGeraet);
+    try {
+      var roh = JSON.parse(global.localStorage.getItem(GERAET_SCHLUESSEL) || '{}');
+      return roh && typeof roh === 'object' ? roh : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function geraetSchreiben(teil) {
+    var neu = Object.assign(geraetLesen(), teil || {});
+    if (!speicherVerfuegbar) { ersatzGeraet = neu; return; }
+    try {
+      global.localStorage.setItem(GERAET_SCHLUESSEL, JSON.stringify(neu));
+    } catch (e) { /* voll oder gesperrt - dann eben ohne Merken */ }
   }
 
   function alleLoeschen() {
@@ -221,6 +246,8 @@
     migrieren: migrieren,
     laden: laden,
     speichern: speichern,
+    geraetLesen: geraetLesen,
+    geraetSchreiben: geraetSchreiben,
     alleLoeschen: alleLoeschen,
     exportJson: exportJson,
     importJson: importJson,

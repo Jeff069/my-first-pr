@@ -270,6 +270,19 @@
     alleszeigen();
   }
 
+  /* Von der Übersicht aus mit einem Tipp ins leere Formular, Betrag zuerst. */
+  function neueBuchungOeffnen() {
+    tabWaehlen(q('tab-buchungen'), false);
+    buchungFormZuruecksetzen();
+    klappe('buchungFormOeffnen', 'buchungFormBereich', true);
+    q('buchungFormOeffnen').lastChild.nodeValue = ' Formular zuklappen';
+    q('buchungBetrag').focus();
+  }
+
+  q('schnellEintragen').addEventListener('click', neueBuchungOeffnen);
+  q('einstiegKnopf').addEventListener('click', neueBuchungOeffnen);
+  q('einstiegDemo').addEventListener('click', function () { q('demoKnopf').click(); });
+
   q('buchungFormOeffnen').addEventListener('click', function () {
     var offen = klappe('buchungFormOeffnen', 'buchungFormBereich');
     q('buchungFormOeffnen').lastChild.nodeValue = offen ? ' Formular zuklappen' : ' Neue Buchung eintragen';
@@ -332,6 +345,12 @@
     q('namenHinweis').hidden = !(daten.einstellungen.personA === store.VORGABE_NAMEN.a
       && daten.einstellungen.personB === store.VORGABE_NAMEN.b);
 
+    /* Ganz am Anfang sagt eine Karte, was zu tun ist - leere Diagramme sagen es nicht. */
+    var leer = !model.buchungenImMonat(daten, aktuellerMonat).length && !daten.dauerauftraege.length;
+    q('einstiegKarte').hidden = !leer;
+    q('schnellEintragen').hidden = leer;
+    document.querySelectorAll('#panel-uebersicht .uebersicht-karte').forEach(function (k) { k.hidden = leer; });
+
     zaehleHoch(q('kzEinnahmen'), u.einnahmen, format.eur);
     zaehleHoch(q('kzAusgaben'), u.ausgaben, format.eur);
 
@@ -353,7 +372,7 @@
     var stehtAus = u.geplanteAusgaben > 0;
     q('kommtNochChip').hidden = !stehtAus;
     q('kommtNochChip').textContent = '⏳ ' + format.eur(u.geplanteAusgaben) + ' gehen noch ab';
-    q('geplantKarte').hidden = !stehtAus;
+    q('geplantKarte').hidden = leer || !stehtAus;
     q('geplantTitel').textContent = 'Geht noch ab: ' + format.eur(u.geplanteAusgaben);
     var geplantListe = q('geplantListe');
     leeren(geplantListe);
@@ -433,7 +452,10 @@
     q('buchungNotiz').value = '';
     q('buchungDatum').value = datumVorgabe();
     q('buchungArt').value = 'ausgabe';
-    fuelleKategorien(q('buchungKategorie'), 'ausgabe');
+    /* Die zuletzt genutzte Kategorie statt „Wohnen & Miete“: Miete kommt von allein,
+       der Wocheneinkauf nicht. Ist sie inzwischen gelöscht, die erste. */
+    fuelleKategorien(q('buchungKategorie'), 'ausgabe', store.geraetLesen().letzteKategorie || 'kat_lebensmittel');
+    if (!q('buchungKategorie').value) q('buchungKategorie').selectedIndex = 0;
     q('buchungPerson').value = 'gemeinsam';
     q('buchungFuer').value = 'beide';
     buchungFuerSchalten();
@@ -491,6 +513,10 @@
 
   q('buchungArt').addEventListener('change', function () {
     fuelleKategorien(q('buchungKategorie'), q('buchungArt').value);
+    /* Gehalt hat einen Empfänger, der Einkauf den gemeinsamen Topf - die Vorgabe folgt der Art. */
+    q('buchungPerson').value = q('buchungArt').value === 'einnahme'
+      ? (daten.einstellungen.letzteEinnahmePerson || 'a')
+      : 'gemeinsam';
     buchungFuerSchalten();
   });
   q('buchungPerson').addEventListener('change', buchungFuerSchalten);
@@ -544,6 +570,8 @@
     var warBearbeitung = !!bearbeiteBuchung;
     aktuellerMonat = eintrag.datum.slice(0, 7);
     frischeZeile = eintrag.id;
+    if (eintrag.art === 'einnahme') daten.einstellungen.letzteEinnahmePerson = eintrag.person;
+    else store.geraetSchreiben({ letzteKategorie: eintrag.kategorieId });
     sichern();
     buchungFormZuruecksetzen();
     klappe('buchungFormOeffnen', 'buchungFormBereich', false);
@@ -553,12 +581,16 @@
     /* Sagen, was die Buchung bewirkt hat - sonst ändert sich die Übersicht
        unbemerkt im Hintergrund. */
     var stand = model.monatsUebersicht(daten, aktuellerMonat);
+    /* Ohne Einnahmen wäre „bleibt −42,90 €“ nur ein Schreck - dann die Ausgabensumme. */
     var text = (warBearbeitung ? '✏️ Geändert' : '✅ Gespeichert')
       + ': ' + (eintrag.art === 'einnahme' ? '+ ' : '− ') + format.eur(eintrag.betrag)
-      + ' · bleibt uns am Monatsende ' + format.eur(stand.saldo);
+      + (stand.einnahmen > 0
+        ? ' · bleibt uns am Monatsende ' + format.eur(stand.saldo)
+        : ' · Ausgaben diesen Monat ' + format.eur(stand.ausgaben));
     /* Hat jemand für den anderen ausgelegt, ändert sich die Ausgleich-Kachel,
        die man vom Reiter Buchungen aus nicht sieht - also mitsagen. */
-    if (eintrag.art === 'ausgabe' && model.fuerVon(eintrag) !== eintrag.person) {
+    if (eintrag.art === 'ausgabe' && (eintrag.person === 'a' || eintrag.person === 'b')
+        && model.fuerVon(eintrag) !== eintrag.person) {
       var g = model.ausgleich(daten, aktuellerMonat);
       text += g.von
         ? ' · Ausgleich jetzt ' + format.eur(g.betrag) + ' ' + personName(g.von) + ' → ' + personName(g.an)

@@ -196,6 +196,18 @@ test('Fixkosten nach Zeitraum: Beendetes und Künftiges zählt im laufenden Mona
   assert.equal(model.fixkostenProMonat(daten, 'ausgabe', '2027-01'), 35000, 'ab dem Startmonat zählt die Kita');
 });
 
+test('Gerätelokales Merken läuft ohne localStorage ohne Fehler', () => {
+  assert.equal(typeof globalThis.localStorage, 'undefined', 'Test setzt eine Umgebung ohne localStorage voraus');
+  assert.deepEqual(store.geraetLesen(), {}, 'nichts gemerkt: leeres Objekt, kein Fehler');
+  store.geraetSchreiben({ letzteKategorie: 'kat_freizeit' });
+  assert.equal(store.geraetLesen().letzteKategorie, 'kat_freizeit', 'in der Sitzung bleibt es gemerkt');
+  store.geraetSchreiben({ anderes: 1 });
+  assert.equal(store.geraetLesen().letzteKategorie, 'kat_freizeit', 'Schreiben ergänzt, statt zu ersetzen');
+  assert.equal(store.leereDaten().einstellungen.letzteEinnahmePerson, 'a');
+  assert.equal(store.migrieren({ buchungen: [], einstellungen: { letzteEinnahmePerson: 'x' } }).einstellungen.letzteEinnahmePerson, 'a', 'Unsinn wird zur Vorgabe');
+  assert.equal(store.migrieren({ buchungen: [], einstellungen: { letzteEinnahmePerson: 'b' } }).einstellungen.letzteEinnahmePerson, 'b');
+});
+
 test('Export und Import ergeben denselben Stand', () => {
   const daten = datenMit(
     [buchung('2026-09-01', 'ausgabe', 12345, { notiz: 'REWE Großeinkauf' })],

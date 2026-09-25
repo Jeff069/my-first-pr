@@ -73,7 +73,7 @@
   function kategorieBalken(el, eintraege) {
     leeren(el);
     if (!eintraege.length) {
-      hinweis(el, 'Für diesen Monat sind noch keine Ausgaben erfasst.');
+      hinweis(el, 'Noch keine Ausgaben in diesem Monat.');
       return;
     }
     var groesster = eintraege[0].betrag || 1;

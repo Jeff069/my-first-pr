@@ -502,6 +502,8 @@ main { max-width: 1040px; margin: 0 auto; padding-bottom: 40px; }
 .feld { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .feld-breit { grid-column: span 2; }
 .feld label { font-size: 0.85rem; font-weight: 600; color: var(--tinte-2); }
+/* Der Betrag ist die eine Zahl, um die es beim Eintragen geht - entsprechend groß. */
+.betrag-gross { font-size: 1.4rem; font-weight: 700; }
 .optional { color: var(--tinte-3); font-weight: 400; }
 
 input, select, textarea {
@@ -592,6 +594,8 @@ button { font-family: var(--sans); cursor: pointer; }
 .leer-hinweis { color: var(--tinte-3); font-size: 0.94rem; margin: 10px 0 0; }
 
 .namen-hinweis { margin: 0 0 14px; color: var(--tinte-2); font-size: 0.94rem; }
+.einstieg-karte p:last-child { margin: 14px 0 0; }
+.einstieg-karte .textlink { font-size: 0.9rem; font-weight: 600; }
 .textlink {
   background: none; border: none; padding: 0; margin: 0;
   font: inherit; font-weight: 650; color: var(--lila-text);
@@ -731,6 +735,7 @@ button { font-family: var(--sans); cursor: pointer; }
   .formular, .filterleiste { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .feld-breit, .feld-knoepfe { grid-column: span 2; }
   input, select, textarea { font-size: 16px; min-height: 48px; }
+  .betrag-gross { font-size: 1.4rem; min-height: 56px; }
   .feld-knoepfe { flex-direction: column; align-items: stretch; }
   .feld-knoepfe button { width: 100%; }
   .knopfreihe > .knopf-primaer, .knopfreihe > .knopf-sekundaer { flex: 1 1 100%; }

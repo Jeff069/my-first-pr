@@ -93,20 +93,32 @@
   <section id="panel-uebersicht" role="tabpanel" aria-labelledby="tab-uebersicht" tabindex="0">
     <!-- Nur solange die Vorgabenamen stehen: auf dem zweiten Handy hieße sonst alles „Ich“ -->
     <p class="namen-hinweis" id="namenHinweis" hidden>👋 <button type="button" id="namenLink" class="textlink">Eure Namen eintragen</button></p>
+
+    <!-- Die wöchentliche Kernaktion mit einem Tipp erreichbar, ohne den Reiter zu wechseln -->
+    <button type="button" id="schnellEintragen" class="knopf-gross"><span class="emoji" aria-hidden="true">➕</span> Ausgabe eintragen</button>
+
+    <!-- Beim allerersten Öffnen: sagen, was zu tun ist, statt leere Karten zu zeigen -->
+    <section class="karte einstieg-karte" id="einstiegKarte" hidden>
+      <h2><span class="emoji" aria-hidden="true">🌱</span>Dieser Monat ist noch leer</h2>
+      <p class="karte-hinweis">Trag die erste Ausgabe ein – der Rest ergibt sich.</p>
+      <button type="button" id="einstiegKnopf" class="knopf-primaer">Erste Buchung eintragen</button>
+      <p><button type="button" id="einstiegDemo" class="textlink">Lieber erst mit Beispielzahlen ausprobieren</button></p>
+    </section>
+
     <!-- Nur sichtbar, wenn in diesem Monat noch etwas abgeht -->
-    <section class="karte" id="geplantKarte" hidden>
+    <section class="karte uebersicht-karte" id="geplantKarte" hidden>
       <h2><span class="emoji" aria-hidden="true">⏳</span><span id="geplantTitel">Geht noch ab</span></h2>
       <ul class="einfache-liste" id="geplantListe"></ul>
     </section>
 
-    <section class="karte">
+    <section class="karte uebersicht-karte">
       <h2><span class="emoji" aria-hidden="true">🧭</span>Wohin das Geld geht</h2>
       <p class="karte-hinweis">Größter Posten zuerst.</p>
       <div id="kategorieDiagramm"></div>
       <button type="button" id="kategorieMehr" class="knopf-klein knopf-breit" hidden>Alle Kategorien anzeigen</button>
     </section>
 
-    <section class="karte" id="ausgleichKarte">
+    <section class="karte uebersicht-karte" id="ausgleichKarte">
       <h2><span class="emoji" aria-hidden="true">🤝</span>Wer gibt wem</h2>
       <p class="betont ag-ergebnis" id="agErgebnis">–</p>
       <ul class="einfache-liste">
@@ -119,12 +131,12 @@
     </section>
 
     <div class="spalten">
-      <section class="karte">
+      <section class="karte uebersicht-karte">
         <h2><span class="emoji" aria-hidden="true">📈</span>Die letzten 6 Monate</h2>
         <p class="karte-hinweis">Rein und Raus je Monat.</p>
         <div id="verlaufDiagramm"></div>
       </section>
-      <section class="karte">
+      <section class="karte uebersicht-karte">
         <h2><span class="emoji" aria-hidden="true">👫</span>Wer hat gezahlt</h2>
         <p class="karte-hinweis">Ausgaben nach Person.</p>
         <div id="personDiagramm"></div>
@@ -146,15 +158,16 @@
       <p class="karte-hinweis">Betrag immer positiv eintragen – ob es abgeht oder hereinkommt, entscheidet das Feld „Art".</p>
       <form id="buchungForm" class="formular" novalidate>
         <input type="hidden" id="buchungId">
-        <div class="feld"><label for="buchungDatum">Datum</label><input type="date" id="buchungDatum" required></div>
-        <div class="feld"><label for="buchungBetrag">Betrag</label><input type="text" inputmode="decimal" id="buchungBetrag" placeholder="z. B. 42,90" required></div>
+        <!-- Der Betrag zuerst und groß: das ist, was man beim Eintragen im Kopf hat -->
+        <div class="feld feld-breit"><label for="buchungBetrag">Betrag</label><input type="text" inputmode="decimal" id="buchungBetrag" class="betrag-gross" placeholder="z. B. 42,90" required></div>
         <div class="feld"><label for="buchungArt">Art</label>
           <select id="buchungArt"><option value="ausgabe">Ausgabe</option><option value="einnahme">Einnahme</option></select>
         </div>
         <div class="feld"><label for="buchungKategorie">Kategorie</label><select id="buchungKategorie"></select></div>
+        <div class="feld feld-breit"><label for="buchungNotiz">Notiz <span class="optional">(hilft beim Wiederfinden)</span></label><input type="text" id="buchungNotiz" placeholder="z. B. Wocheneinkauf"></div>
+        <div class="feld"><label for="buchungDatum">Datum</label><input type="date" id="buchungDatum" required></div>
         <div class="feld"><label for="buchungPerson">Wer hat gezahlt</label><select id="buchungPerson"></select></div>
         <div class="feld" id="buchungFuerFeld"><label for="buchungFuer">Für wen?</label><select id="buchungFuer"></select></div>
-        <div class="feld feld-breit"><label for="buchungNotiz">Notiz <span class="optional">(hilft beim Wiederfinden)</span></label><input type="text" id="buchungNotiz" placeholder="z. B. Wocheneinkauf"></div>
         <div class="feld-knoepfe">
           <button type="submit" class="knopf-primaer">Speichern</button>
           <button type="button" id="buchungAbbrechen" class="knopf-klein">Abbrechen</button>
