@@ -104,7 +104,9 @@
     if (gewaehlt) select.value = gewaehlt;
   }
 
-  var PERSON_EMOJI = { a: '👤', b: '👤', gemeinsam: '👥' };
+  /* Passt zu den Diagrammfarben (Blau, Rosé, Türkis), damit man die Personen
+     im Kopf, in den Karten und in der Auswahl an derselben Farbe erkennt. */
+  var PERSON_EMOJI = { a: '🔵', b: '🩷', gemeinsam: '🟢' };
 
   function fuellePersonen(select, mitAlle, gewaehlt) {
     leeren(select);
@@ -113,6 +115,33 @@
       select.appendChild(option(p, PERSON_EMOJI[p] + '  ' + personName(p)));
     });
     select.value = gewaehlt || (mitAlle ? '' : 'gemeinsam');
+  }
+
+  /* „Für wen?“ - Vorgabe ist „Beide“, damit ein Paar im Normalfall nichts umstellen muss. */
+  function fuellePersonenFuer(select, gewaehlt) {
+    leeren(select);
+    select.appendChild(option('beide', '🤝  Beide'));
+    ['a', 'b'].forEach(function (p) {
+      select.appendChild(option(p, PERSON_EMOJI[p] + '  ' + personName(p)));
+    });
+    select.value = gewaehlt || 'beide';
+  }
+
+  /* Bei Einnahmen und beim gemeinsamen Topf gibt es nichts aufzuteilen:
+     Feld weg und Wert auf „beide“, damit nie eine Schuld aus dem Nichts entsteht. */
+  function fuerFeldSchalten(artSelect, personSelect, feldDiv, fuerSelect) {
+    var ohne = artSelect.value === 'einnahme'
+      || (personSelect.value !== 'a' && personSelect.value !== 'b');
+    feldDiv.hidden = ohne;
+    if (ohne) fuerSelect.value = 'beide';
+  }
+
+  function buchungFuerSchalten() {
+    fuerFeldSchalten(q('buchungArt'), q('buchungPerson'), q('buchungFuerFeld'), q('buchungFuer'));
+  }
+
+  function dauerFuerSchalten() {
+    fuerFeldSchalten(q('dauerArt'), q('dauerPerson'), q('dauerFuerFeld'), q('dauerFuer'));
   }
 
   /* Kurzmeldung am unteren Rand: sagt, was passiert ist, und bietet bei
@@ -242,6 +271,11 @@
     q('kategorieMehr').textContent = alle ? 'Nur die größten fünf zeigen' : 'Alle Kategorien anzeigen';
   });
 
+  q('agMehr').addEventListener('click', function () {
+    var alle = q('agListe').classList.toggle('alle');
+    q('agMehr').textContent = alle ? 'Nur die ersten fünf zeigen' : 'Alle anzeigen';
+  });
+
   q('monatZurueck').addEventListener('click', function () { monatSetzen(model.monatPlus(aktuellerMonat, -1)); });
   q('monatVor').addEventListener('click', function () { monatSetzen(model.monatPlus(aktuellerMonat, 1)); });
   q('monatHeute').addEventListener('click', function () { monatSetzen(format.heuteIso().slice(0, 7)); });
@@ -260,6 +294,7 @@
 
   function zeigeUebersicht() {
     var u = model.monatsUebersicht(daten, aktuellerMonat);
+    var g = model.ausgleich(daten, aktuellerMonat);
 
     zaehleHoch(q('kzEinnahmen'), u.einnahmen, format.eur);
     zaehleHoch(q('kzAusgaben'), u.ausgaben, format.eur);
@@ -268,31 +303,33 @@
     zaehleHoch(saldo, u.saldo, format.eur);
     saldo.className = 'hero-zahl';
     saldo.parentNode.classList.toggle('negativ', u.saldo < 0);
-    q('kzSaldoFuss').textContent = u.saldo < 0
-      ? 'In diesem Monat ist mehr abgeflossen als hereingekommen.'
-      : 'So viel bleibt in diesem Monat übrig.';
+    q('kzSaldoFuss').textContent = u.einnahmen === 0 && u.ausgaben === 0
+      ? 'Noch nichts eingetragen.'
+      : u.saldo < 0
+        ? 'Mehr raus als rein.'
+        : Math.round(u.sparquote) + ' % von dem, was reinkam.';
 
-    /* Zehntel mitzählen, damit die Quote nicht in ganzen Prozent springt. */
-    zaehleHoch(q('kzSparquote'), Math.round(u.sparquote * 10), function (zehntel) {
-      return format.prozent(zehntel / 10);
-    });
+    zaehleHoch(q('kzAusgleich'), g.betrag, format.eur);
+    /* Nur der Geber - der Empfänger ist der andere; so passt auch ein langer Name in die Kachel. */
+    q('kzAusgleichWer').textContent = g.von ? 'von ' + personName(g.von) : 'alles fair ✅';
 
+    /* Was noch abgeht, zeigt sich nur, wenn wirklich etwas aussteht. */
+    var stehtAus = u.geplanteAusgaben > 0;
+    q('kommtNochChip').hidden = !stehtAus;
+    q('kommtNochChip').textContent = '⏳ ' + format.eur(u.geplanteAusgaben) + ' gehen noch ab';
+    q('geplantKarte').hidden = !stehtAus;
+    q('geplantTitel').textContent = 'Geht noch ab: ' + format.eur(u.geplanteAusgaben);
     var geplantListe = q('geplantListe');
     leeren(geplantListe);
-    if (u.geplanteBuchungen.length) {
-      q('geplantSumme').textContent = format.eur(u.geplanteAusgaben);
-      q('geplantFuss').textContent = 'stehen noch aus · in diesem Monat bereits gebucht: '
-        + format.eur(u.gebuchteAusgaben);
-      u.geplanteBuchungen.forEach(function (b) {
-        var li = document.createElement('li');
-        li.appendChild(neu('span', format.datum(b.datum) + ' · ' + (b.notiz || model.kategorieVon(daten, b.kategorieId).name)));
-        li.appendChild(neu('strong', format.eur(b.betrag)));
-        geplantListe.appendChild(li);
-      });
-    } else {
-      q('geplantSumme').textContent = format.eur(0);
-      q('geplantFuss').textContent = 'Für den Rest des Monats steht nichts mehr aus.';
-    }
+    u.geplanteBuchungen.forEach(function (b) {
+      var kat = model.kategorieVon(daten, b.kategorieId);
+      var li = document.createElement('li');
+      li.appendChild(neu('span', kurzDatum(b.datum) + ' · ' + (kat.emoji || '🏷️') + ' ' + (b.notiz || kat.name)));
+      li.appendChild(neu('strong', format.eur(b.betrag)));
+      geplantListe.appendChild(li);
+    });
+
+    zeigeAusgleich(g);
 
     var kategorien = model.nachKategorie(daten, aktuellerMonat, 'ausgabe');
     q('kategorieDiagramm').classList.toggle('ohne-bewegung', !diagrammeAnimieren);
@@ -305,6 +342,52 @@
     charts.personBalken(q('personDiagramm'), model.nachPerson(daten, aktuellerMonat, 'ausgabe'));
   }
 
+  /* Innerhalb der Monatsansicht ist das Jahr überflüssig - so passt die Zeile aufs Handy. */
+  function kurzDatum(iso) {
+    return iso.slice(8, 10) + '.' + iso.slice(5, 7) + '.';
+  }
+
+  function personMitEmoji(p) {
+    return PERSON_EMOJI[p] + ' ' + personName(p);
+  }
+
+  /* Karte „Wer gibt wem“: ein Satz mit dem Ergebnis, zwei Sätze mit dem, was jeder
+     für den anderen ausgelegt hat, und die Posten dahinter. */
+  function zeigeAusgleich(g) {
+    var leer = g.posten.length === 0;
+
+    q('agErgebnis').textContent = g.von
+      ? personMitEmoji(g.von) + ' gibt ' + personMitEmoji(g.an) + ' ' + format.eur(g.betrag) + ' zurück'
+      : leer ? '✅ Alles fair' : '✅ Alles fair – ihr habt gleich viel füreinander ausgelegt.';
+
+    ['a', 'b'].forEach(function (p) {
+      var andere = p === 'a' ? 'b' : 'a';
+      var li = q(p === 'a' ? 'agA' : 'agB');
+      leeren(li);
+      li.appendChild(neu('span', personMitEmoji(p) + ' hat für ' + personMitEmoji(andere) + ' ausgelegt: '));
+      li.appendChild(neu('strong', format.eur(g.bezahltFuerAnderen[p])));
+      li.hidden = leer;
+    });
+    q('agLeer').hidden = !leer;
+
+    var liste = q('agListe');
+    leeren(liste);
+    liste.classList.remove('alle');
+    g.posten.forEach(function (p) {
+      var kat = model.kategorieVon(daten, p.kategorieId);
+      var andere = p.zahler === 'a' ? 'b' : 'a';
+      var li = neu('li', null, 'ag-posten');
+      li.appendChild(neu('span', kurzDatum(p.datum) + ' · ' + (kat.emoji || '🏷️') + ' ' + (p.notiz || kat.name)));
+      li.appendChild(neu('strong', format.eur(p.betrag)));
+      li.appendChild(neu('span', p.fuer === 'beide'
+        ? '→ davon ' + format.eur(p.anteil) + ' für ' + personName(andere)
+        : '→ ganz für ' + personName(andere), 'ag-anteil'));
+      liste.appendChild(li);
+    });
+    q('agMehr').hidden = g.posten.length <= 5;
+    q('agMehr').textContent = 'Alle anzeigen';
+  }
+
   /* ---------------- Buchungen ---------------- */
 
   function buchungFormZuruecksetzen() {
@@ -315,6 +398,8 @@
     q('buchungDatum').value = aktuellerMonat === format.heuteIso().slice(0, 7)
       ? format.heuteIso()
       : aktuellerMonat + '-01';
+    q('buchungFuer').value = 'beide';
+    buchungFuerSchalten();
     q('buchungFormTitel').textContent = 'Neue Buchung';
     q('buchungFehler').hidden = true;
   }
@@ -327,6 +412,8 @@
     q('buchungArt').value = b.art;
     fuelleKategorien(q('buchungKategorie'), b.art, b.kategorieId);
     q('buchungPerson').value = b.person;
+    q('buchungFuer').value = model.fuerVon(b);
+    buchungFuerSchalten();
     q('buchungNotiz').value = b.notiz;
     q('buchungFormTitel').textContent = 'Buchung bearbeiten';
     q('tab-buchungen').click();
@@ -366,7 +453,9 @@
 
   q('buchungArt').addEventListener('change', function () {
     fuelleKategorien(q('buchungKategorie'), q('buchungArt').value);
+    buchungFuerSchalten();
   });
+  q('buchungPerson').addEventListener('change', buchungFuerSchalten);
 
   q('buchungAbbrechen').addEventListener('click', function () {
     buchungFormZuruecksetzen();
@@ -399,6 +488,7 @@
       kategorieId: q('buchungKategorie').value || null,
       notiz: q('buchungNotiz').value.trim(),
       person: q('buchungPerson').value,
+      fuer: q('buchungFuerFeld').hidden ? 'beide' : q('buchungFuer').value,
       quelle: null,
       geaendert: merge.jetzt()
     };
@@ -423,9 +513,18 @@
     /* Sagen, was die Buchung bewirkt hat - sonst ändert sich die Übersicht
        unbemerkt im Hintergrund. */
     var stand = model.monatsUebersicht(daten, aktuellerMonat);
-    meldung((warBearbeitung ? '✏️ Geändert' : '✅ Gespeichert')
+    var text = (warBearbeitung ? '✏️ Geändert' : '✅ Gespeichert')
       + ': ' + (eintrag.art === 'einnahme' ? '+ ' : '− ') + format.eur(eintrag.betrag)
-      + ' · bleibt diesen Monat ' + format.eur(stand.saldo));
+      + ' · bleibt uns am Monatsende ' + format.eur(stand.saldo);
+    /* Hat jemand für den anderen ausgelegt, ändert sich die Ausgleich-Kachel,
+       die man vom Reiter Buchungen aus nicht sieht - also mitsagen. */
+    if (eintrag.art === 'ausgabe' && model.fuerVon(eintrag) !== eintrag.person) {
+      var g = model.ausgleich(daten, aktuellerMonat);
+      text += g.von
+        ? ' · Ausgleich jetzt ' + format.eur(g.betrag) + ' ' + personName(g.von) + ' → ' + personName(g.an)
+        : ' · Ausgleich: alles fair ✅';
+    }
+    meldung(text);
   });
 
   ['filterKategorie', 'filterPerson', 'filterText'].forEach(function (id) {
@@ -554,6 +653,9 @@
       + ' · ' + format.datum(angebot.buchung.datum)
       + ' · ' + kategorieName
       + ' · ' + personName(angebot.buchung.person)
+      + (angebot.buchung.person === 'a' || angebot.buchung.person === 'b'
+        ? ' · für ' + (angebot.buchung.fuer === 'beide' ? 'beide' : personName(angebot.buchung.fuer))
+        : '')
       + (schonDa ? ' — diese Buchung ist bereits erfasst.' : '');
     q('geteiltUebernehmen').hidden = schonDa;
     q('geteiltKarte').hidden = false;
@@ -595,6 +697,8 @@
     q('dauerIntervall').value = 'monatlich';
     q('dauerStart').value = aktuellerMonat;
     q('dauerEnde').value = '';
+    q('dauerFuer').value = 'beide';
+    dauerFuerSchalten();
     q('dauerFormTitel').textContent = 'Neue regelmäßige Zahlung';
     q('dauerFehler').hidden = true;
   }
@@ -607,6 +711,8 @@
     q('dauerArt').value = d.art;
     fuelleKategorien(q('dauerKategorie'), d.art, d.kategorieId);
     q('dauerPerson').value = d.person;
+    q('dauerFuer').value = model.fuerVon(d);
+    dauerFuerSchalten();
     q('dauerTag').value = d.tagImMonat;
     q('dauerIntervall').value = d.intervall;
     q('dauerStart').value = d.startMonat;
@@ -619,7 +725,9 @@
 
   q('dauerArt').addEventListener('change', function () {
     fuelleKategorien(q('dauerKategorie'), q('dauerArt').value);
+    dauerFuerSchalten();
   });
+  q('dauerPerson').addEventListener('change', dauerFuerSchalten);
 
   q('dauerAbbrechen').addEventListener('click', function () {
     dauerFormZuruecksetzen();
@@ -666,6 +774,7 @@
       betrag: betrag,
       kategorieId: q('dauerKategorie').value || null,
       person: q('dauerPerson').value,
+      fuer: q('dauerFuerFeld').hidden ? 'beide' : q('dauerFuer').value,
       tagImMonat: tag,
       intervall: q('dauerIntervall').value,
       startMonat: q('dauerStart').value,
@@ -1023,12 +1132,12 @@
       { tag: '01', art: 'einnahme', betrag: 214000, kategorieId: 'kat_gehalt', notiz: 'Gehalt', person: 'b' },
       { tag: '02', art: 'ausgabe', betrag: 128000, kategorieId: 'kat_wohnen', notiz: 'Miete', person: 'gemeinsam' },
       { tag: '03', art: 'ausgabe', betrag: 9850, kategorieId: 'kat_abos', notiz: 'Internet', person: 'gemeinsam' },
-      { tag: '05', art: 'ausgabe', betrag: 8740, kategorieId: 'kat_lebensmittel', notiz: 'REWE Wocheneinkauf', person: 'b' },
-      { tag: '09', art: 'ausgabe', betrag: 6520, kategorieId: 'kat_mobilitaet', notiz: 'Tanken', person: 'a' },
+      { tag: '05', art: 'ausgabe', betrag: 8740, kategorieId: 'kat_lebensmittel', notiz: 'REWE Wocheneinkauf', person: 'b', fuer: 'beide' },
+      { tag: '09', art: 'ausgabe', betrag: 6520, kategorieId: 'kat_mobilitaet', notiz: 'Tanken', person: 'a', fuer: 'a' },
       { tag: '12', art: 'ausgabe', betrag: 12300, kategorieId: 'kat_lebensmittel', notiz: 'Großeinkauf', person: 'gemeinsam' },
       { tag: '14', art: 'ausgabe', betrag: 4500, kategorieId: 'kat_freizeit', notiz: 'Kino und Essen', person: 'gemeinsam' },
-      { tag: '18', art: 'ausgabe', betrag: 21000, kategorieId: 'kat_versicherung', notiz: 'Haftpflicht', person: 'a' },
-      { tag: '24', art: 'ausgabe', betrag: 7600, kategorieId: 'kat_gesundheit', notiz: 'Apotheke', person: 'b' }
+      { tag: '18', art: 'ausgabe', betrag: 21000, kategorieId: 'kat_versicherung', notiz: 'Haftpflicht', person: 'a', fuer: 'beide' },
+      { tag: '24', art: 'ausgabe', betrag: 7600, kategorieId: 'kat_gesundheit', notiz: 'Apotheke', person: 'b', fuer: 'b' }
     ];
     var vorher = daten.buchungen.length;
     beispiele.forEach(function (b) {
@@ -1041,6 +1150,7 @@
         kategorieId: b.kategorieId,
         notiz: b.notiz,
         person: b.person,
+        fuer: model.fuerVon(b),
         quelle: null
       });
     });
@@ -1214,6 +1324,10 @@
     fuellePersonen(q('buchungPerson'), false, q('buchungPerson').value);
     fuellePersonen(q('dauerPerson'), false, q('dauerPerson').value);
     fuellePersonen(q('filterPerson'), true, q('filterPerson').value);
+    fuellePersonenFuer(q('buchungFuer'), q('buchungFuer').value);
+    fuellePersonenFuer(q('dauerFuer'), q('dauerFuer').value);
+    buchungFuerSchalten();
+    dauerFuerSchalten();
 
     q('personA').value = daten.einstellungen.personA;
     q('personB').value = daten.einstellungen.personB;

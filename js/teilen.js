@@ -39,6 +39,7 @@
     var betrag = Math.round(Number(b.betrag));
     if (!isFinite(betrag) || betrag <= 0) return null;
 
+    var person = b.person === 'a' || b.person === 'b' ? b.person : 'gemeinsam';
     var buchung = {
       id: typeof b.id === 'string' && b.id ? b.id.slice(0, 64) : null,
       datum: b.datum,
@@ -46,7 +47,12 @@
       betrag: betrag,
       kategorieId: typeof b.kategorieId === 'string' ? b.kategorieId.slice(0, 64) : null,
       notiz: typeof b.notiz === 'string' ? b.notiz.slice(0, 200) : '',
-      person: b.person === 'a' || b.person === 'b' ? b.person : 'gemeinsam',
+      person: person,
+      /* Gleiche Regel wie store.fuerNormalisieren (model.js wird hier nicht geladen):
+         fehlt „für wen“ bei a/b, ist es die eigene Sache - keine Schuld aus dem Nichts. */
+      fuer: person === 'a' || person === 'b'
+        ? (b.fuer === 'a' || b.fuer === 'b' || b.fuer === 'beide' ? b.fuer : person)
+        : 'beide',
       quelle: null
     };
     if (!buchung.id) return null;
@@ -73,7 +79,8 @@
         betrag: buchung.betrag,
         kategorieId: buchung.kategorieId,
         notiz: buchung.notiz,
-        person: buchung.person
+        person: buchung.person,
+        fuer: buchung.fuer
       },
       k: kategorie ? { id: kategorie.id, name: kategorie.name, typ: kategorie.typ, slot: kategorie.slot } : null
     };

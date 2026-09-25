@@ -38,13 +38,13 @@
 
   <div class="bilanz" id="bilanz" aria-live="polite">
     <div class="bilanz-haupt">
-      <span class="etikett">Bleibt diesen Monat</span>
+      <span class="etikett">Bleibt uns am Monatsende</span>
       <strong class="hero-zahl" id="kzSaldo">–</strong>
       <span class="bilanz-fuss" id="kzSaldoFuss"></span>
     </div>
     <dl class="bilanz-liste">
       <div>
-        <dt class="etikett"><span class="emoji" aria-hidden="true">📥</span>Rein<span class="dt-erklaerung">alles, was hereinkommt</span></dt>
+        <dt class="etikett"><span class="emoji" aria-hidden="true">📥</span>Rein<span class="dt-erklaerung">alles, was reinkommt</span></dt>
         <dd id="kzEinnahmen">–</dd>
       </div>
       <div>
@@ -52,10 +52,12 @@
         <dd id="kzAusgaben">–</dd>
       </div>
       <div>
-        <dt class="etikett"><span class="emoji" aria-hidden="true">💶</span>Quote<span class="dt-erklaerung">Anteil vom Einkommen, der übrig bleibt</span></dt>
-        <dd id="kzSparquote">–</dd>
+        <dt class="etikett"><span class="emoji" aria-hidden="true">🤝</span>Ausgleich<span class="dt-erklaerung">wer wem etwas zurückgibt</span></dt>
+        <dd id="kzAusgleich">–</dd>
+        <dd class="kachel-fuss" id="kzAusgleichWer"></dd>
       </div>
     </dl>
+    <p class="kopf-chip" id="kommtNochChip" hidden></p>
   </div>
 </header>
 
@@ -89,33 +91,40 @@
 
   <!-- ============================ ÜBERSICHT ============================ -->
   <section id="panel-uebersicht" role="tabpanel" aria-labelledby="tab-uebersicht" tabindex="0">
-    <p class="bereich-intro">Was in diesem Monat hereinkommt, was rausgeht – und wohin.</p>
-
-
-    <section class="karte" id="geplantKarte">
-      <h2><span class="emoji" aria-hidden="true">⏳</span>Kommt diesen Monat noch</h2>
-      <p class="karte-hinweis">Abbuchungen, die im Rest des Monats noch vom Konto gehen. So siehst du, was wirklich frei ist.</p>
-      <p class="betont" id="geplantSumme">–</p>
-      <span class="betont-fuss" id="geplantFuss"></span>
+    <!-- Nur sichtbar, wenn in diesem Monat noch etwas abgeht -->
+    <section class="karte" id="geplantKarte" hidden>
+      <h2><span class="emoji" aria-hidden="true">⏳</span><span id="geplantTitel">Geht noch ab</span></h2>
       <ul class="einfache-liste" id="geplantListe"></ul>
     </section>
 
     <section class="karte">
       <h2><span class="emoji" aria-hidden="true">🧭</span>Wohin das Geld geht</h2>
-      <p class="karte-hinweis">Die Ausgaben des Monats nach Kategorie, größter Posten zuerst.</p>
+      <p class="karte-hinweis">Größter Posten zuerst.</p>
       <div id="kategorieDiagramm"></div>
       <button type="button" id="kategorieMehr" class="knopf-klein knopf-breit" hidden>Alle Kategorien anzeigen</button>
+    </section>
+
+    <section class="karte" id="ausgleichKarte">
+      <h2><span class="emoji" aria-hidden="true">🤝</span>Wer gibt wem</h2>
+      <p class="betont ag-ergebnis" id="agErgebnis">–</p>
+      <ul class="einfache-liste">
+        <li id="agA"></li>
+        <li id="agB"></li>
+      </ul>
+      <p class="karte-hinweis" id="agLeer" hidden>Niemand hat etwas für den anderen ausgelegt. Tipp: beim Eintragen unter „Wer hat gezahlt“ 🔵 Ich oder 🩷 Partnerin wählen – „Für wen?“ steht dann schon auf 🤝 Beide.</p>
+      <ul class="einfache-liste" id="agListe"></ul>
+      <button type="button" id="agMehr" class="knopf-klein knopf-breit" hidden>Alle anzeigen</button>
     </section>
 
     <div class="spalten">
       <section class="karte">
         <h2><span class="emoji" aria-hidden="true">📈</span>Die letzten 6 Monate</h2>
-        <p class="karte-hinweis">Einnahmen und Ausgaben nebeneinander – für den Blick auf die Entwicklung.</p>
+        <p class="karte-hinweis">Rein und Raus je Monat.</p>
         <div id="verlaufDiagramm"></div>
       </section>
       <section class="karte">
         <h2><span class="emoji" aria-hidden="true">👫</span>Wer hat gezahlt</h2>
-        <p class="karte-hinweis">Wie sich die Ausgaben des Monats auf euch beide und auf Gemeinsames verteilen.</p>
+        <p class="karte-hinweis">Ausgaben nach Person.</p>
         <div id="personDiagramm"></div>
       </section>
     </div>
@@ -142,6 +151,7 @@
         </div>
         <div class="feld"><label for="buchungKategorie">Kategorie</label><select id="buchungKategorie"></select></div>
         <div class="feld"><label for="buchungPerson">Wer hat gezahlt</label><select id="buchungPerson"></select></div>
+        <div class="feld" id="buchungFuerFeld"><label for="buchungFuer">Für wen?</label><select id="buchungFuer"></select></div>
         <div class="feld feld-breit"><label for="buchungNotiz">Notiz <span class="optional">(hilft beim Wiederfinden)</span></label><input type="text" id="buchungNotiz" placeholder="z. B. Wocheneinkauf"></div>
         <div class="feld-knoepfe">
           <button type="submit" class="knopf-primaer">Speichern</button>
@@ -202,6 +212,7 @@
         </div>
         <div class="feld"><label for="dauerKategorie">Kategorie</label><select id="dauerKategorie"></select></div>
         <div class="feld"><label for="dauerPerson">Wer zahlt</label><select id="dauerPerson"></select></div>
+        <div class="feld" id="dauerFuerFeld"><label for="dauerFuer">Für wen?</label><select id="dauerFuer"></select></div>
         <div class="feld"><label for="dauerTag">Tag im Monat</label><input type="number" id="dauerTag" min="1" max="31" value="1" required></div>
         <div class="feld"><label for="dauerIntervall">Wie oft</label>
           <select id="dauerIntervall">

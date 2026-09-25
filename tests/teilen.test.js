@@ -6,7 +6,7 @@ const teilen = require('../js/teilen.js');
 
 const BUCHUNG = {
   id: 'b_abc', datum: '2026-09-19', art: 'ausgabe', betrag: 1350,
-  kategorieId: 'kat_freizeit', notiz: 'Blumen für Sära & Co', person: 'b', quelle: null
+  kategorieId: 'kat_freizeit', notiz: 'Blumen für Sära & Co', person: 'b', fuer: 'beide', quelle: null
 };
 const KATEGORIE = { id: 'kat_freizeit', name: 'Freizeit', typ: 'ausgabe', slot: 6 };
 const BASIS = 'https://jeff069.github.io/my-first-pr/';
@@ -33,6 +33,20 @@ test('Die Kennung bleibt gleich - zweimal übernehmen erzeugt keine zwei Buchung
   const a = teilen.ausAdresse(teilen.linkFuer(BUCHUNG, null, BASIS));
   const b = teilen.ausAdresse(teilen.linkFuer(BUCHUNG, null, BASIS));
   assert.equal(a.buchung.id, b.buchung.id);
+});
+
+test('„Für wen?“ übersteht den Link - ohne Angabe gilt die eigene Sache', () => {
+  const beide = teilen.ausAdresse(teilen.linkFuer(BUCHUNG, null, BASIS));
+  assert.equal(beide.buchung.fuer, 'beide');
+
+  const ohne = teilen.pruefen({ b: { id: 'b1', datum: '2026-09-19', betrag: 100, person: 'a' } });
+  assert.equal(ohne.buchung.fuer, 'a', 'alter Link ohne fuer: keine Schuld aus dem Nichts');
+
+  const unsinn = teilen.pruefen({ b: { id: 'b1', datum: '2026-09-19', betrag: 100, person: 'a', fuer: 'oma' } });
+  assert.equal(unsinn.buchung.fuer, 'a');
+
+  const gemeinsam = teilen.pruefen({ b: { id: 'b1', datum: '2026-09-19', betrag: 100, person: 'gemeinsam', fuer: 'a' } });
+  assert.equal(gemeinsam.buchung.fuer, 'beide', 'aus dem gemeinsamen Topf streckt keiner vor');
 });
 
 test('Ohne Anhang kommt nichts zurück', () => {

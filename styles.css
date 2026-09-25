@@ -238,10 +238,12 @@ h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.01em; }
 .bilanz-liste {
   margin: 18px 0 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* minmax(0, …): die Beträge dürfen die Kacheln nicht breiter drücken als ein Drittel. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 .bilanz-liste > div {
+  min-width: 0;
   background: rgba(255, 255, 255, 0.13);
   border-radius: var(--rund-klein);
   padding: 11px 14px;
@@ -260,6 +262,33 @@ h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.01em; }
 }
 .bilanz-liste dd { margin: 3px 0 0; font-size: 1.2rem; font-weight: 750; letter-spacing: -0.02em; white-space: nowrap; }
 .dt-erklaerung { display: none; }
+
+/* Unterzeile der Ausgleich-Kachel („Partnerin → Ich“): bricht nie um, wird abgeschnitten. */
+.bilanz-liste .kachel-fuss {
+  display: block;
+  margin: 2px 0 0;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Kleine Pille unter den Kacheln, gleiche Fläche wie die Kacheln selbst. */
+.kopf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.13);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
 
 /* ---------------- Reiter ---------------- */
 
@@ -331,9 +360,19 @@ main { max-width: 1040px; margin: 0 auto; padding-bottom: 40px; }
 .hilfe p { margin: 12px 0 0; color: var(--tinte-2); font-size: 0.92rem; max-width: 64ch; }
 
 .betont { font-size: 1.65rem; font-weight: 750; margin: 4px 0 0; letter-spacing: -0.02em; }
-.betont-fuss { display: block; margin: 2px 0 14px; font-size: 0.88rem; color: var(--tinte-2); }
 .positiv { color: var(--gut); }
 .negativ { color: var(--rot); }
+
+/* ---------------- Wer gibt wem ---------------- */
+
+/* Ein ganzer Satz - etwas kleiner als eine nackte Zahl, damit er auf dem Handy in zwei Zeilen passt. */
+.ag-ergebnis { font-size: 1.25rem; line-height: 1.35; margin: 4px 0 12px; }
+.ag-posten { flex-wrap: wrap; gap: 2px 14px; }
+/* Notiz auf eine Zeile kürzen, damit der Betrag in seiner Spalte bleibt;
+   der volle Text steht unter Buchungen. */
+.ag-posten > span:first-child { flex: 1 1 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ag-anteil { flex-basis: 100%; color: var(--tinte-2); font-size: 0.88rem; }
+#agListe:not(.alle) li:nth-child(n+6) { display: none; }
 
 /* ---------------- Posten mit Emoji-Feld ---------------- */
 
@@ -654,10 +693,11 @@ button { font-family: var(--sans); cursor: pointer; }
   .monatswahl { padding: 3px; }
   .monatswahl strong { font-size: 0.88rem; min-width: 9.5ch; }
   #monatHeute { padding: 8px 12px; font-size: 0.8rem; }
-  .bilanz-liste { gap: 8px; }
-  .bilanz-liste > div { padding: 9px 11px; }
-  .bilanz-liste dd { font-size: 1.05rem; }
-  .bilanz-liste dt { font-size: 0.66rem; letter-spacing: 0.08em; }
+  /* Drei Kacheln nebeneinander auch bei 375 px: „4.990,00 €“ muss in ein Drittel passen. */
+  .bilanz-liste { gap: 6px; }
+  .bilanz-liste > div { padding: 9px 8px; }
+  .bilanz-liste dd { font-size: 0.98rem; }
+  .bilanz-liste dt { font-size: 0.64rem; letter-spacing: 0.06em; gap: 5px; }
 
   /* Reiter als feste Leiste unten */
   .tableiste {
@@ -721,6 +761,7 @@ button { font-family: var(--sans); cursor: pointer; }
 @media (max-width: 380px) {
   .tableiste button { font-size: 0.62rem; }
   .hero-zahl { font-size: 2.1rem; }
+  .bilanz-liste dd { font-size: 0.92rem; }
 }
 
 /* ---------------- Weniger Bewegung ---------------- */

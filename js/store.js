@@ -53,6 +53,15 @@
     return treffer ? treffer.emoji : null;
   }
 
+  /* Gleiche Regel wie model.fuerVon, hier bewusst noch einmal: store.js lädt model.js
+     nicht. Aus dem gemeinsamen Topf streckt keiner vor, deshalb dort immer 'beide';
+     bei a/b gilt ein gültiges fuer, sonst die eigene Sache. */
+  function fuerNormalisieren(person, fuer) {
+    if (person !== 'a' && person !== 'b') return 'beide';
+    if (fuer === 'a' || fuer === 'b' || fuer === 'beide') return fuer;
+    return person;
+  }
+
   function leereDaten() {
     return {
       version: VERSION,
@@ -113,6 +122,8 @@
         kategorieId: b.kategorieId || null,
         notiz: typeof b.notiz === 'string' ? b.notiz : '',
         person: b.person === 'a' || b.person === 'b' ? b.person : 'gemeinsam',
+        /* „Für wen?“ - Grundlage für den Ausgleich zwischen beiden. */
+        fuer: fuerNormalisieren(b.person, b.fuer),
         quelle: b.quelle && b.quelle.dauerId ? { dauerId: b.quelle.dauerId, monat: b.quelle.monat } : null,
         /* Zeitstempel für den Abgleich zwischen zwei Geräten. */
         geaendert: b.geaendert || '1970-01-01T00:00:00.000Z'
@@ -129,6 +140,7 @@
         betrag: Math.abs(Math.round(Number(d.betrag))),
         kategorieId: d.kategorieId || null,
         person: d.person === 'a' || d.person === 'b' ? d.person : 'gemeinsam',
+        fuer: fuerNormalisieren(d.person, d.fuer),
         tagImMonat: Math.min(31, Math.max(1, parseInt(d.tagImMonat, 10) || 1)),
         intervall: d.intervall === 'vierteljaehrlich' || d.intervall === 'jaehrlich' ? d.intervall : 'monatlich',
         startMonat: d.startMonat || '2000-01',

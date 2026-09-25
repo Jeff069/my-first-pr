@@ -127,6 +127,54 @@
     return reihe;
   }
 
+  /* „Für wen ist die Ausgabe?“ - eine Regel für alte und neue Daten. Aus dem
+     gemeinsamen Topf streckt keiner vor, deshalb dort immer 'beide'; fehlt das
+     Feld bei a/b, ist es die eigene Sache (alte Buchungen erzeugen keine Schulden). */
+  function fuerVon(eintrag) {
+    var e = eintrag || {};
+    if (e.person !== 'a' && e.person !== 'b') return 'beide';
+    if (e.fuer === 'a' || e.fuer === 'b' || e.fuer === 'beide') return e.fuer;
+    return e.person;
+  }
+
+  /* Wer hat für den anderen ausgelegt, und wer gibt wem am Ende etwas zurück?
+     Zählt nur bereits Bezahltes (datum <= heute), immer halbe-halbe. Gerundet
+     wird je Posten, damit die Liste exakt auf die Kennzahl aufgeht. */
+  function ausgleich(daten, monat, heute) {
+    var stichtag = heute || format.heuteIso();
+    var bezahltFuerAnderen = { a: 0, b: 0 };
+
+    var posten = buchungenImMonat(daten, monat).filter(function (b) {
+      return b.art === 'ausgabe' && b.datum <= stichtag
+        && (b.person === 'a' || b.person === 'b') && fuerVon(b) !== b.person;
+    }).sort(function (a, b) {
+      return a.datum < b.datum ? -1 : a.datum > b.datum ? 1 : 0;
+    }).map(function (b) {
+      var fuer = fuerVon(b);
+      var anteil = fuer === 'beide' ? Math.round(b.betrag / 2) : b.betrag;
+      bezahltFuerAnderen[b.person] += anteil;
+      return {
+        id: b.id,
+        datum: b.datum,
+        notiz: b.notiz,
+        kategorieId: b.kategorieId,
+        betrag: b.betrag,
+        zahler: b.person,
+        fuer: fuer,
+        anteil: anteil
+      };
+    });
+
+    var netto = bezahltFuerAnderen.a - bezahltFuerAnderen.b;
+    return {
+      betrag: Math.abs(netto),
+      von: netto > 0 ? 'b' : netto < 0 ? 'a' : null,
+      an: netto > 0 ? 'a' : netto < 0 ? 'b' : null,
+      bezahltFuerAnderen: bezahltFuerAnderen,
+      posten: posten
+    };
+  }
+
   function dauerauftragFaelligIm(dauer, monat) {
     if (!dauer.aktiv) return false;
     if (monat < dauer.startMonat) return false;
@@ -163,6 +211,8 @@
         kategorieId: d.kategorieId,
         notiz: d.bezeichnung,
         person: d.person,
+        /* Klassiker: Miete geht von einem Konto ab, ist aber für beide. */
+        fuer: fuerVon(d),
         quelle: { dauerId: d.id, monat: monat }
       };
     });
@@ -189,6 +239,8 @@
     nachKategorie: nachKategorie,
     nachPerson: nachPerson,
     monatsVerlauf: monatsVerlauf,
+    fuerVon: fuerVon,
+    ausgleich: ausgleich,
     dauerauftragFaelligIm: dauerauftragFaelligIm,
     buchungsDatum: buchungsDatum,
     faelligeBuchungen: faelligeBuchungen,
