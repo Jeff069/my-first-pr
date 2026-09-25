@@ -39,6 +39,11 @@
   --serie-8: #e34948;
   --serie-neutral: #9c9086;
 
+  /* Fokusring: im Hellen das Violett, im Dunkeln die helle Textfarbe - sonst unsichtbar auf dunklen Karten. */
+  --fokus-rand: var(--lila);
+  /* Hauptzahl bei Minus: hell genug fürs Violett (6,9:1) - das dunkle Rot der Karten läge bei 1,9:1. */
+  --hero-minus: #ffb4ad;
+
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --rund: 18px;
   --rund-klein: 12px;
@@ -67,6 +72,8 @@
     --gut-sanft: #17352b;
     --rot: #f08b86;
     --rot-sanft: #35201f;
+    --fokus-rand: var(--lila-text);
+    --hero-minus: var(--rot); /* auf dem dunkleren Violett 6,1:1 */
 
     --serie-1: #3987e5;
     --serie-2: #d95926;
@@ -98,6 +105,8 @@
   --gut-sanft: #17352b;
   --rot: #f08b86;
   --rot-sanft: #35201f;
+  --fokus-rand: var(--lila-text);
+  --hero-minus: var(--rot);
   --serie-1: #3987e5;
   --serie-2: #d95926;
   --serie-3: #199e70;
@@ -171,21 +180,27 @@ h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.01em; }
   align-items: center;
   gap: 9px;
   opacity: 0.92;
+  /* Bei sehr großer Systemschrift darf das eine Wort brechen, statt den Kopf zu sprengen. */
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .kopf h1 .emoji { font-size: 1.15rem; }
 .kopf-unterzeile { margin: 6px 0 0; font-size: 0.88rem; opacity: 0.7; }
 
 .monatswahl {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 3px;
   background: rgba(255, 255, 255, 0.16);
   border-radius: 999px;
   padding: 4px;
 }
-.monatswahl strong { min-width: 10.5ch; text-align: center; font-size: 0.95rem; font-weight: 700; }
+.monatswahl strong { text-align: center; font-size: 0.95rem; font-weight: 700; }
+/* 44 px: die Monatspfeile sind die meistgetippten Ziele der App. */
 .knopf-rund {
-  width: 36px; height: 36px;
+  width: 44px; height: 44px;
   border: none; background: none;
   color: #fff; font-size: 1.15rem;
   border-radius: 50%;
@@ -195,6 +210,7 @@ h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.01em; }
 .kopf .knopf-klein {
   border-color: rgba(255, 255, 255, 0.35);
   color: #fff;
+  min-height: 44px;
 }
 .kopf .knopf-klein:hover { background: rgba(255, 255, 255, 0.16); }
 
@@ -232,6 +248,8 @@ h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.01em; }
   letter-spacing: -0.035em;
   line-height: 1.05;
   margin: 8px 0 3px;
+  /* Lieber umbrechen als seitlich aus dem Kopf laufen (große Systemschrift, 320 px). */
+  overflow-wrap: anywhere;
 }
 .bilanz-fuss { font-size: 0.9rem; opacity: 0.78; }
 
@@ -259,8 +277,10 @@ h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.01em; }
   align-items: center;
   gap: 7px;
   flex-wrap: wrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
-.bilanz-liste dd { margin: 3px 0 0; font-size: 1.2rem; font-weight: 750; letter-spacing: -0.02em; white-space: nowrap; }
+.bilanz-liste dd { margin: 3px 0 0; font-size: 1.2rem; font-weight: 750; letter-spacing: -0.02em; overflow-wrap: anywhere; min-width: 0; }
 .dt-erklaerung { display: none; }
 
 /* Unterzeile der Ausgleich-Kachel („Partnerin → Ich“): bricht nie um, wird abgeschnitten. */
@@ -287,7 +307,7 @@ h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.01em; }
   background: rgba(255, 255, 255, 0.13);
   font-size: 0.85rem;
   font-weight: 600;
-  white-space: nowrap;
+  max-width: 100%;
 }
 
 /* ---------------- Reiter ---------------- */
@@ -324,7 +344,7 @@ h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.01em; }
   cursor: pointer;
   transition: color 0.18s var(--schwung), background-color 0.18s var(--schwung);
 }
-.tableiste button .emoji { font-size: 1.05rem; opacity: 0.55; }
+.tableiste button .emoji { font-size: 1.05rem; opacity: 0.75; }
 .tableiste button:hover { color: var(--tinte); background: var(--karte-tief); }
 .tableiste button[aria-selected="true"] { background: var(--lila-sanft); color: var(--lila-text); }
 .tableiste button[aria-selected="true"] .emoji { opacity: 1; }
@@ -346,7 +366,8 @@ main { max-width: 1040px; margin: 0 auto; padding-bottom: 40px; }
 .karte-hinweis { margin: 0 0 16px; color: var(--tinte-2); font-size: 0.92rem; line-height: 1.6; max-width: 64ch; }
 .karte-hinweis em { font-style: normal; color: var(--tinte); font-weight: 650; }
 .karte-warnung { border-color: color-mix(in srgb, var(--rot) 40%, var(--rand)); }
-.spalten { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; align-items: start; }
+/* minmax(0, …): eine lange Legendenzeile darf die Spalte nicht breiter drücken als die Seite. */
+.spalten { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; align-items: start; }
 
 .bereich-intro { max-width: 66ch; margin: 0 0 16px; color: var(--tinte-2); font-size: 0.96rem; }
 
@@ -361,7 +382,8 @@ main { max-width: 1040px; margin: 0 auto; padding-bottom: 40px; }
 
 .betont { font-size: 1.65rem; font-weight: 750; margin: 4px 0 0; letter-spacing: -0.02em; }
 .positiv { color: var(--gut); }
-.negativ { color: var(--rot); }
+/* Bei Minus wird nur die Hauptzahl rot; Etikett und Satz bleiben weiß und lesbar. */
+.bilanz-haupt.negativ .hero-zahl { color: var(--hero-minus); }
 
 /* ---------------- Wer gibt wem ---------------- */
 
@@ -394,7 +416,7 @@ main { max-width: 1040px; margin: 0 auto; padding-bottom: 40px; }
   font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
   flex: 0 0 auto;
 }
-.posten-mitte { flex: 1; min-width: 0; }
+.posten-mitte { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .posten-name { font-weight: 650; font-size: 0.98rem; }
 .posten-unter { font-size: 0.83rem; color: var(--tinte-3); margin-top: 1px; }
 .posten-betrag { font-weight: 750; font-size: 1.02rem; white-space: nowrap; }
@@ -438,7 +460,7 @@ main { max-width: 1040px; margin: 0 auto; padding-bottom: 40px; }
   list-style: none; display: flex; flex-wrap: wrap; gap: 8px 18px;
   padding: 0; margin: 14px 0 0; font-size: 0.89rem; color: var(--tinte-2);
 }
-.legende li { display: flex; align-items: center; gap: 7px; }
+.legende li { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
 .legende strong { color: var(--tinte); font-weight: 700; }
 
 /* ---------------- Verlauf ---------------- */
@@ -486,7 +508,7 @@ main { max-width: 1040px; margin: 0 auto; padding-bottom: 40px; }
   flex: 0 0 auto;
   background: rgba(255, 255, 255, 0.16);
   border: none; color: #fff;
-  border-radius: 999px; padding: 7px 14px;
+  border-radius: 999px; padding: 11px 16px; min-height: 44px;
   font-size: 0.82rem; font-weight: 700;
 }
 .meldung-aktion:hover { background: rgba(255, 255, 255, 0.28); }
@@ -520,9 +542,8 @@ input, select, textarea {
 }
 input:hover, select:hover { border-color: var(--tinte-3); }
 input:focus, select:focus, textarea:focus {
-  outline: none;
   background: var(--karte);
-  border-color: var(--lila);
+  border-color: var(--fokus-rand);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--lila) 22%, transparent);
 }
 ::placeholder { color: var(--tinte-3); opacity: 1; }
@@ -609,7 +630,7 @@ button { font-family: var(--sans); cursor: pointer; }
   text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
 }
 
-:focus-visible { outline: 2px solid var(--lila); outline-offset: 2px; border-radius: 4px; }
+:focus-visible { outline: 2px solid var(--fokus-rand); outline-offset: 2px; border-radius: 4px; }
 .kopf :focus-visible { outline-color: #fff; }
 
 /* ---------------- Tabellen ---------------- */
@@ -627,7 +648,7 @@ button { font-family: var(--sans); cursor: pointer; }
 /* Jede Buchungszeile ist ein Knopf: Tippen öffnet das Bearbeiten. */
 #buchungListe tr { cursor: pointer; }
 #buchungListe tr:active { background: var(--lila-sanft); }
-#buchungListe tr:focus-visible { outline: 2px solid var(--lila); outline-offset: -2px; }
+#buchungListe tr:focus-visible { outline: 2px solid var(--fokus-rand); outline-offset: -2px; }
 .tabelle .rechts { text-align: right; white-space: nowrap; }
 .tabelle td.rechts { font-weight: 700; font-size: 1rem; }
 .tabelle td.rechts.positiv { color: var(--gut); }
@@ -697,7 +718,7 @@ button { font-family: var(--sans); cursor: pointer; }
 }
 
 @media (max-width: 860px) {
-  .spalten { grid-template-columns: 1fr; }
+  .spalten { grid-template-columns: minmax(0, 1fr); }
   .feld-breit { grid-column: span 1; }
 }
 
@@ -713,12 +734,12 @@ button { font-family: var(--sans); cursor: pointer; }
   .kopf h1 { font-size: 0.85rem; }
   .kopf-unterzeile { display: none; }
   .monatswahl { padding: 3px; }
-  .monatswahl strong { font-size: 0.88rem; min-width: 9.5ch; }
+  .monatswahl strong { font-size: 0.88rem; }
   #monatHeute { padding: 8px 12px; font-size: 0.8rem; }
   /* Drei Kacheln nebeneinander auch bei 375 px: „4.990,00 €“ muss in ein Drittel passen. */
   .bilanz-liste { gap: 6px; }
   .bilanz-liste > div { padding: 9px 8px; }
-  .bilanz-liste dd { font-size: 0.98rem; }
+  .bilanz-liste dd { font-size: 1rem; }
   .bilanz-liste dt { font-size: 0.64rem; letter-spacing: 0.06em; gap: 5px; }
 
   /* Reiter als feste Leiste unten */
@@ -726,7 +747,7 @@ button { font-family: var(--sans); cursor: pointer; }
     position: fixed; left: 0; right: 0; bottom: 0;
     z-index: 30; margin: 0;
     padding: 7px 7px env(safe-area-inset-bottom, 7px);
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px;
     border: none; border-top: 1px solid var(--rand);
     border-radius: 0;
     background: var(--karte);
@@ -734,7 +755,7 @@ button { font-family: var(--sans); cursor: pointer; }
   }
   .tableiste button {
     flex-direction: column; gap: 3px;
-    padding: 7px 2px; min-height: 56px;
+    padding: 7px 0; min-height: 56px; min-width: 0; overflow-wrap: anywhere;
     font-size: 0.68rem; font-weight: 600;
     border-radius: 14px;
   }
@@ -794,12 +815,21 @@ button { font-family: var(--sans); cursor: pointer; }
 }
 
 @media (max-width: 380px) {
-  .tableiste button { font-size: 0.62rem; }
+  .tableiste button { font-size: 0.66rem; }
   .hero-zahl { font-size: 2.1rem; }
   .bilanz-liste dd { font-size: 0.92rem; }
 }
 
 /* ---------------- Weniger Bewegung ---------------- */
+
+/* Ganz schmale Geräte: „Einstellungen“ muss in ein Viertel von 320 px passen, ohne mitten im Wort zu brechen. */
+@media (max-width: 340px) {
+  .tableiste button { font-size: 0.6rem; letter-spacing: -0.01em; }
+  /* Enger gesetzt, damit „4.990,00 €“ in einem Drittel von 320 px einzeilig bleibt. */
+  .bilanz-liste { gap: 4px; }
+  .bilanz-liste > div { padding: 9px 6px; }
+  .bilanz-liste dd { font-size: 0.84rem; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
