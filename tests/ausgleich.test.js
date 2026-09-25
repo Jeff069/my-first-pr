@@ -18,14 +18,12 @@ function datenMit(buchungen, dauerauftraege) {
   return daten;
 }
 
-/* Die Beispieldaten aus dem Demo-Knopf (js/app.js) für September 2026,
-   mit den fuer-Markierungen aus dem Konzept. */
+/* Die Beispieldaten aus dem Demo-Knopf (js/app.js) für September 2026, Stichtag 25.09.:
+   sieben Einzelbuchungen mit den fuer-Markierungen aus dem Konzept plus vier regelmäßige
+   Zahlungen, deren Buchungen wie in der App über faelligeBuchungen entstehen. */
 function demoDaten(mitFuer) {
   const beispiele = [
-    { tag: '01', art: 'einnahme', betrag: 285000, kategorieId: 'kat_gehalt', notiz: 'Gehalt', person: 'a' },
     { tag: '01', art: 'einnahme', betrag: 214000, kategorieId: 'kat_gehalt', notiz: 'Gehalt', person: 'b' },
-    { tag: '02', art: 'ausgabe', betrag: 128000, kategorieId: 'kat_wohnen', notiz: 'Miete', person: 'gemeinsam' },
-    { tag: '03', art: 'ausgabe', betrag: 9850, kategorieId: 'kat_abos', notiz: 'Internet', person: 'gemeinsam' },
     { tag: '05', art: 'ausgabe', betrag: 8740, kategorieId: 'kat_lebensmittel', notiz: 'REWE Wocheneinkauf', person: 'b', fuer: 'beide' },
     { tag: '09', art: 'ausgabe', betrag: 6520, kategorieId: 'kat_mobilitaet', notiz: 'Tanken', person: 'a', fuer: 'a' },
     { tag: '12', art: 'ausgabe', betrag: 12300, kategorieId: 'kat_lebensmittel', notiz: 'Großeinkauf', person: 'gemeinsam' },
@@ -33,12 +31,31 @@ function demoDaten(mitFuer) {
     { tag: '18', art: 'ausgabe', betrag: 21000, kategorieId: 'kat_versicherung', notiz: 'Haftpflicht', person: 'a', fuer: 'beide' },
     { tag: '24', art: 'ausgabe', betrag: 7600, kategorieId: 'kat_gesundheit', notiz: 'Apotheke', person: 'b', fuer: 'b' }
   ];
-  return datenMit(beispiele.map((b, i) => {
+  const beispielDauer = [
+    { bezeichnung: 'Gehalt', art: 'einnahme', betrag: 285000, kategorieId: 'kat_gehalt', person: 'a', tagImMonat: 1 },
+    { bezeichnung: 'Miete', art: 'ausgabe', betrag: 128000, kategorieId: 'kat_wohnen', person: 'gemeinsam', tagImMonat: 1 },
+    { bezeichnung: 'Internet', art: 'ausgabe', betrag: 9850, kategorieId: 'kat_abos', person: 'gemeinsam', tagImMonat: 3 },
+    { bezeichnung: 'Strom', art: 'ausgabe', betrag: 9000, kategorieId: 'kat_wohnen', person: 'gemeinsam', tagImMonat: 28 }
+  ];
+  const daten = datenMit(beispiele.map((b, i) => {
     const eintrag = { id: 'demo_' + i, datum: '2026-09-' + b.tag, art: b.art, betrag: b.betrag, kategorieId: b.kategorieId, notiz: b.notiz, person: b.person, quelle: null };
     if (mitFuer && b.fuer) eintrag.fuer = b.fuer;
     return eintrag;
-  }));
+  }), beispielDauer.map((d, i) => Object.assign({ id: 'demo_d' + i, fuer: 'beide', intervall: 'monatlich', startMonat: '2026-09', endMonat: null, aktiv: true }, d)));
+  daten.buchungen = daten.buchungen.concat(model.faelligeBuchungen(daten, '2026-09'));
+  return daten;
 }
+
+test('Beispielmonat: 11 Buchungen, Strom am 28. steht noch aus', () => {
+  const daten = demoDaten(true);
+  assert.equal(daten.buchungen.length, 11, '7 Einzelbuchungen + 4 erzeugte');
+  const u = model.monatsUebersicht(daten, '2026-09', HEUTE);
+  assert.equal(u.einnahmen, 499000);
+  assert.equal(u.ausgaben, 207510);
+  assert.equal(u.geplanteAusgaben, 9000);
+  assert.equal(u.geplanteBuchungen[0].notiz, 'Strom');
+  assert.equal(model.fixkostenProMonat(daten, 'ausgabe'), 146850);
+});
 
 /* ---------------- fuerVon ---------------- */
 

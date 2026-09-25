@@ -1174,12 +1174,15 @@
   });
 
   q('demoKnopf').addEventListener('click', function () {
-    var monat = aktuellerMonat;
+    var heute = format.heuteIso();
+    var heuteMonat = heute.slice(0, 7);
+    /* In der Zukunft trägt faelligesNachtragen nichts nach - der Beispielmonat
+       landet deshalb spätestens im laufenden Monat. */
+    var monat = aktuellerMonat > heuteMonat ? heuteMonat : aktuellerMonat;
+    var heuteTag = parseInt(heute.slice(8, 10), 10);
+
     var beispiele = [
-      { tag: '01', art: 'einnahme', betrag: 285000, kategorieId: 'kat_gehalt', notiz: 'Gehalt', person: 'a' },
       { tag: '01', art: 'einnahme', betrag: 214000, kategorieId: 'kat_gehalt', notiz: 'Gehalt', person: 'b' },
-      { tag: '02', art: 'ausgabe', betrag: 128000, kategorieId: 'kat_wohnen', notiz: 'Miete', person: 'gemeinsam' },
-      { tag: '03', art: 'ausgabe', betrag: 9850, kategorieId: 'kat_abos', notiz: 'Internet', person: 'gemeinsam' },
       { tag: '05', art: 'ausgabe', betrag: 8740, kategorieId: 'kat_lebensmittel', notiz: 'REWE Wocheneinkauf', person: 'b', fuer: 'beide' },
       { tag: '09', art: 'ausgabe', betrag: 6520, kategorieId: 'kat_mobilitaet', notiz: 'Tanken', person: 'a', fuer: 'a' },
       { tag: '12', art: 'ausgabe', betrag: 12300, kategorieId: 'kat_lebensmittel', notiz: 'Großeinkauf', person: 'gemeinsam' },
@@ -1187,10 +1190,25 @@
       { tag: '18', art: 'ausgabe', betrag: 21000, kategorieId: 'kat_versicherung', notiz: 'Haftpflicht', person: 'a', fuer: 'beide' },
       { tag: '24', art: 'ausgabe', betrag: 7600, kategorieId: 'kat_gesundheit', notiz: 'Apotheke', person: 'b', fuer: 'b' }
     ];
+    /* Was jeden Monat von allein kommt, steht als regelmäßige Zahlung - so zeigt
+       der Beispielmonat auch Abbuchungstag und „Geht noch ab“. Strom liegt bewusst
+       ein paar Tage in der Zukunft. */
+    var beispielDauer = [
+      { bezeichnung: 'Gehalt', art: 'einnahme', betrag: 285000, kategorieId: 'kat_gehalt', person: 'a', tagImMonat: 1 },
+      { bezeichnung: 'Miete', art: 'ausgabe', betrag: 128000, kategorieId: 'kat_wohnen', person: 'gemeinsam', tagImMonat: 1 },
+      { bezeichnung: 'Internet', art: 'ausgabe', betrag: 9850, kategorieId: 'kat_abos', person: 'gemeinsam', tagImMonat: 3 },
+      { bezeichnung: 'Strom', art: 'ausgabe', betrag: 9000, kategorieId: 'kat_wohnen', person: 'gemeinsam', tagImMonat: Math.min(heuteTag + 3, model.tageImMonat(monat)) }
+    ];
+
     var vorher = daten.buchungen.length;
+    var neueBuchungen = [];
+    var neueDauer = [];
+
     beispiele.forEach(function (b) {
+      var id = store.neueId('b');
+      neueBuchungen.push(id);
       daten.buchungen.push({
-        id: store.neueId('b'),
+        id: id,
         geaendert: merge.jetzt(),
         datum: monat + '-' + b.tag,
         art: b.art,
@@ -1202,10 +1220,52 @@
         quelle: null
       });
     });
+    beispielDauer.forEach(function (d) {
+      var id = store.neueId('d');
+      neueDauer.push(id);
+      daten.dauerauftraege.push({
+        id: id,
+        geaendert: merge.jetzt(),
+        bezeichnung: d.bezeichnung,
+        art: d.art,
+        betrag: d.betrag,
+        kategorieId: d.kategorieId,
+        person: d.person,
+        /* Wie im Formular: Einnahme und gemeinsamer Topf haben nichts aufzuteilen. */
+        fuer: 'beide',
+        tagImMonat: d.tagImMonat,
+        intervall: 'monatlich',
+        startMonat: monat,
+        endMonat: null,
+        aktiv: true
+      });
+    });
+    faelligesNachtragen(monat);
     sichern();
-    diagrammeAnimieren = true;
-    alleszeigen();
-    meldung('🧪 ' + (daten.buchungen.length - vorher) + ' Beispielbuchungen angelegt.');
+    monatSetzen(monat);
+
+    meldung('🧪 Beispielmonat angelegt: ' + (daten.buchungen.length - vorher) + ' Buchungen, '
+      + neueDauer.length + ' regelmäßige Zahlungen', {
+      text: 'Rückgängig',
+      tun: function () {
+        /* Auch die aus den Beispiel-Zahlungen erzeugten Buchungen gehen mit -
+           sonst liefe eine erfundene Miete in echte Folgemonate. */
+        daten.buchungen = daten.buchungen.filter(function (b) {
+          var weg = neueBuchungen.indexOf(b.id) !== -1
+            || !!(b.quelle && neueDauer.indexOf(b.quelle.dauerId) !== -1);
+          if (weg) grabstein(b.id);
+          return !weg;
+        });
+        daten.dauerauftraege = daten.dauerauftraege.filter(function (d) { return neueDauer.indexOf(d.id) === -1; });
+        neueDauer.forEach(grabstein);
+        if (bearbeiteBuchung && !daten.buchungen.some(function (b) { return b.id === bearbeiteBuchung; })) buchungFormZuruecksetzen();
+        if (bearbeiteDauer && neueDauer.indexOf(bearbeiteDauer) !== -1) dauerFormZuruecksetzen();
+        sichern();
+        diagrammeAnimieren = true;
+        alleszeigen();
+        meldung('↩️ Beispielmonat entfernt.');
+      }
+    });
   });
 
   /* ---------------- Gemeinsamer Stand ---------------- */
