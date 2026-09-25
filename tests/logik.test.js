@@ -184,6 +184,18 @@ test('Fixkosten legen Quartals- und Jahresbeiträge auf den Monat um', () => {
   assert.equal(model.fixkostenProMonat(daten), 105000, '1000 € + 600 €/12');
 });
 
+test('Fixkosten nach Zeitraum: Beendetes und Künftiges zählt im laufenden Monat nicht', () => {
+  const heuteMonat = '2026-09';
+  const daten = datenMit([], [
+    { id: 'd1', bezeichnung: 'Abo', art: 'ausgabe', betrag: 1299, intervall: 'monatlich', startMonat: '2025-01', endMonat: '2026-08', aktiv: true },
+    { id: 'd2', bezeichnung: 'Kita', art: 'ausgabe', betrag: 35000, intervall: 'monatlich', startMonat: '2027-01', endMonat: null, aktiv: true }
+  ]);
+  assert.equal(model.fixkostenProMonat(daten, 'ausgabe', heuteMonat), 0, 'Abo lief im Vormonat aus, Kita beginnt erst nächstes Jahr');
+  assert.equal(model.fixkostenProMonat(daten, 'ausgabe'), 36299, 'ohne Monat wie bisher: alles Aktive');
+  assert.equal(model.fixkostenProMonat(daten, 'ausgabe', '2026-08'), 1299, 'im letzten Abo-Monat zählt es noch');
+  assert.equal(model.fixkostenProMonat(daten, 'ausgabe', '2027-01'), 35000, 'ab dem Startmonat zählt die Kita');
+});
+
 test('Export und Import ergeben denselben Stand', () => {
   const daten = datenMit(
     [buchung('2026-09-01', 'ausgabe', 12345, { notiz: 'REWE Großeinkauf' })],

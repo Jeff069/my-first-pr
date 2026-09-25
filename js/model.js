@@ -218,11 +218,14 @@
     });
   }
 
-  /* Jahresbeiträge anteilig umgelegt (600 €/Jahr = 50 €/Monat), sonst lügt die Monatssicht. */
-  function fixkostenProMonat(daten, art) {
+  /* Jahresbeiträge anteilig umgelegt (600 €/Jahr = 50 €/Monat), sonst lügt die Monatssicht.
+     Mit Monat zählen nur Zahlungen, die in diesem Monat laufen: ein beendetes Abo
+     und eine erst nächstes Jahr beginnende Kita gehören nicht zu den festen Kosten von heute. */
+  function fixkostenProMonat(daten, art, monat) {
     var typ = art || 'ausgabe';
     return (daten.dauerauftraege || []).filter(function (d) {
-      return d.aktiv && d.art === typ;
+      return d.aktiv && d.art === typ
+        && (!monat || (d.startMonat <= monat && (!d.endMonat || monat <= d.endMonat)));
     }).reduce(function (s, d) {
       return s + Math.round(d.betrag / (INTERVALL_SCHRITT[d.intervall] || 1));
     }, 0);

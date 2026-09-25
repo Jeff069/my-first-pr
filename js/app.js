@@ -613,7 +613,7 @@
       tr.appendChild(neu('td', format.datum(b.datum)));
 
       var notizZelle = neu('td', b.notiz || '–');
-      if (b.quelle) notizZelle.appendChild(neu('span', 'Dauerauftrag', 'marke'));
+      if (b.quelle) notizZelle.appendChild(neu('span', 'automatisch', 'marke'));
       if (b.datum > heute) notizZelle.appendChild(neu('span', 'geplant', 'marke'));
       tr.appendChild(notizZelle);
 
@@ -834,12 +834,41 @@
       geaendert: merge.jetzt()
     };
 
+    var alt = daten.dauerauftraege.filter(function (d) { return d.id === bearbeiteDauer; })[0];
+
     if (bearbeiteDauer) {
       daten.dauerauftraege = daten.dauerauftraege.map(function (d) {
         return d.id === bearbeiteDauer ? Object.assign({}, d, eintrag) : d;
       });
     } else {
       daten.dauerauftraege.push(eintrag);
+    }
+
+    /* Die Buchung des laufenden Monats zieht mit - sonst bleibt die Übersicht bis
+       zum Monatsende falsch. Nur, wenn sie noch unverändert aus der alten Fassung
+       stammt: was jemand von Hand angepasst hat, wird nicht überschrieben. */
+    var heuteMonat = format.heuteIso().slice(0, 7);
+    var vorher = null;
+    var erzeugte = alt ? daten.buchungen.filter(function (b) {
+      return b.quelle && b.quelle.dauerId === eintrag.id && b.quelle.monat === heuteMonat;
+    })[0] : null;
+    if (erzeugte
+        && erzeugte.betrag === alt.betrag
+        && erzeugte.datum === model.buchungsDatum(heuteMonat, alt.tagImMonat)
+        && erzeugte.notiz === alt.bezeichnung
+        && erzeugte.person === alt.person
+        && model.fuerVon(erzeugte) === model.fuerVon(alt)
+        && erzeugte.art === alt.art
+        && erzeugte.kategorieId === alt.kategorieId) {
+      vorher = Object.assign({}, erzeugte);
+      erzeugte.datum = model.buchungsDatum(heuteMonat, eintrag.tagImMonat);
+      erzeugte.betrag = eintrag.betrag;
+      erzeugte.notiz = eintrag.bezeichnung;
+      erzeugte.person = eintrag.person;
+      erzeugte.fuer = model.fuerVon(eintrag);
+      erzeugte.art = eintrag.art;
+      erzeugte.kategorieId = eintrag.kategorieId;
+      erzeugte.geaendert = merge.jetzt();
     }
 
     var warBearbeitungDauer = !!bearbeiteDauer;
@@ -849,8 +878,26 @@
     q('dauerFormOeffnen').lastChild.nodeValue = ' Regelmäßige Zahlung eintragen';
     alleszeigen();
 
-    meldung((warBearbeitungDauer ? '„' + eintrag.bezeichnung + '" geändert' : '„' + eintrag.bezeichnung + '" eingetragen')
-      + ' · feste Kosten jetzt ' + format.eur(model.fixkostenProMonat(daten, 'ausgabe')) + ' im Monat');
+    if (vorher) {
+      meldung('🔁 „' + eintrag.bezeichnung + '" geändert · auch die Buchung vom ' + format.datum(vorher.datum) + ' angepasst', {
+        text: 'Rückgängig',
+        tun: function () {
+          daten.dauerauftraege = daten.dauerauftraege.map(function (d) {
+            return d.id === alt.id ? Object.assign({}, alt, { geaendert: merge.jetzt() }) : d;
+          });
+          daten.buchungen = daten.buchungen.map(function (b) {
+            return b.id === vorher.id ? Object.assign({}, vorher, { geaendert: merge.jetzt() }) : b;
+          });
+          if (bearbeiteDauer === alt.id) dauerFormZuruecksetzen();
+          sichern();
+          alleszeigen();
+          meldung('↩️ Zurückgesetzt.');
+        }
+      });
+      return;
+    }
+    meldung('🔁 ' + (warBearbeitungDauer ? '„' + eintrag.bezeichnung + '" geändert' : '„' + eintrag.bezeichnung + '" eingetragen')
+      + ' · feste Kosten jetzt ' + format.eur(model.fixkostenProMonat(daten, 'ausgabe', heuteMonat)) + ' im Monat');
   });
 
   function zeigeDaueraufraege() {
@@ -858,17 +905,23 @@
     leeren(tbody);
     q('dauerLeer').hidden = daten.dauerauftraege.length > 0;
     q('dauerTabelle').hidden = daten.dauerauftraege.length === 0;
-    q('fixkostenSumme').textContent = format.eur(model.fixkostenProMonat(daten, 'ausgabe')) + ' im Monat';
+    /* Der Reiter hängt nicht am geblätterten Monat: feste Kosten sind die von heute. */
+    var heuteMonat = format.heuteIso().slice(0, 7);
+    q('fixkostenSumme').textContent = format.eur(model.fixkostenProMonat(daten, 'ausgabe', heuteMonat)) + ' im Monat';
 
     var rhythmus = { monatlich: 'jeden Monat', vierteljaehrlich: 'alle 3 Monate', jaehrlich: 'einmal im Jahr' };
 
     daten.dauerauftraege.forEach(function (d) {
+      var beendet = !!d.endMonat && d.endMonat < heuteMonat;
+      var kuenftig = d.startMonat > heuteMonat;
       var tr = document.createElement('tr');
-      if (!d.aktiv) tr.className = 'inaktiv';
+      if (!d.aktiv || beendet || kuenftig) tr.className = 'inaktiv';
 
       var nameZelle = neu('td', d.bezeichnung);
       if (!d.aktiv) nameZelle.appendChild(neu('span', 'pausiert', 'marke'));
-      if (d.endMonat) nameZelle.appendChild(neu('span', 'bis ' + format.monatLabel(d.endMonat), 'marke'));
+      if (beendet) nameZelle.appendChild(neu('span', 'beendet', 'marke'));
+      else if (d.endMonat) nameZelle.appendChild(neu('span', 'bis ' + format.monatLabel(d.endMonat), 'marke'));
+      if (kuenftig) nameZelle.appendChild(neu('span', 'ab ' + format.monatLabel(d.startMonat), 'marke'));
       tr.appendChild(nameZelle);
 
       tr.appendChild(neu('td', rhythmus[d.intervall] || d.intervall));
@@ -897,9 +950,10 @@
         d.geaendert = merge.jetzt();
         sichern();
         alleszeigen();
+        var fixkosten = format.eur(model.fixkostenProMonat(daten, 'ausgabe', format.heuteIso().slice(0, 7)));
         meldung(d.aktiv
-          ? '„' + d.bezeichnung + '" läuft wieder · feste Kosten ' + format.eur(model.fixkostenProMonat(daten, 'ausgabe')) + ' im Monat'
-          : '„' + d.bezeichnung + '" pausiert · feste Kosten ' + format.eur(model.fixkostenProMonat(daten, 'ausgabe')) + ' im Monat');
+          ? '▶️ „' + d.bezeichnung + '" läuft wieder · feste Kosten ' + fixkosten + ' im Monat'
+          : '⏸️ „' + d.bezeichnung + '" pausiert · feste Kosten ' + fixkosten + ' im Monat');
       });
 
       var loeschen = neu('button', 'Löschen', 'zeilen-knopf gefahr');
@@ -1107,7 +1161,7 @@
       vorschau.hidden = false;
       q('importBestaetigen').hidden = false;
       q('importText').textContent = 'Gefunden: ' + importStand.buchungen.length + ' Buchungen, '
-        + importStand.dauerauftraege.length + ' Daueraufträge, ' + importStand.kategorien.length
+        + importStand.dauerauftraege.length + ' regelmäßige Zahlungen, ' + importStand.kategorien.length
         + ' Kategorien. Damit wird der jetzige Stand in diesem Browser ersetzt.';
     };
     leser.readAsText(datei);
@@ -1153,7 +1207,7 @@
     q('importVorschau').hidden = false;
     q('importBestaetigen').hidden = false;
     q('importText').textContent = 'Gefunden: ' + importStand.buchungen.length + ' Buchungen, '
-      + importStand.dauerauftraege.length + ' Daueraufträge, ' + importStand.kategorien.length
+      + importStand.dauerauftraege.length + ' regelmäßige Zahlungen, ' + importStand.kategorien.length
       + ' Kategorien. Damit wird der jetzige Stand in diesem Browser ersetzt.';
   });
 
@@ -1175,7 +1229,7 @@
   });
 
   q('loeschenKnopf').addEventListener('click', function () {
-    if (!global.confirm('Wirklich alle Buchungen, Daueraufträge und Einstellungen löschen? Das lässt sich nicht rückgängig machen.')) return;
+    if (!global.confirm('Wirklich alle Buchungen, regelmäßigen Zahlungen und Einstellungen löschen? Das lässt sich nicht rückgängig machen.')) return;
     store.alleLoeschen();
     daten = store.leereDaten();
     sichern();
