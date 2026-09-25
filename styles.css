@@ -43,6 +43,8 @@
   --fokus-rand: var(--lila);
   /* Hauptzahl bei Minus: hell genug fürs Violett (6,9:1) - das dunkle Rot der Karten läge bei 1,9:1. */
   --hero-minus: #ffb4ad;
+  /* Aufgeklappter Formular-Knopf: gedeckt statt Violett, die weiße Schrift muss aber lesbar bleiben. */
+  --knopf-offen: var(--tinte-2);
 
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --rund: 18px;
@@ -74,6 +76,7 @@
     --rot-sanft: #35201f;
     --fokus-rand: var(--lila-text);
     --hero-minus: var(--rot); /* auf dem dunkleren Violett 6,1:1 */
+    --knopf-offen: #4a4265; /* die helle --tinte-2 läge unter weißer Schrift bei 2:1 */
 
     --serie-1: #3987e5;
     --serie-2: #d95926;
@@ -107,6 +110,7 @@
   --rot-sanft: #35201f;
   --fokus-rand: var(--lila-text);
   --hero-minus: var(--rot);
+  --knopf-offen: #4a4265;
   --serie-1: #3987e5;
   --serie-2: #d95926;
   --serie-3: #199e70;
@@ -610,7 +614,7 @@ button { font-family: var(--sans); cursor: pointer; }
 }
 .knopf-gross:hover { background: var(--lila-tief); }
 .knopf-gross:active { transform: translateY(1px); }
-.knopf-gross[aria-expanded="true"] { background: var(--tinte-2); }
+.knopf-gross[aria-expanded="true"] { background: var(--knopf-offen); }
 .knopf-breit { width: 100%; margin-bottom: 14px; }
 
 .zeilen-knopf {
