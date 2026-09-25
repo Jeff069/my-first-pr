@@ -218,6 +218,43 @@
     });
   }
 
+  /* Nach dem Ändern eines Dauerauftrags: die in diesem Monat schon erzeugte Buchung
+     zieht mit, sofern sie noch unverändert aus der alten Fassung stammt - was jemand
+     von Hand angepasst hat, bleibt. Ist die neue Fassung im Monat gar nicht mehr fällig
+     (beendet, später beginnend, anderer Rhythmus), verschwindet sie ganz: eine Buchung
+     ohne fälligen Dauerauftrag hat in Ausgaben und Verlauf nichts verloren.
+     Ergebnis: null (nichts berührt) oder { was: 'angepasst' | 'entfernt', vorher } zum Zurücknehmen. */
+  function erzeugteBuchungAbgleichen(daten, alt, neu, monat, zeit) {
+    if (!alt) return null;
+    var erzeugte = (daten.buchungen || []).filter(function (b) {
+      return b.quelle && b.quelle.dauerId === neu.id && b.quelle.monat === monat;
+    })[0];
+    if (!erzeugte) return null;
+    var unveraendert = erzeugte.betrag === alt.betrag
+      && erzeugte.datum === buchungsDatum(monat, alt.tagImMonat)
+      && erzeugte.notiz === alt.bezeichnung
+      && erzeugte.person === alt.person
+      && fuerVon(erzeugte) === fuerVon(alt)
+      && erzeugte.art === alt.art
+      && erzeugte.kategorieId === alt.kategorieId;
+    if (!unveraendert) return null;
+
+    var vorher = Object.assign({}, erzeugte);
+    if (!dauerauftragFaelligIm(neu, monat)) {
+      daten.buchungen = daten.buchungen.filter(function (b) { return b.id !== erzeugte.id; });
+      return { was: 'entfernt', vorher: vorher };
+    }
+    erzeugte.datum = buchungsDatum(monat, neu.tagImMonat);
+    erzeugte.betrag = neu.betrag;
+    erzeugte.notiz = neu.bezeichnung;
+    erzeugte.person = neu.person;
+    erzeugte.fuer = fuerVon(neu);
+    erzeugte.art = neu.art;
+    erzeugte.kategorieId = neu.kategorieId;
+    erzeugte.geaendert = zeit;
+    return { was: 'angepasst', vorher: vorher };
+  }
+
   /* Jahresbeiträge anteilig umgelegt (600 €/Jahr = 50 €/Monat), sonst lügt die Monatssicht.
      Mit Monat zählen nur Zahlungen, die in diesem Monat laufen: ein beendetes Abo
      und eine erst nächstes Jahr beginnende Kita gehören nicht zu den festen Kosten von heute. */
@@ -247,6 +284,7 @@
     dauerauftragFaelligIm: dauerauftragFaelligIm,
     buchungsDatum: buchungsDatum,
     faelligeBuchungen: faelligeBuchungen,
+    erzeugteBuchungAbgleichen: erzeugteBuchungAbgleichen,
     fixkostenProMonat: fixkostenProMonat
   };
 

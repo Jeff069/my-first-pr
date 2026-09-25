@@ -176,6 +176,46 @@ test('Quartals- und Jahresrhythmus zählen ab dem Startmonat', () => {
   assert.equal(model.dauerauftragFaelligIm(inaktiv, '2026-03'), false);
 });
 
+test('Geänderter Dauerauftrag: die erzeugte Buchung zieht mit, fällt weg, oder bleibt, wenn sie von Hand geändert war', () => {
+  const monat = '2026-09';
+  const alt = {
+    id: 'd1', bezeichnung: 'Abo', art: 'ausgabe', betrag: 1000, kategorieId: 'kat_freizeit',
+    person: 'gemeinsam', tagImMonat: 1, intervall: 'monatlich', startMonat: '2026-07', endMonat: null, aktiv: true
+  };
+  const erzeugt = () => buchung('2026-09-01', 'ausgabe', 1000, { id: 'b_d1_2026-09', kategorieId: 'kat_freizeit', notiz: 'Abo', person: 'gemeinsam', quelle: { dauerId: 'd1', monat } });
+
+  /* Betrag und Tag ändern: die Buchung wird angepasst */
+  let daten = datenMit([erzeugt()], [alt]);
+  let a = model.erzeugteBuchungAbgleichen(daten, alt, Object.assign({}, alt, { betrag: 1200, tagImMonat: 5 }), monat, 'z1');
+  assert.equal(a.was, 'angepasst');
+  assert.equal(a.vorher.betrag, 1000, 'vorher hält den alten Stand fürs Zurücknehmen');
+  assert.deepEqual([daten.buchungen[0].betrag, daten.buchungen[0].datum, daten.buchungen[0].geaendert], [1200, '2026-09-05', 'z1']);
+
+  /* Ende = Vormonat: im laufenden Monat nicht mehr fällig, die Buchung verschwindet */
+  daten = datenMit([erzeugt()], [alt]);
+  a = model.erzeugteBuchungAbgleichen(daten, alt, Object.assign({}, alt, { endMonat: '2026-08' }), monat, 'z1');
+  assert.equal(a.was, 'entfernt');
+  assert.equal(a.vorher.id, 'b_d1_2026-09');
+  assert.equal(daten.buchungen.length, 0, 'ein beendetes Abo bucht im September nichts mehr');
+  daten.dauerauftraege = [Object.assign({}, alt, { endMonat: '2026-08' })];
+  assert.equal(model.faelligeBuchungen(daten, monat).length, 0, 'und wächst auch nicht nach');
+
+  /* Start in die Zukunft und Rhythmus, der den Monat nicht mehr trifft: ebenso weg */
+  daten = datenMit([erzeugt()], [alt]);
+  assert.equal(model.erzeugteBuchungAbgleichen(daten, alt, Object.assign({}, alt, { startMonat: '2026-10' }), monat, 'z1').was, 'entfernt');
+  daten = datenMit([erzeugt()], [alt]);
+  assert.equal(model.erzeugteBuchungAbgleichen(daten, alt, Object.assign({}, alt, { intervall: 'vierteljaehrlich', startMonat: '2026-08' }), monat, 'z1').was, 'entfernt');
+
+  /* Von Hand angepasste Buchung bleibt - auch wenn die Zahlung jetzt beendet ist */
+  daten = datenMit([buchung('2026-09-03', 'ausgabe', 999, { id: 'b_d1_2026-09', kategorieId: 'kat_freizeit', notiz: 'Abo', person: 'gemeinsam', quelle: { dauerId: 'd1', monat } })], [alt]);
+  assert.equal(model.erzeugteBuchungAbgleichen(daten, alt, Object.assign({}, alt, { endMonat: '2026-08' }), monat, 'z1'), null);
+  assert.equal(daten.buchungen.length, 1);
+
+  /* Ohne alte Fassung (neu angelegt) oder ohne erzeugte Buchung passiert nichts */
+  assert.equal(model.erzeugteBuchungAbgleichen(datenMit([], [alt]), null, alt, monat, 'z1'), null);
+  assert.equal(model.erzeugteBuchungAbgleichen(datenMit([], [alt]), alt, Object.assign({}, alt, { betrag: 5 }), monat, 'z1'), null);
+});
+
 test('Fixkosten legen Quartals- und Jahresbeiträge auf den Monat um', () => {
   const daten = datenMit([], [
     { id: 'd1', bezeichnung: 'Miete', art: 'ausgabe', betrag: 100000, intervall: 'monatlich', startMonat: '2026-01', aktiv: true },

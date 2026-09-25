@@ -903,31 +903,11 @@
     }
 
     /* Die Buchung des laufenden Monats zieht mit - sonst bleibt die Übersicht bis
-       zum Monatsende falsch. Nur, wenn sie noch unverändert aus der alten Fassung
-       stammt: was jemand von Hand angepasst hat, wird nicht überschrieben. */
+       zum Monatsende falsch. Ist die Zahlung jetzt beendet oder beginnt sie erst
+       später, fällt die Buchung weg; von Hand Angepasstes bleibt (siehe model). */
     var heuteMonat = format.heuteIso().slice(0, 7);
-    var vorher = null;
-    var erzeugte = alt ? daten.buchungen.filter(function (b) {
-      return b.quelle && b.quelle.dauerId === eintrag.id && b.quelle.monat === heuteMonat;
-    })[0] : null;
-    if (erzeugte
-        && erzeugte.betrag === alt.betrag
-        && erzeugte.datum === model.buchungsDatum(heuteMonat, alt.tagImMonat)
-        && erzeugte.notiz === alt.bezeichnung
-        && erzeugte.person === alt.person
-        && model.fuerVon(erzeugte) === model.fuerVon(alt)
-        && erzeugte.art === alt.art
-        && erzeugte.kategorieId === alt.kategorieId) {
-      vorher = Object.assign({}, erzeugte);
-      erzeugte.datum = model.buchungsDatum(heuteMonat, eintrag.tagImMonat);
-      erzeugte.betrag = eintrag.betrag;
-      erzeugte.notiz = eintrag.bezeichnung;
-      erzeugte.person = eintrag.person;
-      erzeugte.fuer = model.fuerVon(eintrag);
-      erzeugte.art = eintrag.art;
-      erzeugte.kategorieId = eintrag.kategorieId;
-      erzeugte.geaendert = merge.jetzt();
-    }
+    var abgleich = model.erzeugteBuchungAbgleichen(daten, alt, eintrag, heuteMonat, merge.jetzt());
+    if (abgleich && abgleich.was === 'entfernt') grabstein(abgleich.vorher.id);
 
     var warBearbeitungDauer = !!bearbeiteDauer;
     sichern();
@@ -936,16 +916,23 @@
     q('dauerFormOeffnen').lastChild.nodeValue = ' Regelmäßige Zahlung eintragen';
     alleszeigen();
 
-    if (vorher) {
-      meldung('🔁 „' + eintrag.bezeichnung + '" geändert · auch die Buchung vom ' + format.datum(vorher.datum) + ' angepasst', {
+    if (abgleich) {
+      var vorher = abgleich.vorher;
+      var entfernt = abgleich.was === 'entfernt';
+      meldung('🔁 „' + eintrag.bezeichnung + '" geändert · ' + (entfernt ? 'die' : 'auch die') + ' Buchung vom '
+        + format.datum(vorher.datum) + (entfernt ? ' entfernt' : ' angepasst'), {
         text: 'Rückgängig',
         tun: function () {
           daten.dauerauftraege = daten.dauerauftraege.map(function (d) {
             return d.id === alt.id ? Object.assign({}, alt, { geaendert: merge.jetzt() }) : d;
           });
-          daten.buchungen = daten.buchungen.map(function (b) {
-            return b.id === vorher.id ? Object.assign({}, vorher, { geaendert: merge.jetzt() }) : b;
-          });
+          var zurueck = Object.assign({}, vorher, { geaendert: merge.jetzt() });
+          if (entfernt) {
+            daten.buchungen.push(zurueck);
+            grabsteinEntfernen(vorher.id);
+          } else {
+            daten.buchungen = daten.buchungen.map(function (b) { return b.id === vorher.id ? zurueck : b; });
+          }
           if (bearbeiteDauer === alt.id) dauerFormZuruecksetzen();
           sichern();
           alleszeigen();
