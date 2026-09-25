@@ -460,6 +460,8 @@
     q('buchungFuer').value = 'beide';
     buchungFuerSchalten();
     q('buchungFormTitel').textContent = 'Neue Buchung';
+    q('buchungTeilen').hidden = true;
+    q('buchungLoeschen').hidden = true;
     q('buchungFehler').hidden = true;
   }
 
@@ -475,6 +477,8 @@
     buchungFuerSchalten();
     q('buchungNotiz').value = b.notiz;
     q('buchungFormTitel').textContent = 'Buchung bearbeiten';
+    q('buchungTeilen').hidden = false;
+    q('buchungLoeschen').hidden = false;
     q('tab-buchungen').click();
     klappe('buchungFormOeffnen', 'buchungFormBereich', true);
     q('buchungFormOeffnen').lastChild.nodeValue = ' Formular zuklappen';
@@ -523,6 +527,22 @@
 
   q('buchungAbbrechen').addEventListener('click', function () {
     buchungFormZuruecksetzen();
+    klappe('buchungFormOeffnen', 'buchungFormBereich', false);
+    q('buchungFormOeffnen').lastChild.nodeValue = ' Neue Buchung eintragen';
+  });
+
+  function bearbeiteteBuchung() {
+    return daten.buchungen.filter(function (b) { return b.id === bearbeiteBuchung; })[0] || null;
+  }
+  q('buchungTeilen').addEventListener('click', function () {
+    var b = bearbeiteteBuchung();
+    if (b) buchungTeilen(b);
+  });
+  q('buchungLoeschen').addEventListener('click', function () {
+    var b = bearbeiteteBuchung();
+    if (!b) return;
+    buchungLoeschen(b);
+    /* Die Buchung ist weg - ein leeres Formular hätte hier nichts mehr zu tun. */
     klappe('buchungFormOeffnen', 'buchungFormBereich', false);
     q('buchungFormOeffnen').lastChild.nodeValue = ' Neue Buchung eintragen';
   });
@@ -642,12 +662,26 @@
         }, 60);
       }
 
-      tr.appendChild(neu('td', format.datum(b.datum)));
+      /* Die ganze Zeile öffnet das Bearbeiten - Teilen und Löschen stehen dort im Formular,
+         statt bei jeder Zeile griffbereit zu liegen. */
+      var titel = b.notiz || kat.name;
+      tr.tabIndex = 0;
+      tr.setAttribute('role', 'button');
+      tr.setAttribute('aria-label', 'Buchung ändern: ' + titel + ', ' + format.eur(b.betrag) + ', ' + format.datum(b.datum));
+      tr.addEventListener('click', function () { buchungBearbeiten(b); });
+      tr.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); buchungBearbeiten(b); }
+      });
 
-      var notizZelle = neu('td', b.notiz || '–');
-      if (b.quelle) notizZelle.appendChild(neu('span', 'automatisch', 'marke'));
-      if (b.datum > heute) notizZelle.appendChild(neu('span', 'geplant', 'marke'));
-      tr.appendChild(notizZelle);
+      /* Aufs Handy passt die Zeile nur ohne Jahr - der Monat steht ohnehin im Kopf.
+         Die Marken stehen beim Datum, damit der Titel neben dem Betrag einzeilig bleibt. */
+      var datumZelle = neu('td', kurzDatum(b.datum));
+      datumZelle.appendChild(neu('span', b.datum.slice(0, 4), 'jahr'));
+      if (b.quelle) datumZelle.appendChild(neu('span', 'automatisch', 'marke'));
+      if (b.datum > heute) datumZelle.appendChild(neu('span', 'geplant', 'marke'));
+      tr.appendChild(datumZelle);
+
+      tr.appendChild(neu('td', titel));
 
       var katZelle = document.createElement('td');
       var huelle = neu('span', null, 'kategorie-zelle');
@@ -655,7 +689,8 @@
       var punkt = neu('span', null, 'farb-punkt');
       punkt.style.background = charts.farbe(kat.slot || 0);
       huelle.appendChild(punkt);
-      huelle.appendChild(neu('span', kat.name));
+      /* Ohne Notiz ist der Kategoriename schon der Titel - nicht zweimal zeigen. */
+      if (b.notiz) huelle.appendChild(neu('span', kat.name));
       katZelle.appendChild(huelle);
       tr.appendChild(katZelle);
 
@@ -663,22 +698,6 @@
 
       tr.appendChild(neu('td', (b.art === 'einnahme' ? '+' : '−') + ' ' + format.eur(b.betrag),
         b.art === 'einnahme' ? 'rechts positiv' : 'rechts'));
-
-      var aktionen = neu('td', null, 'rechts');
-      var bearbeiten = neu('button', 'Bearbeiten', 'zeilen-knopf');
-      bearbeiten.type = 'button';
-      bearbeiten.addEventListener('click', function () { buchungBearbeiten(b); });
-      var verschicken = neu('button', 'Teilen', 'zeilen-knopf');
-      verschicken.type = 'button';
-      verschicken.addEventListener('click', function () { buchungTeilen(b); });
-
-      var loeschen = neu('button', 'Löschen', 'zeilen-knopf gefahr');
-      loeschen.type = 'button';
-      loeschen.addEventListener('click', function () { buchungLoeschen(b); });
-      aktionen.appendChild(bearbeiten);
-      aktionen.appendChild(verschicken);
-      aktionen.appendChild(loeschen);
-      tr.appendChild(aktionen);
 
       tbody.appendChild(tr);
     });

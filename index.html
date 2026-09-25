@@ -146,8 +146,6 @@
 
   <!-- ============================ BUCHUNGEN ============================ -->
   <section id="panel-buchungen" role="tabpanel" aria-labelledby="tab-buchungen" tabindex="0" hidden>
-    <p class="bereich-intro">Jede einzelne Einnahme und Ausgabe – hier eintragen, ändern und nachschlagen.</p>
-
     <button type="button" id="buchungFormOeffnen" class="knopf-gross" aria-expanded="false" aria-controls="buchungFormBereich">
       <span class="emoji" aria-hidden="true">➕</span>
       Neue Buchung eintragen
@@ -155,7 +153,7 @@
 
     <section class="karte" id="buchungFormBereich" hidden>
       <h2><span class="emoji" aria-hidden="true">✏️</span><span id="buchungFormTitel">Neue Buchung</span></h2>
-      <p class="karte-hinweis">Betrag immer positiv eintragen – ob es abgeht oder hereinkommt, entscheidet das Feld „Art".</p>
+      <p class="karte-hinweis">Betrag ohne Minus – ob es abgeht oder reinkommt, sagt „Art“.</p>
       <form id="buchungForm" class="formular" novalidate>
         <input type="hidden" id="buchungId">
         <!-- Der Betrag zuerst und groß: das ist, was man beim Eintragen im Kopf hat -->
@@ -171,6 +169,11 @@
         <div class="feld-knoepfe">
           <button type="submit" class="knopf-primaer">Speichern</button>
           <button type="button" id="buchungAbbrechen" class="knopf-klein">Abbrechen</button>
+          <!-- Nur beim Bearbeiten: Teilen und Löschen gehören zur einen geöffneten Buchung -->
+          <div class="feld-nebenknoepfe">
+            <button type="button" id="buchungTeilen" class="knopf-klein" hidden>Teilen</button>
+            <button type="button" id="buchungLoeschen" class="knopf-klein gefahr" hidden>Löschen</button>
+          </div>
         </div>
       </form>
       <p class="fehler" id="buchungFehler" role="alert" hidden></p>
@@ -178,7 +181,7 @@
 
     <section class="karte">
       <h2><span class="emoji" aria-hidden="true">🧾</span>Buchungen im Monat</h2>
-      <p class="karte-hinweis">Tippe auf <em>Bearbeiten</em>, um etwas zu ändern, oder auf <em>Teilen</em>, um eine Buchung ans andere Telefon zu schicken.</p>
+      <p class="karte-hinweis">Tippe auf eine Buchung, um sie zu ändern, zu teilen oder zu löschen.</p>
 
       <button type="button" id="filterOeffnen" class="knopf-klein knopf-breit" aria-expanded="false" aria-controls="filterBereich">Filtern und suchen</button>
       <div class="filterleiste" id="filterBereich" hidden>
@@ -189,7 +192,7 @@
 
       <div class="tabelle-huelle">
         <table class="tabelle" id="buchungTabelle">
-          <thead><tr><th>Datum</th><th>Notiz</th><th>Kategorie</th><th>Wer</th><th class="rechts">Betrag</th><th></th></tr></thead>
+          <thead><tr><th>Datum</th><th>Notiz</th><th>Kategorie</th><th>Wer</th><th class="rechts">Betrag</th></tr></thead>
           <tbody id="buchungListe"></tbody>
         </table>
       </div>
