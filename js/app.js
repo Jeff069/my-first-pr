@@ -256,10 +256,17 @@
     if (!bearbeiteDauer) q('dauerStart').value = aktuellerMonat;
   }
 
+  /* Ein Filter darf nie unsichtbar weiterwirken - sonst sieht ein Monat leer aus,
+     der es nicht ist, und man trägt Dinge doppelt ein. */
+  function filterLeeren() {
+    ['filterKategorie', 'filterPerson', 'filterText'].forEach(function (id) { q(id).value = ''; });
+  }
+
   function monatSetzen(monat) {
     aktuellerMonat = monat;
     diagrammeAnimieren = true;
     formularDatenAnMonat();
+    filterLeeren();
     alleszeigen();
   }
 
@@ -282,6 +289,13 @@
   q('filterOeffnen').addEventListener('click', function () {
     var offen = klappe('filterOeffnen', 'filterBereich');
     q('filterOeffnen').textContent = offen ? 'Filter zuklappen' : 'Filtern und suchen';
+    if (!offen) { filterLeeren(); zeigeBuchungen(); }
+  });
+
+  q('filterZuruecksetzen').addEventListener('click', function () {
+    filterLeeren();
+    zeigeBuchungen();
+    q('filterOeffnen').focus();
   });
 
   q('kategorieMehr').addEventListener('click', function () {
@@ -563,7 +577,10 @@
     var suche = q('filterText').value.trim().toLowerCase();
     var heute = format.heuteIso();
 
-    var liste = model.buchungenImMonat(daten, aktuellerMonat).filter(function (b) {
+    var alle = model.buchungenImMonat(daten, aktuellerMonat);
+    var gefiltert = !!(katFilter || personFilter || suche);
+
+    var liste = alle.filter(function (b) {
       if (katFilter && b.kategorieId !== katFilter) return false;
       if (personFilter && b.person !== personFilter) return false;
       if (suche && (b.notiz || '').toLowerCase().indexOf(suche) === -1) return false;
@@ -571,6 +588,10 @@
     }).sort(function (a, b) { return a.datum < b.datum ? -1 : a.datum > b.datum ? 1 : 0; });
 
     q('buchungLeer').hidden = liste.length > 0;
+    q('buchungLeerText').textContent = gefiltert
+      ? 'Kein Treffer – ' + alle.length + ' Buchungen ausgeblendet.'
+      : 'In diesem Monat ist noch nichts eingetragen. Tippe oben auf ➕.';
+    q('filterZuruecksetzen').hidden = !gefiltert;
     var hervorheben = frischeZeile;
     frischeZeile = null;
     q('buchungTabelle').hidden = liste.length === 0;
