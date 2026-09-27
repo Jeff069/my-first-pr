@@ -137,6 +137,23 @@ Gelöschtes hinterlässt einen Grabstein, damit es nicht vom anderen Gerät zur�
 gelöschter Eintrag später wieder bearbeitet, gewinnt die Bearbeitung. Ohne Netz arbeitet die App
 normal weiter und gleicht beim nächsten Mal ab.
 
+## Spieleabend (Extra)
+
+Im Ordner [`spieleabend/`](spieleabend/) steckt eine eigene kleine Party-App: ein Handy, alle
+zusammen, keine Installation. Öffnen über `spieleabend/index.html` (oder `…/spieleabend/` auf
+GitHub Pages).
+
+| Spiel | So geht’s |
+|---|---|
+| 🕵️ **Imposter** | Alle sehen dasselbe geheime Wort, nur der Imposter nicht. Reihum ein Wort sagen, dann den Imposter entlarven. 1–3 Imposter, Kategorien wählbar, Diskussions-Timer |
+| 🤳 **Stirnraten** | Handy an die Stirn, die anderen erklären. Nach unten kippen = richtig, nach oben = weiter (oder tippen) |
+| 💣 **Tick Tack Boom** | Begriff zur Kategorie nennen, Handy weitergeben. Wann die Bombe hochgeht, weiß niemand |
+| 👉 **Wer würde eher …?** | Frage lesen, 3 · 2 · 1, alle zeigen gleichzeitig auf jemanden |
+| ⚡ **Reflex-Duell** | 2–4 Leute an einem Handy: wer nach Grün zuerst tippt, punktet. Zu früh kostet einen Punkt |
+
+Eigene Begriffe und Fragen kommen in `spieleabend/woerter.js`, die Spielregeln stehen in
+`spieleabend/logik.js` (getestet in `tests/spieleabend.test.js`).
+
 ## Wo die Daten liegen
 
 Ausschließlich im `localStorage` deines Browsers. Nichts wird übertragen, es gibt keinen Server und

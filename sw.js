@@ -49,7 +49,12 @@ self.addEventListener('activate', function (e) {
 
 self.addEventListener('fetch', function (e) {
   var anfrage = e.request;
-  if (anfrage.method !== 'GET' || new URL(anfrage.url).origin !== self.location.origin) return;
+  var adresse = new URL(anfrage.url);
+  if (anfrage.method !== 'GET' || adresse.origin !== self.location.origin) return;
+
+  /* Der Spieleabend ist eine eigene Seite: nicht als index.html des
+     Haushaltsbuchs ablegen, sondern ganz normal aus dem Netz laden. */
+  if (adresse.pathname.indexOf(new URL('./spieleabend/', self.location).pathname) === 0) return;
 
   /* Seitenaufrufe zuerst aus dem Netz, damit eine neue Fassung ankommt;
      ohne Netz aus dem Bestand. */
