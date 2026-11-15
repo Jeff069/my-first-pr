@@ -19,12 +19,22 @@ Style: cinematic urban graphic novel, hand-drawn with clean dark outlines, contr
 
 Sobald das **Stil-Referenzbild** existiert, wird es bei jeder Generierung als Stil-Referenz mitgegeben.
 
+**Style Lock (Castkit-Methode, wortwörtlich in jeden Figuren- und Umgebungs-Prompt):**
+
+```
+Rendered as a cinematic urban graphic-novel illustration: believable adult human proportions and bone structure, simplified in execution; clean confident dark outlines with varying line weight; matte, poreless skin with soft, finely graded shading carrying the form; controlled hand-drawn textures; hair drawn as grouped locks with a few separate strands; beards and fabric rendered in detail, cloth with real weight and folds; muted base colors with one or two bold color accents; distinctive faces with restrained, expressive features; one consistent drawing style across the entire image.
+```
+
+**Figuren nach Castkit:** Face Lock (Brustbild, 3:4, schwarzes Tanktop, flaches 18-%-Grau, kein Licht) → Outfit → 3-Felder-Blatt. Figuren tragen kein Licht, die Szene (Kiosk) macht das Licht.
+
 ## Figuren
 
 ### Ben Akho
 - Mitte 20, Frankfurt, selbstbewusst, trocken, gelangweilt-überlegen, erklärt korrekt
-- Lockige schwarze Haare, Skin Fade, gepflegter schwarzer Vollbart
-- Schwarzer Pullover mit **„069 Frankfurt"** in gotischer Schrift, verwaschene Jeans, rot-weiße Sneaker
+- **Haare (festgelegt):** schwarz, Skin Fade an Seiten und Hinterkopf, Deckhaar lang mit offenen Locken bis zu den Schultern
+- Gepflegter schwarzer Vollbart, kurz, scharfe Wangenlinie
+- **Kein Muttermal** (vom Nutzer so entschieden)
+- Oberteil mit **nur „069"** in gotischer Schrift (T-Shirt oder Pullover noch offen), verwaschene Jeans, rot-weiße Sneaker
 - **Immer:** Energydrink-Dose (Red Bull) und **Zigarette hinterm Ohr** (nie im Mund – stört die Lippensynchronität)
 - Spricht tief, ruhig, Frankfurter Slang („Babbel net", „Ischwör", „Lan", „Moruk")
 
