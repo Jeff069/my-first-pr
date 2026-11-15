@@ -5,6 +5,7 @@ Hier steht alles, was in neuen Sitzungen nicht verloren gehen darf.
 
 | Datei | Inhalt |
 |---|---|
+| [`UEBERGABE.md`](./UEBERGABE.md) | **Aktueller Stand und nächster Schritt** – zuerst lesen |
 | [`SERIEN-BIBEL.md`](./SERIEN-BIBEL.md) | Figuren, Stil, Orte, feste Regeln, Stimmen, vorhandene Assets |
 | [`HIGGSFIELD-LEITFADEN.md`](./HIGGSFIELD-LEITFADEN.md) | Modellwahl, Prompt-Regeln, Seedance-2.5-Struktur, Kosten, Fehler aus der Praxis |
 | [`FIGUREN-BRIEFS.md`](./FIGUREN-BRIEFS.md) | Ausgefüllte Character Briefs, Nahaufnahme- und Sheet-Prompts für Ben und Kevin |

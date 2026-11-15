@@ -65,7 +65,7 @@ Bewährt für Dialoge: Modell **Eleven v4** (`elevenlabs_v4`) mit `dialogue`-Lis
 
 ## Arbeitsregeln
 - **Vor jeder Generierung, die Credits kostet: Kosten nennen und auf Okay warten.**
-- Der Nutzer generiert selbst auf **higgsfield.ai mit Unlimited**. Über Claude Code gibt es **kein Unlimited** (nur in Claude-Chat, Cowork und ChatGPT).
+- **Unlimited** des Nutzers gilt auf higgsfield.ai sowie im Claude-Chat, in Claude-Projekten und in Cowork (`use_unlim: true`), **nicht** in Claude Code. Im Claude-Projekt darf Claude also mit Unlimited direkt generieren; greift Unlimited für ein Modell nicht, erst Kosten nennen und fragen.
 - Schritt für Schritt: ein Schritt muss sitzen, bevor der nächste kommt. Nicht raten – Ergebnisse vom Nutzer ansehen und konkret bewerten.
 
 ## Vorhandene Dateien in Higgsfield (Stand Folge-1-Vorarbeit)

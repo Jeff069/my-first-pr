@@ -81,6 +81,19 @@ Was nicht abweichen darf: Gesichter, Kleidung, Dose in Bens rechter Hand, Seite 
 - **Kippe hinterm Ohr** wandert gern in den Mund: ausdrücklich „tucked behind his ear" und Mund geschlossen.
 - **Lange Wörter im Neonschild** (KRANKFURT) buchstabieren: `K-R-A-N-K-F-U-R-T`.
 
+## 5b. Castkit-Prinzipien (in eigenen Worten)
+Für alle Figuren-Referenzbilder gilt die Castkit-Methode (Skill „castkit-v1" von Joey):
+- **Zwei Achsen trennen:** Die Figur soll fertig und detailliert aussehen, aber das Bild darf **kein fotografisches Licht** tragen (keine Lichtrichtung, keine Schatten, keine Unschärfe). Sonst wandert dieses Licht in jede spätere Szene. **Die Szene macht das Licht, nie die Figur.**
+- **18-%-Grau als Fläche, nicht als Raum:** kein Boden, keine Wand, kein Horizont, also auch kein Schatten unter den Füßen. Mittelgrau vermeidet Lichtsäume an den Kanten.
+- **Fester Schlussblock („Flat Close"),** immer wortgleich, mit 5 Pflichten: flache Fläche · schattenloses Licht auf der Figur · null Schatten außerhalb · null Überstrahlen · Stil bzw. Realismus voll beschrieben.
+- **Style Lock** einmal festlegen, dann wortwörtlich in jeden Prompt.
+- **Reihenfolge:** Text-Steckbrief → Face Lock (Tanktop) → Outfit → Charakter-Blatt. Nie vorspringen.
+- **Identity Firewall** bei Änderungen: alle unveränderten Merkmale einzeln aufzählen, „nur X ist anders".
+- **Referenzen sparsam,** und bei mehreren sagen, welches Bild was bestimmt (sonst wird gemittelt).
+- **Charakter-Blatt:** 3 Felder, alle exakt frontal bzw. exakt von hinten; Satz zum gleichen Hautton in allen Feldern (Rückenansicht wird sonst dunkler).
+- **Mimik über Muskeln** beschreiben, nicht über Gefühlswörter.
+- **Bild-Prompts:** keine Namen, kein Seitenverhältnis, keine `@Image`-Platzhalter, keine Altersangabe. (Für Seedance-**Video**-Prompts gilt dagegen die `@Image`-Struktur aus Abschnitt 3.)
+
 ## 6. Kosten (über die Claude-Verbindung, Stand Nov. 2026)
 | Was | Kosten |
 |---|---|
@@ -93,6 +106,8 @@ Was nicht abweichen darf: Gesichter, Kleidung, Dose in Bens rechter Hand, Seite 
 | Intone, 480p, 30 s | ca. 90 Credits |
 
 Auf der Website sind Nano Banana Pro, Seedream 5.0 Pro, Seedance 2.5 und Text-to-Speech für den Nutzer **unlimited**.
+
+**Unlimited über Claude:** funktioniert im normalen Claude-Chat, in Claude-Projekten und in Cowork (`use_unlim: true`), **nicht** in Claude Code.
 
 ## 7. Technische Notizen für Claude
 - Higgsfield-Workspace muss ausgewählt sein, sonst sind eigene Stimmen nicht sichtbar (`select_workspace`).

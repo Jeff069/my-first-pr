@@ -1,113 +1,73 @@
-# Figuren-Briefs – Ben und Kevin
+# Figuren-Briefs – Ben und Kevin (Castkit-Methode)
 
-Methode aus dem Skill `character-consistency` (NIGO Studio, MIT): Je genauer die Figur beschrieben ist, desto stabiler bleibt sie. Was nicht im Text steht, existiert für das Modell nicht.
+Figuren werden nach dem Skill **Castkit v1** gebaut (animierter Zweig):
 
-**Ablauf pro Figur**
-1. **Nahaufnahme** erzeugen (Brustbild, frontal, kühles Grau), mehrere Versionen, die beste wird „die Figur".
-2. **3-Felder-Sheet** im Querformat mit der Nahaufnahme als einzigem Referenzbild.
-3. In jedem späteren Prompt die **Rollen-Zeile** verwenden und die Merkmale in Worten wiederholen.
+1. **Text-Steckbrief festlegen** (kostenlos, so lange ändern, bis er sitzt)
+2. **Station 0 – Face Lock:** Brustbild, Gesicht füllt das Bild, schlichtes schwarzes Tanktop, flaches 18-%-Grau, kein Licht. Nano Banana Pro, **3:4** im Tool.
+3. **Station 2 – Outfit:** Outfit direkt auf die festgelegte Figur, Ganzkörper. Erst Outfit-Vorschlag im Text absegnen, dann Bild.
+4. **Station 4 – 3-Felder-Blatt:** aus dem abgesegneten Outfit-Bild. Links Ganzkörper vorne ohne Kopf, Mitte Ganzkörper hinten, rechts Gesicht groß. Alles exakt frontal.
 
-**Modelle (Website, Unlimited prüfen):** Nahaufnahme mit **Nano Banana 2** (für Comic-Figuren empfohlen), Sheet mit **Seedream 5.0 Pro** (für Charakter-Sheets empfohlen) oder ebenfalls Nano Banana 2.
-
-**Wichtig:** Im Sheet steckt nur der **Zeichenstil**, keine Szenen-Stimmung (kein Neon, keine Nacht). Ein neutrales Sheet passt in jede Szene.
+Regeln für Bild-Prompts (Castkit): keine Namen, kein Seitenverhältnis, keine Platzhalter wie `@Image` im Prompt, kein Alter als Zahl. Style Lock und „Animated Flat Close" immer wortwörtlich.
 
 ---
 
 ## Ben Akho
 
-```text
-NAME:        Ben Akho
-AGE / BUILD: man in his mid-20s, average height, solid athletic build, relaxed upright posture
-FACE:        warm medium-brown skin; dark brown eyes with slightly heavy lids that give a calm, unimpressed look;
-             thick dark straight eyebrows; straight nose; small mole on the left cheek;
-             full black beard, neatly trimmed with a sharp cheek line, connected moustache
-HAIR:        short tight black curls on top, skin fade on the sides
-OUTFIT:      black crew-neck cotton sweatshirt, slightly oversized, with "069 Frankfurt" in off-white gothic
-             blackletter on the chest; brown leather belt with a gold buckle; straight dark-washed blue jeans,
-             slightly faded at the thighs; red-and-white retro running sneakers without logos;
-             one white cigarette tucked behind his right ear
-PROP:        blue-silver energy drink can, always held in his right hand
-EXPRESSION:  calm and slightly bored, lips closed, one eyebrow a little raised
+### Steckbrief – FESTGELEGT
+- **Auftreten:** erwachsener Mann, kräftig-sportlich, breite Schultern, ruhig-selbstsichere Haltung
+- **Haut:** warmes Mittelbraun mit olivfarbenem Unterton, matt, klar
+- **Kopf und Gesicht:** leicht längliches Oval, markanter Kiefer unter dem Bart, deutliche Wangenknochen
+- **Augen:** mandelförmig, dunkelbraun, Oberlider leicht schwer
+- **Brauen:** dicht, dunkel, gerade, seine linke Braue minimal höher
+- **Nase:** gerade, Spitze leicht rund
+- **Lippen:** voll, geschlossen, Mundwinkel waagerecht
+- **Haare:** schwarz, Skin Fade an Seiten und Hinterkopf, Deckhaar lang mit offenen Locken bis zu den Schultern
+- **Bart:** schwarzer Vollbart, kurz, gepflegt, scharfe Wangenlinie, sauberer Halsabschluss, Schnurrbart verbunden
+- **Erkennungsmerkmale:** keine (kein Muttermal)
+- **Ausdruck:** neutral-entspannt, ruhig, leicht unbeeindruckt, Mund zu
+
+### Face Lock – Prompt (Nano Banana Pro · 3:4 · 2K · keine Referenz · 4 Versionen)
+```
+A clean character reference headshot of a character, in a vertical frame from the forehead down to the upper chest with the face filling most of the frame — a true close-up, not a portrait with space around it.
+
+A man with a solid, athletic build, broad shoulders and a calm, self-assured bearing. Warm medium-brown skin with an olive undertone, matte, poreless and clear. A slightly long oval head with a strong, defined jaw beneath the beard and clearly drawn cheekbones. Almond-shaped eyes set at a natural distance, the upper lids resting slightly low, dark brown irises designed with one small clean highlight each. Thick, dark, straight eyebrows, his left brow a touch higher than his right. Dense dark lashes drawn as a few clean strokes. A straight nose with a slightly rounded tip, in simplified construction. Full lips, closed and relaxed, corners level, natural mouth width. Ears visible at the sides of the head. Black hair: a clean skin fade on the sides and back, and the longer hair on top grown out into loose, defined black curls that fall freely down to the shoulders, drawn as grouped curly locks with a few separate strands. A full black beard, neatly groomed and short, with a sharp clean cheek line, a clean neckline and a connected moustache.
+
+He wears a plain black ribbed tank, no jewelry, no logos, no graphics. Body squared to camera, head level, neutral relaxed expression, eyes directly to camera, lips closed and relaxed, subtle calm, unimpressed energy.
+
+Rendered as a cinematic urban graphic-novel illustration: believable adult human proportions and bone structure, simplified in execution; clean confident dark outlines with varying line weight; matte, poreless skin with soft, finely graded shading carrying the form; controlled hand-drawn textures; hair drawn as grouped locks with a few separate strands; beards and fabric rendered in detail, cloth with real weight and folds; muted base colors with one or two bold color accents; distinctive faces with restrained, expressive features; one consistent drawing style across the entire image.
+
+The background is a single flat 18% neutral gray field — one uniform value at every pixel corner to corner, identical directly beside the character and in the far corners, with no seam line, no gradient, no hotspot, no vignette, and no falloff anywhere in the frame. It is a flat color field, not a painted environment — no surface, no floor, no wall, no horizon, and no plane the figure stands on or in front of.
+
+Flat model-sheet lighting: the character is lit evenly from the front with no key direction, no shadow side, no rim light, no dramatic value shift across the face, both sides of the face reading at the same brightness. Form is carried by shape, construction, line, and color, and by the folds of the cloth, not by cast light.
+
+Absolutely zero shadow anywhere outside the character — no cast shadow, no contact shadow, no floor shadow, no drop shadow, no halo, no glow, no outline glow, no color bleeding from the character onto the field. The field behind the figure is untouched.
+
+Colors render at their true designed values — skin, hair, and wardrobe exactly as designed, never cooled or muted by the gray. Even clarity edge to edge, no depth of field, no blur, no vignette, no bloom, no atmosphere. A clean finished character model reference, consistent in style across the entire figure.
 ```
 
-### Nahaufnahme (9:16 oder 3:4, keine Referenz)
-```
-Chest-up portrait of Ben Akho, a man in his mid-20s, front view facing the camera, plain cool grey background, even soft studio light.
-EYES: dark brown eyes with slightly heavy lids, calm and unimpressed look, thick dark straight eyebrows, one brow slightly raised.
-SKIN: warm medium-brown skin, straight nose, small mole on the left cheek.
-BEARD AND HAIR: full black beard, neatly trimmed with a sharp cheek line, connected moustache; short tight black curls on top, skin fade on the sides; one white cigarette tucked behind his right ear.
-EXPRESSION: calm, slightly bored, lips closed.
-CLOTHING: black crew-neck sweatshirt with "069 Frankfurt" in off-white gothic blackletter on the chest.
-Style: urban graphic novel, hand-drawn with clean dark outlines, controlled textures, soft finely graded shading, believable adult proportions, muted colors. Sharp focus on the eyes.
-```
+**Checkliste Face Lock:** Stirn bis obere Brust, Gesicht füllt das Bild · Grau gleichmäßig, kein Schatten · beide Gesichtshälften gleich hell · gezeichneter Stil mit Konturen · Fade + Locken bis zur Schulter · kein Muttermal · Tanktop ohne Logo · ruhiger Ausdruck · in einer Menschenmenge wiedererkennbar
 
-### 3-Felder-Sheet (16:9, Referenz = beste Nahaufnahme)
-```
-Character reference sheet of the same person, 16:9 landscape, three panels side by side on one seamless cool grey studio background.
-Left panel (about 45% of the width): bust-up portrait, front view, facing camera.
-Center panel: full body standing straight, front view, arms relaxed, feet visible.
-Right panel: full body standing straight, rear view from directly behind, heels visible.
-Even studio light, identical appearance in all three panels.
-IDENTITY: warm medium-brown skin, dark brown calm eyes, thick dark eyebrows, small mole on the left cheek, full neatly trimmed black beard, short tight black curls with skin fade, white cigarette tucked behind his right ear; black crew-neck sweatshirt with "069 Frankfurt" in off-white gothic blackletter, brown leather belt with gold buckle, straight dark-washed blue jeans, red-and-white retro running sneakers, a blue-silver energy drink can in his right hand.
-Style: urban graphic novel, hand-drawn with clean dark outlines, controlled textures, soft finely graded shading, believable adult proportions, muted colors.
-```
+### Outfit (Station 2) – Vorschlag, noch abzusegnen
+- Schwarzer Rundhals-Pullover aus Baumwolle, leicht oversized, auf der Brust mittig **„069"** in gebrochen-weißer gotischer Frakturschrift (ca. handbreit groß)
+- Brauner Ledergürtel mit goldener Schnalle
+- Gerade geschnittene, dunkel verwaschene Bluejeans, an den Oberschenkeln leicht ausgeblichen
+- Rot-weiße Retro-Laufschuhe ohne Logos
+- Eine weiße Zigarette hinter seinem rechten Ohr
+- Blau-silberne Energydrink-Dose in der rechten Hand
 
-### Rollen-Zeile für spätere Prompts
-```
-@Image 1 defines Ben's facial features, hairstyle, beard and clothing. Do not use the grey background or the panel layout.
-```
+Offene Fragen für später: Gürtel ja/nein? Dose schon im Outfit-Bild oder erst in Szenen?
 
 ---
 
 ## Kevin
 
-```text
-NAME:        Kevin
-AGE / BUILD: man around 20, clearly adult, tall and lanky, taller than Ben, very skinny, long thin arms and legs,
-             slightly hunched shoulders
-FACE:        pale skin with a few faint blemishes; light grey-blue eyes, wide and nervous; eyebrows raised;
-             thin patchy light-brown moustache and light stubble on the chin; a few drops of sweat on the forehead
-HAIR:        short messy light-brown hair under the cap
-OUTFIT:      dark charcoal baseball cap facing forward, slightly crooked; oversized light grey cotton crew-neck
-             sweatshirt; matching very baggy light grey sweatpants with drawstring; small black nylon crossbody bag
-             across the chest; worn white low sneakers without logos
-PROP:        old smartphone with a spiderweb-cracked screen, held in his right hand
-EXPRESSION:  anxious, brows raised, mouth slightly open
-```
+### Steckbrief – ENTWURF (noch nicht festgelegt)
+- **Auftreten:** erwachsener Mann, groß (größer als Ben), sehr dünn und schlaksig, lange dünne Arme und Beine, leicht gebückt, nervös
+- **Haut:** blass, ein paar leichte Unreinheiten nur wenn gewünscht (Castkit: schmeichelhaft, also eher nicht)
+- **Augen:** hell graublau, weit aufgerissen, Brauen hochgezogen
+- **Bart:** dünner, lückenhafter hellbrauner Schnurrbart, leichter Flaum am Kinn
+- **Haare:** kurz, unordentlich, hellbraun, unter einer Cap
+- **Ausdruck:** ängstlich, Brauen hoch, Mund leicht offen
+- **Outfit (Station 2):** dunkelgraue Baseball-Cap nach vorne, leicht schief; zu weiter hellgrauer Jogginganzug (Rundhals-Sweatshirt und sehr weite Jogginghose); kleine schwarze Umhängetasche quer über der Brust; abgetragene weiße No-Name-Sneaker; altes Smartphone mit gesprungenem Display in der rechten Hand
 
-### Nahaufnahme (9:16 oder 3:4, keine Referenz)
-```
-Chest-up portrait of Kevin, a clearly adult man around 20, front view facing the camera, plain cool grey background, even soft studio light.
-EYES: light grey-blue eyes, wide and nervous, eyebrows raised.
-SKIN: pale skin with a few faint blemishes, a few drops of sweat on the forehead, thin patchy light-brown moustache and light stubble on the chin.
-HAIR: short messy light-brown hair under a dark charcoal baseball cap facing forward, slightly crooked.
-EXPRESSION: anxious, mouth slightly open.
-CLOTHING: oversized light grey crew-neck sweatshirt, strap of a small black crossbody bag across the chest.
-Style: urban graphic novel, hand-drawn with clean dark outlines, controlled textures, soft finely graded shading, believable adult proportions, muted colors. Sharp focus on the eyes.
-```
-
-### 3-Felder-Sheet (16:9, Referenz = beste Nahaufnahme)
-```
-Character reference sheet of the same person, 16:9 landscape, three panels side by side on one seamless cool grey studio background.
-Left panel (about 45% of the width): bust-up portrait, front view, facing camera.
-Center panel: full body standing, front view, arms relaxed, feet visible.
-Right panel: full body standing, rear view from directly behind, heels visible.
-Even studio light, identical appearance in all three panels.
-IDENTITY: clearly adult man around 20, tall, lanky and very skinny with long thin arms and legs, slightly hunched; pale skin, light grey-blue nervous eyes, thin patchy light-brown moustache; short messy light-brown hair under a dark charcoal baseball cap facing forward; oversized light grey crew-neck sweatshirt, matching very baggy light grey sweatpants, small black nylon crossbody bag, worn white low sneakers without logos, an old smartphone with a cracked screen in his right hand.
-Style: urban graphic novel, hand-drawn with clean dark outlines, controlled textures, soft finely graded shading, believable adult proportions, muted colors.
-```
-
-### Rollen-Zeile für spätere Prompts
-```
-@Image 2 defines Kevin's facial features, hairstyle, cap and clothing. Do not use the grey background or the panel layout.
-```
-
----
-
-## Checkliste für jedes Ergebnis
-- Alle drei Felder zeigen **dieselbe Person im selben Outfit**
-- **Kühles Grau**, keine Szene im Hintergrund
-- **Klar erwachsen** (Kevin!), realistische Proportionen
-- Kippe **hinterm Ohr** (Ben), Cap **nach vorne** (Kevin)
-- Keine Logos
-- Lieber mehrere Versionen erzeugen und die sauberste nehmen, als ein schlechtes Layout mit Prompt-Änderungen zu reparieren
+**Wichtig bei Kevin:** In jedem Prompt ausdrücklich erwachsen beschreiben (Statur, Größe, Bartwuchs). In früheren Versuchen wurde er sonst wie ein Kind gezeichnet.
