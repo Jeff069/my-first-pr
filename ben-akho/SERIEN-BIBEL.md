@@ -34,7 +34,7 @@ Rendered as a cinematic urban graphic-novel illustration: believable adult human
 - **Haare (festgelegt):** schwarz, Skin Fade an Seiten und Hinterkopf, Deckhaar lang mit offenen Locken bis zu den Schultern
 - Gepflegter schwarzer Vollbart, kurz, scharfe Wangenlinie
 - **Kein Muttermal** (vom Nutzer so entschieden)
-- Oberteil mit **nur „069"** in gotischer Schrift (T-Shirt oder Pullover noch offen), verwaschene Jeans, rot-weiße Sneaker
+- **Schwarzer Pullover** mit **nur „069"** in gotischer Schrift auf der Brust, verwaschene Jeans, rot-weiße Sneaker
 - **Immer:** Energydrink-Dose (Red Bull) und **Zigarette hinterm Ohr** (nie im Mund – stört die Lippensynchronität)
 - Spricht tief, ruhig, Frankfurter Slang („Babbel net", „Ischwör", „Lan", „Moruk")
 
